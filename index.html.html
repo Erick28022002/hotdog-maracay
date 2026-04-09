@@ -227,7 +227,7 @@ input[type=date]{color-scheme:dark;}
     <div class="panel active" id="panel-clover">
       <div class="tnote">Reporte Clover incluye 7% Sales Tax · Ingresa cantidades y totales tal como aparecen</div>
       <div class="card">
-        <div class="ch gr"><span class="ci">🟢</span><div><div class="ct">Clover — Productos</div><div class="cs">Cantidad vendida por producto</div></div></div>
+        <div class="ch gr"><span class="ci">🍀</span><div><div class="ct">Clover — Productos</div><div class="cs">Cantidad vendida por producto</div></div></div>
         <div id="prods-cl"></div>
         <div class="mrow" style="background:rgba(255,214,10,.04)">
           <div class="mlbl" style="font-weight:900">Total ventas ref.<div class="msub">Suma productos</div></div>
@@ -261,7 +261,7 @@ input[type=date]{color-scheme:dark;}
     <div class="panel" id="panel-square">
       <div class="tnote">Reporte Square incluye 7% Sales Tax · Ingresa cantidades y totales tal como aparecen</div>
       <div class="card">
-        <div class="ch bl"><span class="ci">🔵</span><div><div class="ct">Square — Productos</div><div class="cs">Cantidad vendida por producto</div></div></div>
+        <div class="ch bl"><span class="ci">▣</span><div><div class="ct">Square — Productos</div><div class="cs">Cantidad vendida por producto</div></div></div>
         <div id="prods-sq"></div>
         <div class="mrow" style="background:rgba(255,214,10,.04)">
           <div class="mlbl" style="font-weight:900">Total ventas ref.<div class="msub">Suma productos</div></div>
@@ -414,8 +414,8 @@ input[type=date]{color-scheme:dark;}
 
   <!-- BOTTOM NAV -->
   <div class="bnav">
-    <button class="nitem active" data-t="clover" onclick="switchTab('clover')"><span class="ni">🟢</span><span class="nl">Clover</span><span class="nd"></span></button>
-    <button class="nitem" data-t="square" onclick="switchTab('square')"><span class="ni">🔵</span><span class="nl">Square</span><span class="nd"></span></button>
+    <button class="nitem active" data-t="clover" onclick="switchTab('clover')"><span class="ni">🍀</span><span class="nl">Clover</span><span class="nd"></span></button>
+    <button class="nitem" data-t="square" onclick="switchTab('square')"><span class="ni">▣</span><span class="nl">Square</span><span class="nd"></span></button>
     <button class="nitem" data-t="bar" onclick="switchTab('bar')"><span class="ni">🍺</span><span class="nl">Bar</span><span class="nd"></span></button>
     <button class="nitem" data-t="semana" onclick="switchTab('semana')"><span class="ni">📅</span><span class="nl">Semana</span><span class="nd"></span></button>
     <button class="nitem" data-t="total" onclick="switchTab('total')"><span class="ni">💰</span><span class="nl">Total</span><span class="nd"></span></button>
@@ -754,7 +754,7 @@ function buildTotalPanel() {
   const detail = document.getElementById('total-detail');
   detail.innerHTML = `
     <div class="scard">
-      <div class="sch" style="background:linear-gradient(135deg,#071A0D,#0D3320)">🟢 Clover</div>
+      <div class="sch" style="background:linear-gradient(135deg,#071A0D,#0D3320)">🍀 Clover</div>
       <div class="sline"><span class="sl">Ventas ref.</span><span class="sv" style="color:var(--go)">$${fmt(d.clHD)}</span></div>
       ${HD.map(p=>{const q=d.cl_qty[p.k]||0;return q?`<div class="sline" style="padding-left:22px"><span class="sl">${p.n} ×${q}</span><span class="sv" style="color:var(--mu)">$${fmt(q*p.p)}</span></div>`:''}).join('')}
       <div class="sline"><span class="sl">💳 POS</span><span class="sv" style="color:var(--bl)">$${fmt(d.clPos)}</span></div>
@@ -763,7 +763,7 @@ function buildTotalPanel() {
       ${d.tips_cl.map(e=>`<div class="sline" style="padding-left:22px"><span class="sl">👤 ${e.name}</span><span class="sv" style="color:var(--gr)">$${fmt(e.amt)}</span></div>`).join('')}
     </div>
     <div class="scard">
-      <div class="sch" style="background:linear-gradient(135deg,#070E26,#0D1F4A)">🔵 Square</div>
+      <div class="sch" style="background:linear-gradient(135deg,#070E26,#0D1F4A)">▣ Square</div>
       <div class="sline"><span class="sl">Ventas ref.</span><span class="sv" style="color:var(--go)">$${fmt(d.sqHD)}</span></div>
       ${HD.map(p=>{const q=d.sq_qty[p.k]||0;return q?`<div class="sline" style="padding-left:22px"><span class="sl">${p.n} ×${q}</span><span class="sv" style="color:var(--mu)">$${fmt(q*p.p)}</span></div>`:''}).join('')}
       <div class="sline"><span class="sl">💳 POS</span><span class="sv" style="color:var(--bl)">$${fmt(d.sqPos)}</span></div>
@@ -930,8 +930,8 @@ function buildWeekPanel() {
   const tEf=tClEf+tSqEf;
 
   document.getElementById('week-cards').innerHTML=`
-    <div class="wcard"><div class="wch" style="background:linear-gradient(135deg,#071A0D,#0D3320)">🟢 Clover</div><div class="wcb"><div class="wca" style="color:var(--gr)">$${fmt(tClEf)}</div><div class="wcs">💳 $${fmt(tClPos)} · 🤝 $${fmt(tClProp)}</div></div></div>
-    <div class="wcard"><div class="wch" style="background:linear-gradient(135deg,#070E26,#0D1F4A)">🔵 Square</div><div class="wcb"><div class="wca" style="color:var(--bl)">$${fmt(tSqEf)}</div><div class="wcs">💳 $${fmt(tSqPos)} · 🤝 $${fmt(tSqProp)}</div></div></div>
+    <div class="wcard"><div class="wch" style="background:linear-gradient(135deg,#071A0D,#0D3320)">🍀 Clover</div><div class="wcb"><div class="wca" style="color:var(--gr)">$${fmt(tClEf)}</div><div class="wcs">💳 $${fmt(tClPos)} · 🤝 $${fmt(tClProp)}</div></div></div>
+    <div class="wcard"><div class="wch" style="background:linear-gradient(135deg,#070E26,#0D1F4A)">▣ Square</div><div class="wcb"><div class="wca" style="color:var(--bl)">$${fmt(tSqEf)}</div><div class="wcs">💳 $${fmt(tSqPos)} · 🤝 $${fmt(tSqProp)}</div></div></div>
     <div class="wcard"><div class="wch" style="background:linear-gradient(135deg,#1A0A00,#3A1F00)">🍺 Bar</div><div class="wcb"><div class="wca" style="color:var(--or)">$${fmt(tBar)}</div><div class="wcs">SC emp: $${fmt(tSC)}</div></div></div>
     <div class="wcard"><div class="wch" style="background:var(--s2)">💵 Efectivo</div><div class="wcb"><div class="wca" style="color:var(--go)">$${fmt(tEf)}</div><div class="wcs">${w.length} días guardados</div></div></div>`;
 
@@ -973,7 +973,7 @@ function genDayText(){
   HD.forEach(p=>{const q=d.cl_qty[p.k]||0;if(q)t+=`  ${p.n}: ${q} ($${fmt(q*p.p)})\n`;});
   t+=`  💳 POS: $${fmt(d.clPos)}  💵 Efect: $${fmt(d.clEf)}  🤝 Prop: $${fmt(d.clProp)}\n`;
   d.tips_cl.forEach(e=>t+=`  Tip ${e.name}: $${fmt(e.amt)}\n`);
-  t+=`\n🔵 SQUARE\n`;
+  t+=`\n▣ SQUARE\n`;
   HD.forEach(p=>{const q=d.sq_qty[p.k]||0;if(q)t+=`  ${p.n}: ${q} ($${fmt(q*p.p)})\n`;});
   t+=`  💳 POS: $${fmt(d.sqPos)}  💵 Efect: $${fmt(d.sqEf)}  🤝 Prop: $${fmt(d.sqProp)}\n`;
   d.tips_sq.forEach(e=>t+=`  Tip ${e.name}: $${fmt(e.amt)}\n`);
@@ -989,7 +989,7 @@ function genDayText(){
 function genWeekText(){
   if(!weekData.length)return'Sin días guardados.';
   let t=`📅 REPORTE SEMANAL — HOT DOG MARACAY\n${'─'.repeat(36)}\n\n`;
-  weekData.forEach(d=>{t+=`${dayLbl(d.fecha).toUpperCase()}\n  🟢 Cl: $${fmt(d.cl_ef)} efect · $${fmt(d.cl_pos)} POS · $${fmt(d.cl_prop)} prop\n  🔵 Sq: $${fmt(d.sq_ef)} efect · $${fmt(d.sq_pos)} POS · $${fmt(d.sq_prop)} prop\n${d.bar_total>0?`  🍺 Bar: $${fmt(d.bar_total)} c/tax\n`:''} 💵 Efect día: $${fmt((d.cl_ef||0)+(d.sq_ef||0))}\n\n`;});
+  weekData.forEach(d=>{t+=`${dayLbl(d.fecha).toUpperCase()}\n  🍀 Cl: $${fmt(d.cl_ef)} efect · $${fmt(d.cl_pos)} POS · $${fmt(d.cl_prop)} prop\n  ▣ Sq: $${fmt(d.sq_ef)} efect · $${fmt(d.sq_pos)} POS · $${fmt(d.sq_prop)} prop\n${d.bar_total>0?`  🍺 Bar: $${fmt(d.bar_total)} c/tax\n`:''} 💵 Efect día: $${fmt((d.cl_ef||0)+(d.sq_ef||0))}\n\n`;});
   const te=weekData.reduce((s,d)=>s+(d.cl_ef||0)+(d.sq_ef||0),0);
   const tb=weekData.reduce((s,d)=>s+(d.bar_total||0),0);
   t+=`${'─'.repeat(36)}\n💵 EFECT. TOTAL SEMANA: $${fmt(te)}\n${tb>0?`🍺 BAR TOTAL: $${fmt(tb)}\n`:''}`;
