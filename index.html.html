@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HotDog">
+<meta name="theme-color" content="#0C0C0E">
+<title>Hot Dog Maracay</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0C0C0E;--s1:#111114;--s2:#18181C;--s3:#222228;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.14);
+  --txt:#EFEFEF;--mu:#777;--mu2:#444;
+  --gr:#2ECC71;--gr-d:#0D3320;--gr-l:rgba(46,204,113,0.1);
+  --bl:#3B82F6;--bl-d:#0D1F4A;--bl-l:rgba(59,130,246,0.1);
+  --or:#F59E0B;--or-d:#3A1F00;--or-l:rgba(245,158,11,0.1);
+  --go:#FFD60A;--go-l:rgba(255,214,10,0.08);
+  --re:#EF4444;--re-l:rgba(239,68,68,0.1);
+  --pu:#A855F7;
+}
+html,body{height:100%;background:var(--bg);overscroll-behavior:none;}
+body{font-family:'Syne',sans-serif;color:var(--txt);}
+
+/* APP SHELL */
+.app{display:flex;flex-direction:column;height:100vh;height:-webkit-fill-available;}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.panel{padding:12px;padding-bottom:30px;display:none;}
+.panel.active{display:block;}
+
+/* HEADER */
+.hdr{background:var(--s1);border-bottom:1px solid var(--b);padding:14px 16px 10px;flex-shrink:0;padding-top:max(14px,env(safe-area-inset-top));}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.hdr-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--go);}
+.sync-pill{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--b);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--mu);}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--gr);flex-shrink:0;}
+.sync-dot.off{background:var(--re);}
+.sync-dot.busy{background:var(--or);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hdr-fields{display:flex;gap:8px;}
+.hf{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:7px 10px;flex:1;}
+.hf label{font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;}
+.hf input{background:none;border:none;outline:none;color:var(--txt);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;width:100%;}
+input[type=date]{color-scheme:dark;}
+
+/* BOTTOM NAV */
+.bnav{display:flex;background:var(--s1);border-top:1px solid var(--b);padding-bottom:max(8px,env(safe-area-inset-bottom));flex-shrink:0;}
+.nitem{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 4px;cursor:pointer;border:none;background:none;}
+.nitem .ni{font-size:20px;line-height:1;}
+.nitem .nl{font-size:9px;font-weight:700;color:var(--mu);letter-spacing:.3px;text-transform:uppercase;margin-top:3px;}
+.nitem .nd{width:4px;height:4px;border-radius:50%;background:transparent;margin-top:3px;}
+.nitem.active[data-t=clover] .nl,.nitem.active[data-t=clover] .nd{color:var(--gr);background:var(--gr);}
+.nitem.active[data-t=square] .nl,.nitem.active[data-t=square] .nd{color:var(--bl);background:var(--bl);}
+.nitem.active[data-t=bar]    .nl,.nitem.active[data-t=bar]    .nd{color:var(--or);background:var(--or);}
+.nitem.active[data-t=semana] .nl,.nitem.active[data-t=semana] .nd{color:var(--pu);background:var(--pu);}
+.nitem.active[data-t=total]  .nl,.nitem.active[data-t=total]  .nd{color:var(--go);background:var(--go);}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--b);border-radius:14px;overflow:hidden;margin-bottom:12px;}
+.ch{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--b);}
+.ch .ci{font-size:19px;}
+.ch .ct{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;}
+.ch .cs{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;margin-top:1px;}
+.ch.gr{background:linear-gradient(135deg,#071A0D,#0D3320);}
+.ch.bl{background:linear-gradient(135deg,#070E26,#0D1F4A);}
+.ch.or{background:linear-gradient(135deg,#1A0A00,#3A1F00);}
+.ch.pu{background:linear-gradient(135deg,#130820,#2A0D52);}
+.ch.dk{background:var(--s2);}
+
+/* PRODUCT ROW — fixed height to prevent reflow */
+.prow{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--b);gap:10px;min-height:58px;}
+.prow:last-child{border-bottom:none;}
+.pinfo{flex:1;min-width:0;}
+.pname{font-size:12px;font-weight:700;line-height:1.3;}
+.pprice{font-size:10px;color:var(--mu);margin-top:2px;}
+.psub{min-width:60px;text-align:right;font-family:'DM Mono',monospace;font-size:12px;color:var(--mu2);}
+.psub.on{color:var(--go);}
+
+/* STEPPER — key fix: no re-render on input, uses DOM directly */
+.stp{display:flex;align-items:center;background:var(--s2);border:1px solid var(--b);border-radius:10px;overflow:hidden;}
+.stp button{width:32px;height:36px;background:none;border:none;color:var(--txt);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.stp button:active{background:rgba(255,255,255,.12);}
+.stp input{width:34px;text-align:center;background:none;border:none;outline:none;color:var(--txt);font-family:'DM Mono',monospace;font-size:15px;font-weight:500;padding:0;-moz-appearance:textfield;}
+.stp input::-webkit-inner-spin-button,.stp input::-webkit-outer-spin-button{-webkit-appearance:none;}
+
+/* MONEY ROW */
+.mrow{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--b);gap:10px;}
+.mrow:last-child{border-bottom:none;}
+.mlbl{font-size:13px;font-weight:700;flex:1;}
+.msub{font-size:10px;color:var(--mu);font-weight:500;margin-top:2px;}
+.minp{display:flex;align-items:center;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:0 10px;gap:3px;min-width:115px;}
+.sym{color:var(--mu);font-size:14px;font-weight:700;}
+.minp input{background:none;border:none;outline:none;color:var(--txt);font-family:'DM Mono',monospace;font-size:16px;font-weight:500;width:82px;text-align:right;padding:10px 0;-moz-appearance:textfield;}
+.minp input::-webkit-inner-spin-button,.minp input::-webkit-outer-spin-button{-webkit-appearance:none;}
+.mval{font-family:'DM Mono',monospace;font-size:16px;padding:10px 0;text-align:right;width:82px;}
+
+/* 3 BOXES */
+.boxes3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b);border-top:1px solid var(--b);}
+.box{background:var(--s2);padding:10px 8px;text-align:center;}
+.box .bl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--mu);margin-bottom:5px;}
+.box .bv{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;}
+
+/* BAR TABLE */
+.bar-hdr{display:grid;grid-template-columns:1fr 36px 36px 36px 36px;gap:3px;padding:7px 12px;background:var(--s2);border-bottom:1px solid var(--b);}
+.bar-hdr span{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;text-align:center;color:var(--mu);}
+.bar-hdr span:first-child{text-align:left;}
+.brow{display:grid;grid-template-columns:1fr 36px 36px 36px 36px;gap:3px;padding:8px 12px;border-bottom:1px solid var(--b);align-items:center;}
+.brow:last-child{border-bottom:none;}
+.bname{font-size:11px;font-weight:700;}
+.bprice{font-size:9px;color:var(--mu);}
+.pm{background:var(--s2);border:1px solid var(--b);border-radius:7px;color:var(--txt);font-family:'DM Mono',monospace;font-size:14px;text-align:center;padding:6px 2px;outline:none;width:100%;-moz-appearance:textfield;}
+.pm::-webkit-inner-spin-button,.pm::-webkit-outer-spin-button{-webkit-appearance:none;}
+.btot{display:grid;grid-template-columns:1fr 36px 36px 36px 36px;gap:3px;padding:8px 12px;background:var(--s2);border-top:1px solid var(--b);}
+.btot span{font-size:10px;font-weight:700;text-align:center;font-family:'DM Mono',monospace;}
+.btot span:first-child{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;text-align:left;display:flex;align-items:center;}
+
+/* DELIVERY */
+.del-g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b);}
+.del-c{background:var(--s1);padding:10px 6px;text-align:center;}
+.del-ico{font-size:16px;margin-bottom:3px;}
+.del-lbl{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--mu);letter-spacing:.3px;margin-bottom:7px;}
+.del-stp{display:flex;align-items:center;justify-content:center;background:var(--s2);border:1px solid var(--b);border-radius:8px;overflow:hidden;}
+.del-stp button{width:28px;height:30px;background:none;border:none;color:var(--txt);font-size:16px;cursor:pointer;}
+.del-stp button:active{background:rgba(255,255,255,.1);}
+.del-stp input{width:30px;text-align:center;background:none;border:none;outline:none;color:var(--go);font-family:'DM Mono',monospace;font-size:13px;padding:0;-moz-appearance:textfield;}
+.del-stp input::-webkit-inner-spin-button,.del-stp input::-webkit-outer-spin-button{-webkit-appearance:none;}
+
+/* EMP ROW */
+.erow{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--b);}
+.einp{flex:1;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--txt);font-family:'Syne',sans-serif;font-size:12px;padding:8px 10px;outline:none;}
+.einp::placeholder{color:var(--mu2);}
+.add-btn{width:calc(100% - 24px);margin:8px 12px;background:none;border:1px dashed var(--b2);border-radius:8px;color:var(--mu);padding:8px;font-size:11px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;text-align:center;display:block;}
+
+/* GRAND */
+.grand{background:linear-gradient(135deg,#071A0D 0%,#070E26 50%,#1A0A00 100%);border:1px solid rgba(255,214,10,.2);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px;}
+.g-lbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.3);font-weight:700;}
+.g-amt{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--go);letter-spacing:2px;line-height:1;text-shadow:0 0 30px rgba(255,214,10,.25);}
+.g-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;}
+
+/* SEP BOXES */
+.sep2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.sbox{background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:14px;text-align:center;}
+.sbox .sbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin-bottom:6px;}
+.sbox .sba{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;}
+.sbox .sbs{font-size:9px;color:var(--mu);margin-top:4px;}
+
+/* SCARD */
+.scard{background:var(--s1);border:1px solid var(--b);border-radius:14px;overflow:hidden;margin-bottom:12px;}
+.sch{padding:10px 14px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.5px;}
+.sline{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--b);font-size:12px;}
+.sline:last-child{border-bottom:none;}
+.sl{color:var(--mu);font-weight:600;}
+.sv{font-family:'DM Mono',monospace;font-size:12px;}
+
+/* WEEK */
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.wcard{background:var(--s1);border:1px solid var(--b);border-radius:14px;overflow:hidden;}
+.wch{padding:8px 12px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1.5px;}
+.wcb{padding:10px 12px;}
+.wca{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;}
+.wcs{font-size:9px;color:var(--mu);margin-top:3px;}
+.wtbl{width:100%;border-collapse:collapse;font-size:11px;}
+.wtbl th{background:var(--s2);padding:7px 8px;font-weight:800;font-size:9px;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--b);}
+.wtbl th:first-child{text-align:left;padding-left:12px;}
+.wtbl td{padding:8px;text-align:center;border-bottom:1px solid var(--b);font-weight:600;}
+.wtbl td:first-child{text-align:left;padding-left:12px;font-family:'DM Mono',monospace;font-size:10px;}
+.wtbl tr.tr-tot td{background:var(--s2);font-weight:800;}
+
+/* BTNS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:transform .15s;}
+.btn:active{transform:scale(.97);}
+.btn-wa{background:linear-gradient(135deg,#0A5C47,#22C55E);color:white;}
+.btn-sv{background:linear-gradient(135deg,#2A0A52,#9333EA);color:white;}
+.btn-cp{background:var(--s2);border:1px solid var(--b);color:var(--txt);}
+.btn-dg{background:var(--re-l);border:1px solid rgba(239,68,68,.2);color:var(--re);}
+.btn-sh{background:linear-gradient(135deg,#0A3A1A,#0F9549);color:white;}
+
+/* SETTINGS PANEL */
+.setting-row{padding:12px 14px;border-bottom:1px solid var(--b);}
+.setting-row:last-child{border-bottom:none;}
+.setting-row label{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;}
+.setting-row input{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'DM Mono',monospace;font-size:12px;padding:9px 12px;outline:none;}
+.setting-row input::placeholder{color:var(--mu2);}
+.setting-row p{font-size:11px;color:var(--mu);line-height:1.5;margin-top:6px;}
+.setting-row a{color:var(--go);text-decoration:none;}
+
+/* NOTE */
+.nw{padding:10px 12px;}
+.nw textarea{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:10px;color:var(--txt);font-family:'Syne',sans-serif;font-size:12px;padding:10px;outline:none;resize:none;min-height:60px;}
+.nw textarea::placeholder{color:var(--mu2);}
+
+/* TNOTE */
+.tnote{background:var(--go-l);border:1px solid rgba(255,214,10,.12);border-radius:10px;padding:8px 12px;font-size:10px;color:rgba(255,214,10,.65);font-weight:600;margin-bottom:12px;text-align:center;}
+
+/* TOAST */
+.toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:100px;font-size:12px;font-weight:700;pointer-events:none;z-index:999;white-space:nowrap;transition:opacity .3s;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;}
+.toast.show{opacity:1;}
+.toast.ok{background:var(--gr);color:white;}
+.toast.err{background:var(--re);color:white;}
+.toast.info{background:var(--bl);color:white;}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-title">🌭 HOT DOG MARACAY</div>
+      <div class="sync-pill">
+        <div class="sync-dot off" id="syncDot"></div>
+        <span id="syncLbl">Local</span>
+      </div>
+    </div>
+    <div class="hdr-fields">
+      <div class="hf"><label>Fecha</label><input type="date" id="hFecha"></div>
+      <div class="hf"><label>Cajero</label><input type="text" id="hCajero" placeholder="Nombre..."></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- CLOVER -->
+    <div class="panel active" id="panel-clover">
+      <div class="tnote">Reporte Clover incluye 7% Sales Tax · Ingresa cantidades y totales tal como aparecen</div>
+      <div class="card">
+        <div class="ch gr"><span class="ci">🟢</span><div><div class="ct">Clover — Productos</div><div class="cs">Cantidad vendida por producto</div></div></div>
+        <div id="prods-cl"></div>
+        <div class="mrow" style="background:rgba(255,214,10,.04)">
+          <div class="mlbl" style="font-weight:900">Total ventas ref.<div class="msub">Suma productos</div></div>
+          <div style="font-family:'DM Mono',monospace;font-size:17px;color:var(--go);padding-right:2px" id="cl-hd-tot">$0.00</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">📊</span><div><div class="ct">Totales del Reporte</div><div class="cs">Copiar del sistema Clover</div></div></div>
+        <div class="mrow"><div class="mlbl">💳 Total POS / Tarjeta<div class="msub">Debit + Credit del reporte</div></div><div class="minp"><span class="sym">$</span><input type="number" step="0.01" placeholder="0.00" id="cl-pos" oninput="updateBoxes('cl')"></div></div>
+        <div class="mrow"><div class="mlbl">💵 Efectivo en Caja<div class="msub">Cash del reporte</div></div><div class="minp"><span class="sym">$</span><input type="number" step="0.01" placeholder="0.00" id="cl-ef" oninput="updateBoxes('cl')"></div></div>
+        <div class="mrow"><div class="mlbl">🤝 Propinas<div class="msub">Propinas del reporte</div></div><div class="minp"><span class="sym">$</span><input type="number" step="0.01" placeholder="0.00" id="cl-prop" oninput="updateBoxes('cl')"></div></div>
+        <div class="boxes3">
+          <div class="box"><div class="bl" style="color:var(--bl)">💳 POS</div><div class="bv" style="color:var(--bl)" id="cl-b-pos">$0.00</div></div>
+          <div class="box"><div class="bl" style="color:var(--gr)">💵 Efect.</div><div class="bv" style="color:var(--gr)" id="cl-b-ef">$0.00</div></div>
+          <div class="box"><div class="bl" style="color:var(--go)">🤝 Prop.</div><div class="bv" style="color:var(--go)" id="cl-b-prop">$0.00</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">🛵</span><div><div class="ct">Delivery — Clover</div></div></div>
+        <div class="del-g" id="del-cl"></div>
+      </div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">👷</span><div><div class="ct">Tips por Empleado</div></div></div>
+        <div id="tips-cl"></div>
+        <button class="add-btn" onclick="addTip('cl')">+ Agregar empleado</button>
+      </div>
+      <div class="card"><div class="nw"><textarea id="nota-cl" placeholder="Notas Clover..."></textarea></div></div>
+    </div>
+
+    <!-- SQUARE -->
+    <div class="panel" id="panel-square">
+      <div class="tnote">Reporte Square incluye 7% Sales Tax · Ingresa cantidades y totales tal como aparecen</div>
+      <div class="card">
+        <div class="ch bl"><span class="ci">🔵</span><div><div class="ct">Square — Productos</div><div class="cs">Cantidad vendida por producto</div></div></div>
+        <div id="prods-sq"></div>
+        <div class="mrow" style="background:rgba(255,214,10,.04)">
+          <div class="mlbl" style="font-weight:900">Total ventas ref.<div class="msub">Suma productos</div></div>
+          <div style="font-family:'DM Mono',monospace;font-size:17px;color:var(--go);padding-right:2px" id="sq-hd-tot">$0.00</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">📊</span><div><div class="ct">Totales del Reporte</div><div class="cs">Copiar del sistema Square</div></div></div>
+        <div class="mrow"><div class="mlbl">💳 Total POS / Tarjeta<div class="msub">Pagos con tarjeta</div></div><div class="minp"><span class="sym">$</span><input type="number" step="0.01" placeholder="0.00" id="sq-pos" oninput="updateBoxes('sq')"></div></div>
+        <div class="mrow"><div class="mlbl">💵 Efectivo en Caja<div class="msub">Cash del reporte</div></div><div class="minp"><span class="sym">$</span><input type="number" step="0.01" placeholder="0.00" id="sq-ef" oninput="updateBoxes('sq')"></div></div>
+        <div class="mrow"><div class="mlbl">🤝 Propinas<div class="msub">Propinas del reporte</div></div><div class="minp"><span class="sym">$</span><input type="number" step="0.01" placeholder="0.00" id="sq-prop" oninput="updateBoxes('sq')"></div></div>
+        <div class="boxes3">
+          <div class="box"><div class="bl" style="color:var(--bl)">💳 POS</div><div class="bv" style="color:var(--bl)" id="sq-b-pos">$0.00</div></div>
+          <div class="box"><div class="bl" style="color:var(--gr)">💵 Efect.</div><div class="bv" style="color:var(--gr)" id="sq-b-ef">$0.00</div></div>
+          <div class="box"><div class="bl" style="color:var(--go)">🤝 Prop.</div><div class="bv" style="color:var(--go)" id="sq-b-prop">$0.00</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">🛵</span><div><div class="ct">Delivery — Square</div></div></div>
+        <div class="del-g" id="del-sq"></div>
+      </div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">👷</span><div><div class="ct">Tips por Empleado</div></div></div>
+        <div id="tips-sq"></div>
+        <button class="add-btn" onclick="addTip('sq')">+ Agregar empleado</button>
+      </div>
+      <div class="card"><div class="nw"><textarea id="nota-sq" placeholder="Notas Square..."></textarea></div></div>
+    </div>
+
+    <!-- BAR -->
+    <div class="panel" id="panel-bar">
+      <div class="tnote">🍺 Precio base × uds + 8% Tax · Service Charge 18% → empleados · Separado de Clover/Square</div>
+      <div class="card">
+        <div class="ch or"><span class="ci">🍺</span><div><div class="ct">Cervezas & Hookah</div><div class="cs">💳 POS · ⚡ Zelle · 💵 Efectivo</div></div></div>
+        <div class="bar-hdr">
+          <span>Producto</span><span style="color:var(--or)">$/u</span>
+          <span style="color:var(--bl)">💳</span><span style="color:var(--go)">⚡</span><span style="color:var(--gr)">💵</span>
+        </div>
+        <div id="rows-bar"></div>
+        <div class="btot">
+          <span>Bruto</span>
+          <span style="color:var(--or)" id="bt-tot">$0</span>
+          <span style="color:var(--bl)" id="bt-pos">$0</span>
+          <span style="color:var(--go)" id="bt-zel">$0</span>
+          <span style="color:var(--gr)" id="bt-ef">$0</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">🧾</span><div><div class="ct">Impuestos</div></div></div>
+        <div class="mrow"><div class="mlbl">Ventas brutas<div class="msub">Auto</div></div><div class="minp"><span class="sym">$</span><div class="mval" style="color:var(--or)" id="bar-gross">0.00</div></div></div>
+        <div class="mrow"><div class="mlbl">Tax + Licencia 8%</div><div class="minp"><span class="sym" style="color:var(--re)">$</span><div class="mval" style="color:var(--re)" id="bar-tax">0.00</div></div></div>
+        <div class="mrow" style="background:rgba(245,158,11,.04)"><div class="mlbl" style="font-weight:900">Total con Tax</div><div class="minp" style="border-color:rgba(245,158,11,.2)"><span class="sym" style="color:var(--or)">$</span><div class="mval" style="color:var(--or)" id="bar-total">0.00</div></div></div>
+      </div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">🤝</span><div><div class="ct">Service Charge 18%</div><div class="cs">Para empleados</div></div></div>
+        <div class="mrow"><div class="mlbl">Base<div class="msub">Por defecto ventas brutas</div></div><div class="minp"><span class="sym">$</span><input type="number" step="0.01" placeholder="auto" id="sc-base" oninput="recalcBar()"></div></div>
+        <div class="mrow" style="background:rgba(46,204,113,.04)"><div class="mlbl" style="color:var(--gr);font-weight:900">Service Charge</div><div class="minp" style="border-color:rgba(46,204,113,.2)"><span class="sym" style="color:var(--gr)">$</span><div class="mval" style="color:var(--gr)" id="sc-amt">0.00</div></div></div>
+        <div id="sc-emps"></div>
+        <button class="add-btn" onclick="addSCEmp()">+ Agregar empleado SC</button>
+      </div>
+      <div class="card"><div class="nw"><textarea id="nota-bar" placeholder="Notas del bar..."></textarea></div></div>
+    </div>
+
+    <!-- SEMANA -->
+    <div class="panel" id="panel-semana">
+      <div class="tnote">📅 Ciclo Martes→Martes · <span id="sync-status-note">Guardado local</span></div>
+      <div class="wgrid" id="week-cards"></div>
+      <div class="card">
+        <div class="ch pu"><span class="ci">📅</span><div><div class="ct">Detalle por Día</div></div></div>
+        <div style="overflow-x:auto"><table class="wtbl">
+          <thead><tr>
+            <th>Día</th>
+            <th style="color:var(--gr)">Clover 💵</th>
+            <th style="color:var(--bl)">Square 💵</th>
+            <th style="color:var(--or)">Bar</th>
+            <th style="color:var(--go)">Efect.</th>
+          </tr></thead>
+          <tbody id="week-tbody"></tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="ch or"><span class="ci">📊</span><div><div class="ct">Reporte Bar — Para el Local</div><div class="cs">Separado · Solo bar</div></div></div>
+        <div id="bar-week"></div>
+      </div>
+      <button class="btn btn-wa" onclick="sendWA(genBarText())">🍺 Enviar reporte BAR al local</button>
+      <button class="btn btn-wa" style="background:linear-gradient(135deg,#4A0D8C,#9333EA)" onclick="sendWA(genWeekText())">📅 Enviar reporte SEMANA</button>
+      <button class="btn btn-cp" onclick="copyText(genWeekText())">📋 Copiar reporte semanal</button>
+      <button class="btn btn-dg" onclick="clearWeek()">🗑 Limpiar semana</button>
+    </div>
+
+    <!-- TOTAL -->
+    <div class="panel" id="panel-total">
+      <div class="grand">
+        <div class="g-lbl">Efectivo de Caja del Día</div>
+        <div class="g-amt" id="grand-ef">$0.00</div>
+        <div class="g-sub">Clover + Square · Solo efectivo</div>
+      </div>
+      <div class="sep2">
+        <div class="sbox">
+          <div class="sbl" style="color:var(--bl)">💳 POS Total</div>
+          <div class="sba" style="color:var(--bl)" id="tot-pos">$0</div>
+          <div class="sbs" id="tot-pos-sub">Cl $0 · Sq $0</div>
+        </div>
+        <div class="sbox">
+          <div class="sbl" style="color:var(--go)">🤝 Propinas</div>
+          <div class="sba" style="color:var(--go)" id="tot-prop">$0</div>
+          <div class="sbs" id="tot-prop-sub">Cl $0 · Sq $0</div>
+        </div>
+      </div>
+      <div id="total-detail"></div>
+      <button class="btn btn-sv" id="btn-save" onclick="guardarDia()">☁️ Guardar en la nube</button>
+      <button class="btn btn-wa" onclick="sendWA(genDayText())">💬 Enviar por WhatsApp</button>
+      <button class="btn btn-cp" onclick="copyText(genDayText())">📋 Copiar texto</button>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="panel" id="panel-config">
+      <div class="tnote">⚙️ Configura Google Sheets para sincronización en la nube</div>
+      <div class="card">
+        <div class="ch dk"><span class="ci">🔗</span><div><div class="ct">Google Sheets (Gratis)</div><div class="cs">Sincroniza entre todos los teléfonos</div></div></div>
+        <div class="setting-row">
+          <label>URL de tu Web App (Google Apps Script)</label>
+          <input type="url" id="gs-url" placeholder="https://script.google.com/macros/s/..." oninput="saveConfig()">
+          <p>Sigue las instrucciones de abajo para obtener esta URL. Una vez configurada, todos los empleados que tengan la app con esta URL verán los mismos datos.</p>
+        </div>
+        <div class="setting-row">
+          <label>Estado de conexión</label>
+          <button class="btn btn-cp" style="margin:0" onclick="testConnection()">🔌 Probar conexión</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch dk"><span class="ci">📖</span><div><div class="ct">Cómo configurarlo</div><div class="cs">3 pasos simples</div></div></div>
+        <div style="padding:14px;font-size:12px;line-height:1.8;color:var(--mu)">
+          <strong style="color:var(--go);font-size:13px;">Paso 1 — Crear Google Sheet</strong><br>
+          Ve a <a href="https://sheets.google.com" target="_blank" style="color:var(--bl)">sheets.google.com</a> → crea una hoja nueva → nómbrala <em style="color:var(--txt)">"HotDogMaracay"</em>.<br><br>
+
+          <strong style="color:var(--go);font-size:13px;">Paso 2 — Crear el Script</strong><br>
+          En la hoja: <em>Extensiones → Apps Script</em> → borra el código que hay → pega este código:<br>
+          <div style="background:var(--s3);border-radius:8px;padding:10px;margin:8px 0;font-family:'DM Mono',monospace;font-size:10px;color:var(--gr);word-break:break-all;" id="script-code"></div>
+          Haz clic en 💾 Guardar → luego en ▶️ <strong style="color:var(--txt)">Ejecutar</strong> (para dar permisos) → acepta todos los permisos.<br><br>
+
+          <strong style="color:var(--go);font-size:13px;">Paso 3 — Publicar</strong><br>
+          Haz clic en <strong style="color:var(--txt)">Implementar → Nueva implementación</strong> → tipo: <strong style="color:var(--txt)">Aplicación web</strong> → "Quién tiene acceso": <strong style="color:var(--txt)">Cualquier persona</strong> → clic en <strong style="color:var(--txt)">Implementar</strong> → copia la URL y pégala arriba.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <button class="nitem active" data-t="clover" onclick="switchTab('clover')"><span class="ni">🟢</span><span class="nl">Clover</span><span class="nd"></span></button>
+    <button class="nitem" data-t="square" onclick="switchTab('square')"><span class="ni">🔵</span><span class="nl">Square</span><span class="nd"></span></button>
+    <button class="nitem" data-t="bar" onclick="switchTab('bar')"><span class="ni">🍺</span><span class="nl">Bar</span><span class="nd"></span></button>
+    <button class="nitem" data-t="semana" onclick="switchTab('semana')"><span class="ni">📅</span><span class="nl">Semana</span><span class="nd"></span></button>
+    <button class="nitem" data-t="total" onclick="switchTab('total')"><span class="ni">💰</span><span class="nl">Total</span><span class="nd"></span></button>
+    <button class="nitem" data-t="config" onclick="switchTab('config')"><span class="ni">⚙️</span><span class="nl">Config</span><span class="nd"></span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════
+const HD = [
+  {k:'p2',  n:'Promo Clásica',        p:12.50},
+  {k:'hvt', n:'Hot Dog Venezolano',   p:6.85},
+  {k:'ccm', n:'Combo Carne Mechada',  p:19.99},
+  {k:'hcm', n:'HD Carne Mechada',     p:10.99},
+  {k:'bac', n:'Bacon Extra',          p:2.00},
+  {k:'qso', n:'Queso de Mano Extra',  p:2.00},
+];
+const BAR = [
+  {k:'pbh', n:'Promo Beer+Hookah',  p:50},
+  {k:'pbq', n:'Promo Buquet',       p:15},
+  {k:'pco', n:'Promo Corona 6×',    p:25},
+  {k:'pmo', n:'Promo Modelo 6×',    p:25},
+  {k:'phk', n:'Promo Heineken 6×',  p:25},
+  {k:'pst', n:'Promo Stella 6×',    p:25},
+  {k:'hoo', n:'Hookah',             p:35},
+  {k:'ref', n:'Refill Hookah',      p:20},
+  {k:'bzu', n:'Beer Zulia',         p:4},
+  {k:'bhk', n:'Beer Heineken',      p:5},
+  {k:'bco', n:'Beer Corona',        p:5},
+  {k:'bmo', n:'Beer Modelo',        p:5},
+  {k:'bst', n:'Beer Stella',        p:5},
+];
+const TAX_BAR=0.08, SC_RATE=0.18;
+const WEEK_KEY='hdm_v4_week';
+const CFG_KEY='hdm_v4_config';
+const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+// ═══════════════════════════════════════════
+// STATE — plain objects, no framework
+// ═══════════════════════════════════════════
+// Quantities stored in DOM (avoids re-render/keyboard dismiss)
+// Only money values stored in state when needed for calc
+
+let weekData = [];
+let gsUrl = '';
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Set today
+  document.getElementById('hFecha').value = todayStr();
+
+  // Build product rows (once, static DOM)
+  buildHDRows('cl');
+  buildHDRows('sq');
+  buildBarRows();
+  buildDelivery('cl');
+  buildDelivery('sq');
+
+  // Init tips
+  for(let i=0;i<3;i++) addTip('cl',true);
+  for(let i=0;i<3;i++) addTip('sq',true);
+  addSCEmp(true); addSCEmp(true);
+
+  // Load config + week
+  loadConfig();
+  loadWeek();
+
+  // Script code display
+  document.getElementById('script-code').textContent = getScriptCode();
+});
+
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function fmt(n){return Number(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function dayLbl(f){const d=new Date(f+'T12:00:00');return DAYS[d.getDay()]+' '+d.toLocaleDateString('es',{day:'numeric',month:'short'});}
+
+// ═══════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════
+function switchTab(t) {
+  document.querySelectorAll('.nitem').forEach(n=>n.classList.toggle('active', n.dataset.t===t));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='semana') buildWeekPanel();
+  if(t==='total')  buildTotalPanel();
+}
+
+// ═══════════════════════════════════════════
+// BUILD PRODUCT ROWS — static DOM, no re-render
+// Key fix: inputs are plain DOM, data read via getElementById on demand
+// ═══════════════════════════════════════════
+function buildHDRows(term) {
+  const c = document.getElementById('prods-'+term);
+  c.innerHTML = '';
+  HD.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'prow';
+    div.innerHTML = `
+      <div class="pinfo"><div class="pname">${p.n}</div><div class="pprice">$${p.p.toFixed(2)} c/u</div></div>
+      <div class="stp">
+        <button type="button" onclick="stepQty('${term}','${p.k}',-1)">−</button>
+        <input type="number" id="qty-${term}-${p.k}" value="" placeholder="0" min="0"
+               oninput="updateHDTotal('${term}')">
+        <button type="button" onclick="stepQty('${term}','${p.k}',1)">+</button>
+      </div>
+      <div class="psub" id="sub-${term}-${p.k}">—</div>`;
+    c.appendChild(div);
+  });
+}
+
+function stepQty(term, key, delta) {
+  const inp = document.getElementById(`qty-${term}-${key}`);
+  const v = Math.max(0, (parseInt(inp.value)||0) + delta);
+  inp.value = v;
+  updateHDSubtotal(term, key, v);
+  updateHDTotal(term);
+}
+
+function updateHDSubtotal(term, key, qty) {
+  const p = HD.find(x=>x.k===key);
+  const el = document.getElementById(`sub-${term}-${key}`);
+  if(!el||!p) return;
+  if(qty > 0){ el.textContent='$'+fmt(qty*p.p); el.className='psub on'; }
+  else { el.textContent='—'; el.className='psub'; }
+}
+
+function updateHDTotal(term) {
+  let total = 0;
+  HD.forEach(p => {
+    const q = parseInt(document.getElementById(`qty-${term}-${p.k}`)?.value)||0;
+    total += q * p.p;
+    updateHDSubtotal(term, p.k, q);
+  });
+  document.getElementById(`${term}-hd-tot`).textContent = '$'+fmt(total);
+}
+
+function updateBoxes(term) {
+  const pos  = parseFloat(document.getElementById(`${term}-pos`)?.value)||0;
+  const ef   = parseFloat(document.getElementById(`${term}-ef`)?.value)||0;
+  const prop = parseFloat(document.getElementById(`${term}-prop`)?.value)||0;
+  document.getElementById(`${term}-b-pos`).textContent  = '$'+fmt(pos);
+  document.getElementById(`${term}-b-ef`).textContent   = '$'+fmt(ef);
+  document.getElementById(`${term}-b-prop`).textContent = '$'+fmt(prop);
+}
+
+// ═══════════════════════════════════════════
+// BAR ROWS — static DOM
+// ═══════════════════════════════════════════
+function buildBarRows() {
+  const c = document.getElementById('rows-bar');
+  c.innerHTML = '';
+  BAR.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'brow';
+    div.innerHTML = `
+      <div><div class="bname">${p.n}</div><div class="bprice">$${p.p}</div></div>
+      <div class="bprice" style="text-align:center;font-weight:700;">$${p.p}</div>
+      <input class="pm" type="number" min="0" placeholder="0" id="bar-pos-${p.k}" oninput="recalcBar()" style="border-color:rgba(59,130,246,.25)">
+      <input class="pm" type="number" min="0" placeholder="0" id="bar-zel-${p.k}" oninput="recalcBar()" style="border-color:rgba(255,214,10,.25)">
+      <input class="pm" type="number" min="0" placeholder="0" id="bar-ef-${p.k}"  oninput="recalcBar()" style="border-color:rgba(46,204,113,.25)">`;
+    c.appendChild(div);
+  });
+}
+
+function recalcBar() {
+  let gP=0,gZ=0,gE=0;
+  BAR.forEach(p => {
+    gP += (parseInt(document.getElementById(`bar-pos-${p.k}`)?.value)||0)*p.p;
+    gZ += (parseInt(document.getElementById(`bar-zel-${p.k}`)?.value)||0)*p.p;
+    gE += (parseInt(document.getElementById(`bar-ef-${p.k}`)?.value)||0)*p.p;
+  });
+  const gross=gP+gZ+gE, tax=gross*TAX_BAR, total=gross+tax;
+  const base=parseFloat(document.getElementById('sc-base')?.value)||gross;
+  const sc=base*SC_RATE;
+  document.getElementById('bt-tot').textContent='$'+fmt(gross);
+  document.getElementById('bt-pos').textContent='$'+fmt(gP);
+  document.getElementById('bt-zel').textContent='$'+fmt(gZ);
+  document.getElementById('bt-ef').textContent='$'+fmt(gE);
+  document.getElementById('bar-gross').textContent=fmt(gross);
+  document.getElementById('bar-tax').textContent=fmt(tax);
+  document.getElementById('bar-total').textContent=fmt(total);
+  document.getElementById('sc-amt').textContent=fmt(sc);
+  updateSCEmps();
+}
+
+// ═══════════════════════════════════════════
+// DELIVERY
+// ═══════════════════════════════════════════
+function buildDelivery(term) {
+  const c = document.getElementById('del-'+term);
+  const apps = [['ub','🚗','Uber Eats'],['dd','🚪','DoorDash'],['gh','🍔','Grubhub']];
+  c.innerHTML = apps.map(([k,ico,lbl])=>`
+    <div class="del-c">
+      <div class="del-ico">${ico}</div><div class="del-lbl">${lbl}</div>
+      <div class="del-stp">
+        <button type="button" onclick="stepDel('${term}_${k}',-1)">−</button>
+        <input type="number" id="del-${term}-${k}" value="" placeholder="0" min="0">
+        <button type="button" onclick="stepDel('${term}_${k}',1)">+</button>
+      </div>
+    </div>`).join('');
+}
+
+function stepDel(key,d){
+  const [term,k]=key.split('_');
+  const el=document.getElementById(`del-${term}-${k}`);
+  el.value=Math.max(0,(parseInt(el.value)||0)+d);
+}
+
+// ═══════════════════════════════════════════
+// TIPS
+// ═══════════════════════════════════════════
+function addTip(term, silent=false) {
+  const c = document.getElementById('tips-'+term);
+  const i = c.children.length;
+  const div = document.createElement('div');
+  div.className = 'erow';
+  div.id = `tip-${term}-${i}`;
+  div.innerHTML = `
+    <input class="einp" type="text" placeholder="Nombre empleado" id="tipn-${term}-${i}">
+    <div class="minp" style="min-width:95px"><span class="sym">$</span>
+      <input type="number" step="0.01" placeholder="0" id="tipa-${term}-${i}" style="width:60px">
+    </div>
+    <button type="button" onclick="this.parentElement.remove()"
+      style="background:var(--re-l);border:none;border-radius:9px;color:var(--re);padding:9px 11px;cursor:pointer">✕</button>`;
+  c.appendChild(div);
+}
+
+// ═══════════════════════════════════════════
+// SERVICE CHARGE EMPLOYEES
+// ═══════════════════════════════════════════
+function addSCEmp(silent=false) {
+  const c = document.getElementById('sc-emps');
+  const i = c.children.length;
+  const div = document.createElement('div');
+  div.className = 'erow';
+  div.innerHTML = `
+    <input class="einp" type="text" placeholder="Empleado" id="scn-${i}">
+    <div class="minp" style="min-width:75px">
+      <input type="number" step="1" placeholder="%" id="scp-${i}" oninput="updateSCEmps()" style="width:40px">
+      <span class="sym" style="font-size:12px">%</span>
+    </div>
+    <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--gr);min-width:52px;text-align:right" id="sce-${i}">$0.00</span>
+    <button type="button" onclick="this.parentElement.remove();updateSCEmps()"
+      style="background:var(--re-l);border:none;border-radius:9px;color:var(--re);padding:9px 11px;cursor:pointer">✕</button>`;
+  c.appendChild(div);
+}
+
+function updateSCEmps() {
+  const sc = parseFloat(document.getElementById('sc-amt')?.textContent?.replace(',',''))||0;
+  let i=0;
+  while(document.getElementById(`scp-${i}`)!==null) {
+    const pct=parseFloat(document.getElementById(`scp-${i}`)?.value)||0;
+    const el=document.getElementById(`sce-${i}`);
+    if(el) el.textContent='$'+fmt(pct>0?sc*(pct/100):0);
+    i++;
+  }
+}
+
+// ═══════════════════════════════════════════
+// READ ALL VALUES FROM DOM
+// ═══════════════════════════════════════════
+function readAll() {
+  const cl_qty={}, sq_qty={};
+  HD.forEach(p=>{
+    cl_qty[p.k]=parseInt(document.getElementById(`qty-cl-${p.k}`)?.value)||0;
+    sq_qty[p.k]=parseInt(document.getElementById(`qty-sq-${p.k}`)?.value)||0;
+  });
+  const bar_pos={},bar_zel={},bar_ef={};
+  BAR.forEach(p=>{
+    bar_pos[p.k]=parseInt(document.getElementById(`bar-pos-${p.k}`)?.value)||0;
+    bar_zel[p.k]=parseInt(document.getElementById(`bar-zel-${p.k}`)?.value)||0;
+    bar_ef[p.k] =parseInt(document.getElementById(`bar-ef-${p.k}`)?.value)||0;
+  });
+  const clPos=parseFloat(document.getElementById('cl-pos')?.value)||0;
+  const clEf =parseFloat(document.getElementById('cl-ef')?.value)||0;
+  const clProp=parseFloat(document.getElementById('cl-prop')?.value)||0;
+  const sqPos=parseFloat(document.getElementById('sq-pos')?.value)||0;
+  const sqEf =parseFloat(document.getElementById('sq-ef')?.value)||0;
+  const sqProp=parseFloat(document.getElementById('sq-prop')?.value)||0;
+  const clHD=HD.reduce((s,p)=>s+(cl_qty[p.k]||0)*p.p,0);
+  const sqHD=HD.reduce((s,p)=>s+(sq_qty[p.k]||0)*p.p,0);
+  let bP=0,bZ=0,bE=0;
+  BAR.forEach(p=>{bP+=(bar_pos[p.k]||0)*p.p;bZ+=(bar_zel[p.k]||0)*p.p;bE+=(bar_ef[p.k]||0)*p.p;});
+  const barGross=bP+bZ+bE,barTax=barGross*TAX_BAR,barTotal=barGross+barTax;
+  const scBase=parseFloat(document.getElementById('sc-base')?.value)||barGross;
+  const sc=scBase*SC_RATE;
+
+  // Tips
+  const tips_cl=[],tips_sq=[];
+  let i=0;while(document.getElementById(`tipn-cl-${i}`)){
+    const n=document.getElementById(`tipn-cl-${i}`)?.value||'';
+    const a=parseFloat(document.getElementById(`tipa-cl-${i}`)?.value)||0;
+    if(n||a) tips_cl.push({name:n,amt:a});
+    i++;
+  }
+  i=0;while(document.getElementById(`tipn-sq-${i}`)){
+    const n=document.getElementById(`tipn-sq-${i}`)?.value||'';
+    const a=parseFloat(document.getElementById(`tipa-sq-${i}`)?.value)||0;
+    if(n||a) tips_sq.push({name:n,amt:a});
+    i++;
+  }
+
+  const del={cl_ub:parseInt(document.getElementById('del-cl-ub')?.value)||0,cl_dd:parseInt(document.getElementById('del-cl-dd')?.value)||0,cl_gh:parseInt(document.getElementById('del-cl-gh')?.value)||0,sq_ub:parseInt(document.getElementById('del-sq-ub')?.value)||0,sq_dd:parseInt(document.getElementById('del-sq-dd')?.value)||0,sq_gh:parseInt(document.getElementById('del-sq-gh')?.value)||0};
+
+  return {
+    fecha:document.getElementById('hFecha')?.value||todayStr(),
+    cajero:document.getElementById('hCajero')?.value||'',
+    cl_qty,sq_qty,clHD,sqHD,
+    clPos,clEf,clProp,sqPos,sqEf,sqProp,
+    bar_pos,bar_zel,bar_ef,
+    barGross,barTax,barTotal,bP,bZ,bE,sc,
+    tips_cl,tips_sq,del,
+    nota_cl:document.getElementById('nota-cl')?.value||'',
+    nota_sq:document.getElementById('nota-sq')?.value||'',
+    nota_bar:document.getElementById('nota-bar')?.value||'',
+  };
+}
+
+// ═══════════════════════════════════════════
+// TOTAL PANEL
+// ═══════════════════════════════════════════
+function buildTotalPanel() {
+  const d = readAll();
+  const grandEf = d.clEf + d.sqEf;
+  document.getElementById('grand-ef').textContent = '$'+fmt(grandEf);
+  document.getElementById('tot-pos').textContent = '$'+fmt(d.clPos+d.sqPos);
+  document.getElementById('tot-pos-sub').textContent = `Cl $${fmt(d.clPos)} · Sq $${fmt(d.sqPos)}`;
+  document.getElementById('tot-prop').textContent = '$'+fmt(d.clProp+d.sqProp);
+  document.getElementById('tot-prop-sub').textContent = `Cl $${fmt(d.clProp)} · Sq $${fmt(d.sqProp)}`;
+
+  const detail = document.getElementById('total-detail');
+  detail.innerHTML = `
+    <div class="scard">
+      <div class="sch" style="background:linear-gradient(135deg,#071A0D,#0D3320)">🟢 Clover</div>
+      <div class="sline"><span class="sl">Ventas ref.</span><span class="sv" style="color:var(--go)">$${fmt(d.clHD)}</span></div>
+      ${HD.map(p=>{const q=d.cl_qty[p.k]||0;return q?`<div class="sline" style="padding-left:22px"><span class="sl">${p.n} ×${q}</span><span class="sv" style="color:var(--mu)">$${fmt(q*p.p)}</span></div>`:''}).join('')}
+      <div class="sline"><span class="sl">💳 POS</span><span class="sv" style="color:var(--bl)">$${fmt(d.clPos)}</span></div>
+      <div class="sline"><span class="sl">💵 Efectivo</span><span class="sv" style="color:var(--gr)">$${fmt(d.clEf)}</span></div>
+      <div class="sline"><span class="sl">🤝 Propinas</span><span class="sv" style="color:var(--go)">$${fmt(d.clProp)}</span></div>
+      ${d.tips_cl.map(e=>`<div class="sline" style="padding-left:22px"><span class="sl">👤 ${e.name}</span><span class="sv" style="color:var(--gr)">$${fmt(e.amt)}</span></div>`).join('')}
+    </div>
+    <div class="scard">
+      <div class="sch" style="background:linear-gradient(135deg,#070E26,#0D1F4A)">🔵 Square</div>
+      <div class="sline"><span class="sl">Ventas ref.</span><span class="sv" style="color:var(--go)">$${fmt(d.sqHD)}</span></div>
+      ${HD.map(p=>{const q=d.sq_qty[p.k]||0;return q?`<div class="sline" style="padding-left:22px"><span class="sl">${p.n} ×${q}</span><span class="sv" style="color:var(--mu)">$${fmt(q*p.p)}</span></div>`:''}).join('')}
+      <div class="sline"><span class="sl">💳 POS</span><span class="sv" style="color:var(--bl)">$${fmt(d.sqPos)}</span></div>
+      <div class="sline"><span class="sl">💵 Efectivo</span><span class="sv" style="color:var(--gr)">$${fmt(d.sqEf)}</span></div>
+      <div class="sline"><span class="sl">🤝 Propinas</span><span class="sv" style="color:var(--go)">$${fmt(d.sqProp)}</span></div>
+      ${d.tips_sq.map(e=>`<div class="sline" style="padding-left:22px"><span class="sl">👤 ${e.name}</span><span class="sv" style="color:var(--bl)">$${fmt(e.amt)}</span></div>`).join('')}
+    </div>
+    ${d.barGross>0?`
+    <div class="scard">
+      <div class="sch" style="background:linear-gradient(135deg,#1A0A00,#3A1F00)">🍺 Bar — Separado</div>
+      <div class="sline"><span class="sl">Ventas brutas</span><span class="sv" style="color:var(--or)">$${fmt(d.barGross)}</span></div>
+      <div class="sline"><span class="sl">💳 POS</span><span class="sv" style="color:var(--bl)">$${fmt(d.bP)}</span></div>
+      <div class="sline"><span class="sl">⚡ Zelle</span><span class="sv" style="color:var(--go)">$${fmt(d.bZ)}</span></div>
+      <div class="sline"><span class="sl">💵 Efectivo</span><span class="sv" style="color:var(--gr)">$${fmt(d.bE)}</span></div>
+      <div class="sline"><span class="sl">Tax 8%</span><span class="sv" style="color:var(--re)">$${fmt(d.barTax)}</span></div>
+      <div class="sline" style="background:rgba(245,158,11,.04)"><span class="sl" style="color:var(--txt);font-weight:800">Total Bar con Tax</span><span class="sv" style="color:var(--or);font-size:14px">$${fmt(d.barTotal)}</span></div>
+      <div class="sline" style="background:rgba(46,204,113,.04)"><span class="sl" style="color:var(--gr);font-weight:700">SC 18% → Empleados</span><span class="sv" style="color:var(--gr)">$${fmt(d.sc)}</span></div>
+    </div>`:''}`;
+}
+
+// ═══════════════════════════════════════════
+// SAVE DAY
+// ═══════════════════════════════════════════
+async function guardarDia() {
+  const d = readAll();
+  if(!d.fecha){showToast('⚠️ Selecciona la fecha','err');return;}
+
+  const record = {
+    fecha:d.fecha, cajero:d.cajero,
+    cl_hd:d.clHD, cl_pos:d.clPos, cl_ef:d.clEf, cl_prop:d.clProp,
+    sq_hd:d.sqHD, sq_pos:d.sqPos, sq_ef:d.sqEf, sq_prop:d.sqProp,
+    bar_gross:d.barGross, bar_tax:d.barTax, bar_total:d.barTotal,
+    bar_pos:d.bP, bar_zel:d.bZ, bar_ef:d.bE, bar_sc:d.sc,
+    del_cl:d.del.cl_ub+d.del.cl_dd+d.del.cl_gh,
+    del_sq:d.del.sq_ub+d.del.sq_dd+d.del.sq_gh,
+    saved_at: new Date().toISOString(),
+  };
+
+  // Save locally always
+  let week = loadWeekLocal().filter(x=>x.fecha!==d.fecha);
+  week.push(record);
+  week.sort((a,b)=>a.fecha>b.fecha?1:-1);
+  saveWeekLocal(week);
+  weekData = week;
+
+  // Try cloud sync
+  if(gsUrl) {
+    setSyncStatus('busy','Guardando...');
+    const ok = await syncToSheets(record);
+    if(ok) {
+      setSyncStatus('on','Sincronizado ☁️');
+      showToast('✅ Guardado en Google Sheets','ok');
+    } else {
+      setSyncStatus('off','Solo local');
+      showToast('⚠️ Guardado local (sin internet)','info');
+    }
+  } else {
+    showToast('✅ Guardado localmente','ok');
+    setSyncStatus('off','Sin nube (Config ⚙️)');
+  }
+}
+
+// ═══════════════════════════════════════════
+// GOOGLE SHEETS SYNC
+// ═══════════════════════════════════════════
+async function syncToSheets(record) {
+  if(!gsUrl) return false;
+  try {
+    const res = await fetch(gsUrl, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:'save', data: record}),
+    });
+    const json = await res.json();
+    return json.status === 'ok';
+  } catch(e) { return false; }
+}
+
+async function loadFromSheets() {
+  if(!gsUrl) return null;
+  try {
+    const res = await fetch(gsUrl+'?action=load');
+    const json = await res.json();
+    return Array.isArray(json.data) ? json.data : null;
+  } catch(e) { return null; }
+}
+
+async function loadWeek() {
+  const local = loadWeekLocal();
+  weekData = local;
+
+  if(gsUrl) {
+    setSyncStatus('busy','Cargando...');
+    const cloud = await loadFromSheets();
+    if(cloud) {
+      // Merge: cloud wins for same date
+      const merged = [...local];
+      cloud.forEach(cd=>{
+        if(!merged.find(l=>l.fecha===cd.fecha)) merged.push(cd);
+      });
+      merged.sort((a,b)=>a.fecha>b.fecha?1:-1);
+      weekData = merged;
+      saveWeekLocal(merged);
+      setSyncStatus('on','Sincronizado ☁️');
+    } else {
+      setSyncStatus('off','Sin conexión');
+    }
+  }
+}
+
+async function testConnection() {
+  if(!gsUrl){showToast('Configura la URL primero','err');return;}
+  setSyncStatus('busy','Probando...');
+  const ok = await loadFromSheets();
+  if(ok!==null){setSyncStatus('on','Conectado ✅');showToast('✅ Conexión exitosa','ok');}
+  else{setSyncStatus('off','Sin conexión');showToast('❌ No se pudo conectar','err');}
+}
+
+// ═══════════════════════════════════════════
+// LOCAL STORAGE
+// ═══════════════════════════════════════════
+function loadWeekLocal(){try{return JSON.parse(localStorage.getItem(WEEK_KEY))||[];}catch{return[];}}
+function saveWeekLocal(w){try{localStorage.setItem(WEEK_KEY,JSON.stringify(w));}catch(e){showToast('⚠️ Sin espacio de almacenamiento','err');}}
+function clearWeek(){if(!confirm('¿Limpiar todos los días guardados?'))return;localStorage.removeItem(WEEK_KEY);weekData=[];buildWeekPanel();showToast('🗑 Semana limpiada','info');}
+
+function loadConfig(){
+  try{
+    const cfg=JSON.parse(localStorage.getItem(CFG_KEY)||'{}');
+    gsUrl=cfg.gsUrl||'';
+    if(gsUrl){
+      document.getElementById('gs-url').value=gsUrl;
+      setSyncStatus('on','Google Sheets');
+      document.getElementById('sync-status-note').textContent='☁️ Google Sheets conectado';
+    }
+  }catch{}
+}
+function saveConfig(){
+  gsUrl=document.getElementById('gs-url')?.value||'';
+  try{localStorage.setItem(CFG_KEY,JSON.stringify({gsUrl}));}catch{}
+  if(gsUrl){setSyncStatus('on','Configurado ✅');document.getElementById('sync-status-note').textContent='☁️ Google Sheets conectado';}
+  else{setSyncStatus('off','Sin nube');}
+}
+
+function setSyncStatus(state, lbl) {
+  const dot=document.getElementById('syncDot');
+  const lbl2=document.getElementById('syncLbl');
+  if(dot){dot.className='sync-dot'+(state==='off'?' off':state==='busy'?' busy':'');}
+  if(lbl2) lbl2.textContent=lbl;
+}
+
+// ═══════════════════════════════════════════
+// WEEK PANEL
+// ═══════════════════════════════════════════
+function buildWeekPanel() {
+  const w = weekData;
+  const tClEf=w.reduce((s,d)=>s+(d.cl_ef||0),0);
+  const tClPos=w.reduce((s,d)=>s+(d.cl_pos||0),0);
+  const tClProp=w.reduce((s,d)=>s+(d.cl_prop||0),0);
+  const tSqEf=w.reduce((s,d)=>s+(d.sq_ef||0),0);
+  const tSqPos=w.reduce((s,d)=>s+(d.sq_pos||0),0);
+  const tSqProp=w.reduce((s,d)=>s+(d.sq_prop||0),0);
+  const tBar=w.reduce((s,d)=>s+(d.bar_total||0),0);
+  const tSC=w.reduce((s,d)=>s+(d.bar_sc||0),0);
+  const tEf=tClEf+tSqEf;
+
+  document.getElementById('week-cards').innerHTML=`
+    <div class="wcard"><div class="wch" style="background:linear-gradient(135deg,#071A0D,#0D3320)">🟢 Clover</div><div class="wcb"><div class="wca" style="color:var(--gr)">$${fmt(tClEf)}</div><div class="wcs">💳 $${fmt(tClPos)} · 🤝 $${fmt(tClProp)}</div></div></div>
+    <div class="wcard"><div class="wch" style="background:linear-gradient(135deg,#070E26,#0D1F4A)">🔵 Square</div><div class="wcb"><div class="wca" style="color:var(--bl)">$${fmt(tSqEf)}</div><div class="wcs">💳 $${fmt(tSqPos)} · 🤝 $${fmt(tSqProp)}</div></div></div>
+    <div class="wcard"><div class="wch" style="background:linear-gradient(135deg,#1A0A00,#3A1F00)">🍺 Bar</div><div class="wcb"><div class="wca" style="color:var(--or)">$${fmt(tBar)}</div><div class="wcs">SC emp: $${fmt(tSC)}</div></div></div>
+    <div class="wcard"><div class="wch" style="background:var(--s2)">💵 Efectivo</div><div class="wcb"><div class="wca" style="color:var(--go)">$${fmt(tEf)}</div><div class="wcs">${w.length} días guardados</div></div></div>`;
+
+  const tbody=document.getElementById('week-tbody');
+  if(!w.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--mu);padding:18px;font-size:11px">Sin días guardados</td></tr>';return;}
+  tbody.innerHTML=w.map(d=>`
+    <tr>
+      <td>${dayLbl(d.fecha)}</td>
+      <td style="color:var(--gr)">$${fmt(d.cl_ef)}</td>
+      <td style="color:var(--bl)">$${fmt(d.sq_ef)}</td>
+      <td style="color:var(--or)">${d.bar_total>0?'$'+fmt(d.bar_total):'—'}</td>
+      <td style="color:var(--go);font-weight:800">$${fmt((d.cl_ef||0)+(d.sq_ef||0))}</td>
+    </tr>`).join('')
+    +`<tr class="tr-tot"><td>SEMANA</td><td style="color:var(--gr)">$${fmt(tClEf)}</td><td style="color:var(--bl)">$${fmt(tSqEf)}</td><td style="color:var(--or)">${tBar>0?'$'+fmt(tBar):'—'}</td><td style="color:var(--go)">$${fmt(tEf)}</td></tr>`;
+
+  const barDays=w.filter(d=>d.bar_gross>0);
+  const bw=document.getElementById('bar-week');
+  if(!barDays.length){bw.innerHTML='<div style="padding:14px;font-size:12px;color:var(--mu);text-align:center">Sin ventas de bar</div>';return;}
+  bw.innerHTML=barDays.map(d=>`
+    <div class="mrow">
+      <div class="mlbl">${dayLbl(d.fecha)}<div class="msub">Bruto $${fmt(d.bar_gross)} · Tax $${fmt(d.bar_tax)}</div></div>
+      <div style="text-align:right">
+        <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--or)">$${fmt(d.bar_total)}</div>
+        <div style="font-size:10px;color:var(--mu)">💳$${fmt(d.bar_pos)} ⚡$${fmt(d.bar_zel)} 💵$${fmt(d.bar_ef||0)}</div>
+      </div>
+    </div>`).join('')
+    +`<div class="mrow" style="background:var(--or-l)"><div class="mlbl" style="font-weight:900">TOTAL BAR SEMANA</div><div style="font-family:'DM Mono',monospace;font-size:16px;color:var(--or)">$${fmt(tBar)}</div></div>
+    <div class="mrow" style="background:rgba(46,204,113,.05)"><div class="mlbl" style="color:var(--gr);font-weight:800">Service Charge → Empleados</div><div style="font-family:'DM Mono',monospace;font-size:15px;color:var(--gr)">$${fmt(tSC)}</div></div>`;
+}
+
+// ═══════════════════════════════════════════
+// TEXT GENERATORS
+// ═══════════════════════════════════════════
+function genDayText(){
+  const d=readAll();
+  const fecha=d.fecha?new Date(d.fecha+'T12:00:00').toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'}):'';
+  let t=`🌭 HOT DOG MARACAY\n${fecha.toUpperCase()} · Cajero: ${d.cajero||'—'}\n${'─'.repeat(32)}\n\n`;
+  t+=`🟢 CLOVER\n`;
+  HD.forEach(p=>{const q=d.cl_qty[p.k]||0;if(q)t+=`  ${p.n}: ${q} ($${fmt(q*p.p)})\n`;});
+  t+=`  💳 POS: $${fmt(d.clPos)}  💵 Efect: $${fmt(d.clEf)}  🤝 Prop: $${fmt(d.clProp)}\n`;
+  d.tips_cl.forEach(e=>t+=`  Tip ${e.name}: $${fmt(e.amt)}\n`);
+  t+=`\n🔵 SQUARE\n`;
+  HD.forEach(p=>{const q=d.sq_qty[p.k]||0;if(q)t+=`  ${p.n}: ${q} ($${fmt(q*p.p)})\n`;});
+  t+=`  💳 POS: $${fmt(d.sqPos)}  💵 Efect: $${fmt(d.sqEf)}  🤝 Prop: $${fmt(d.sqProp)}\n`;
+  d.tips_sq.forEach(e=>t+=`  Tip ${e.name}: $${fmt(e.amt)}\n`);
+  if(d.barGross>0){
+    t+=`\n🍺 BAR\n`;
+    BAR.forEach(p=>{const q=(parseInt(document.getElementById(`bar-pos-${p.k}`)?.value)||0)+(parseInt(document.getElementById(`bar-zel-${p.k}`)?.value)||0)+(parseInt(document.getElementById(`bar-ef-${p.k}`)?.value)||0);if(q)t+=`  ${p.n}: ${q} ($${fmt(q*p.p)})\n`;});
+    t+=`  💳$${fmt(d.bP)} ⚡$${fmt(d.bZ)} 💵$${fmt(d.bE)}\n  Total con tax: $${fmt(d.barTotal)} · SC: $${fmt(d.sc)}\n`;
+  }
+  t+=`\n${'─'.repeat(32)}\n💵 EFECTIVO CAJA: $${fmt(d.clEf+d.sqEf)}\n💳 POS TOTAL: $${fmt(d.clPos+d.sqPos)}\n🤝 PROPINAS: $${fmt(d.clProp+d.sqProp)}\n`;
+  return t;
+}
+
+function genWeekText(){
+  if(!weekData.length)return'Sin días guardados.';
+  let t=`📅 REPORTE SEMANAL — HOT DOG MARACAY\n${'─'.repeat(36)}\n\n`;
+  weekData.forEach(d=>{t+=`${dayLbl(d.fecha).toUpperCase()}\n  🟢 Cl: $${fmt(d.cl_ef)} efect · $${fmt(d.cl_pos)} POS · $${fmt(d.cl_prop)} prop\n  🔵 Sq: $${fmt(d.sq_ef)} efect · $${fmt(d.sq_pos)} POS · $${fmt(d.sq_prop)} prop\n${d.bar_total>0?`  🍺 Bar: $${fmt(d.bar_total)} c/tax\n`:''} 💵 Efect día: $${fmt((d.cl_ef||0)+(d.sq_ef||0))}\n\n`;});
+  const te=weekData.reduce((s,d)=>s+(d.cl_ef||0)+(d.sq_ef||0),0);
+  const tb=weekData.reduce((s,d)=>s+(d.bar_total||0),0);
+  t+=`${'─'.repeat(36)}\n💵 EFECT. TOTAL SEMANA: $${fmt(te)}\n${tb>0?`🍺 BAR TOTAL: $${fmt(tb)}\n`:''}`;
+  return t;
+}
+
+function genBarText(){
+  const bd=weekData.filter(d=>d.bar_gross>0);
+  if(!bd.length)return'Sin ventas de bar.';
+  let t=`🍺 REPORTE BAR SEMANAL\n${'─'.repeat(36)}\n\n`;
+  bd.forEach(d=>{t+=`${dayLbl(d.fecha)}: $${fmt(d.bar_total)} (💳$${fmt(d.bar_pos)} ⚡$${fmt(d.bar_zel)} 💵$${fmt(d.bar_ef||0)}) SC:$${fmt(d.bar_sc||0)}\n`;});
+  t+=`\nTOTAL: $${fmt(bd.reduce((s,d)=>s+d.bar_total,0))} · SC: $${fmt(bd.reduce((s,d)=>s+(d.bar_sc||0),0))}\n`;
+  return t;
+}
+
+function sendWA(txt){window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank');}
+function copyText(txt){
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>showToast('✅ Copiado','ok')).catch(()=>fbCopy(txt));
+  else fbCopy(txt);
+}
+function fbCopy(txt){const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0;top:0;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('✅ Copiado','ok');}
+
+function showToast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className=`toast ${type} show`;
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ═══════════════════════════════════════════
+// APPS SCRIPT CODE TO DISPLAY
+// ═══════════════════════════════════════════
+function getScriptCode(){
+  return `function doPost(e){
+  var data=JSON.parse(e.postData.contents);
+  var ss=SpreadsheetApp.getActiveSpreadsheet();
+  var sh=ss.getSheetByName('Datos')||ss.insertSheet('Datos');
+  if(sh.getLastRow()===0)sh.appendRow(['fecha','cajero','cl_ef','cl_pos','cl_prop','sq_ef','sq_pos','sq_prop','bar_total','bar_sc','saved_at']);
+  var d=data.data;
+  var rows=sh.getDataRange().getValues();
+  for(var i=1;i<rows.length;i++){if(rows[i][0]===d.fecha){sh.deleteRow(i+1);break;}}
+  sh.appendRow([d.fecha,d.cajero,d.cl_ef,d.cl_pos,d.cl_prop,d.sq_ef,d.sq_pos,d.sq_prop,d.bar_total,d.bar_sc,d.saved_at]);
+  return ContentService.createTextOutput(JSON.stringify({status:'ok'})).setMimeType(ContentService.MimeType.JSON);
+}
+function doGet(e){
+  var ss=SpreadsheetApp.getActiveSpreadsheet();
+  var sh=ss.getSheetByName('Datos');
+  if(!sh)return ContentService.createTextOutput(JSON.stringify({data:[]})).setMimeType(ContentService.MimeType.JSON);
+  var rows=sh.getDataRange().getValues();
+  var headers=rows[0];
+  var data=rows.slice(1).map(r=>{var o={};headers.forEach((h,i)=>o[h]=r[i]);return o;});
+  return ContentService.createTextOutput(JSON.stringify({data:data})).setMimeType(ContentService.MimeType.JSON);
+}`;
+}
+</script>
+</body>
+</html>
