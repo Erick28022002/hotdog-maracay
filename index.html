@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Hot Dog Maracay — Los mejores hot dogs venezolanos en Miami. North Miami Beach, Doral y Downtown.">
+<title>Hotdog Maracay — Un Pedacito de Venezuela en Miami</title>
+<base href="./">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://web.squarecdn.com/v1/square.js"></script>
+<style>
+:root{
+  --bg:#0A0A0A;
+  --s1:#111111;
+  --s2:#181818;
+  --s3:#222222;
+  --b:rgba(255,255,255,0.07);
+  --b2:rgba(255,255,255,0.14);
+  --txt:#F5F0E8;
+  --mu:#888077;
+  /* BRAND OFFICIAL PALETTE */
+  --mango:#FAA83C;
+  --terra:#F16243;
+  --blue:#00A7D1;
+  --fucsia:#CB5C95;
+  --white:#FFFFFF;
+  --red:#E8272A;
+  --gr:#22C55E;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+
+/* ── NEON UTILITIES ── */
+.n-mango{color:var(--mango);text-shadow:0 0 20px rgba(250,168,60,.7),0 0 50px rgba(250,168,60,.35)}
+.n-blue{color:var(--blue);text-shadow:0 0 20px rgba(0,167,209,.8),0 0 50px rgba(0,167,209,.4)}
+.n-fucsia{color:var(--fucsia);text-shadow:0 0 20px rgba(203,92,149,.8),0 0 50px rgba(203,92,149,.4)}
+.n-terra{color:var(--terra);text-shadow:0 0 16px rgba(241,98,67,.7),0 0 40px rgba(241,98,67,.35)}
+.stroke-mango{color:transparent;-webkit-text-stroke:2px var(--mango);text-shadow:0 0 40px rgba(250,168,60,.5)}
+.stroke-blue{color:transparent;-webkit-text-stroke:2px var(--blue);text-shadow:0 0 40px rgba(0,167,209,.6)}
+.stroke-fucsia{color:transparent;-webkit-text-stroke:2px var(--fucsia);text-shadow:0 0 40px rgba(203,92,149,.6)}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:0 60px;height:72px;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .4s,border-color .4s;
+  border-bottom:1px solid transparent;
+}
+nav.scrolled{background:rgba(10,10,10,.94);backdrop-filter:blur(24px);border-color:rgba(250,168,60,.15)}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;
+  color:var(--mango);display:flex;align-items:center;gap:8px;
+  text-shadow:0 0 16px rgba(250,168,60,.5);
+}
+.nav-links{display:flex;gap:36px}
+.nav-links a{font-size:12px;font-weight:700;color:var(--mu);transition:color .2s;letter-spacing:.8px;text-transform:uppercase}
+.nav-links a:hover{color:var(--mango)}
+.btn-order{
+  background:linear-gradient(135deg,var(--mango),var(--terra));
+  color:#000;font-family:'Montserrat',sans-serif;font-weight:900;font-size:12px;
+  padding:10px 24px;border-radius:100px;cursor:pointer;border:none;
+  letter-spacing:.5px;text-transform:uppercase;transition:filter .15s,transform .15s;
+}
+.btn-order:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;z-index:110}
+.ham span{display:block;width:24px;height:2px;background:var(--txt);border-radius:2px;transition:transform .3s,opacity .3s}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+/* Mobile nav drawer */
+.mobile-nav{
+  display:none;position:fixed;inset:0;z-index:105;
+  flex-direction:column;align-items:center;justify-content:center;gap:32px;
+  background:rgba(10,10,10,.97);backdrop-filter:blur(20px);
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.mobile-nav.open{opacity:1;pointer-events:all}
+.mobile-nav a{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;color:var(--txt);transition:color .2s}
+.mobile-nav a:hover{color:var(--mango)}
+.mobile-nav .mn-close{position:absolute;top:20px;right:20px;background:var(--s2);border:1px solid var(--b);color:var(--txt);width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ── HERO ── */
+.hero{height:100vh;position:relative;display:flex;align-items:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;overflow:hidden}
+.hero-bg img{width:100%;height:120%;object-fit:cover;filter:brightness(.28) saturate(1.5) hue-rotate(5deg)}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(10,10,10,.92) 0%,rgba(241,98,67,.04) 50%,rgba(10,10,10,.88) 100%);
+}
+/* Neon lines decorative */
+.hero-overlay::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--blue),var(--fucsia),transparent);
+  opacity:.7;
+}
+.hero-content{position:relative;z-index:2;padding:0 80px;max-width:900px}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(250,168,60,.1);border:1px solid rgba(250,168,60,.35);
+  border-radius:100px;padding:7px 20px;
+  font-size:11px;font-weight:700;color:var(--mango);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:28px;opacity:0;transform:translateY(16px);
+}
+.hero h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(68px,11vw,130px);line-height:.9;
+  letter-spacing:2px;margin-bottom:28px;
+}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line-inner{display:block;transform:translateY(105%)}
+.hero-desc{
+  font-size:17px;color:rgba(245,240,232,.68);max-width:520px;
+  line-height:1.75;margin-bottom:40px;font-weight:400;
+  opacity:0;transform:translateY(20px);
+}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;opacity:0;transform:translateY(20px)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--mango),var(--terra));
+  color:#000;font-weight:900;font-size:14px;padding:16px 36px;
+  border-radius:100px;border:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:filter .15s,transform .15s;letter-spacing:.4px;text-transform:uppercase;
+}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.btn-outline{
+  background:transparent;color:var(--txt);font-weight:700;font-size:14px;
+  padding:15px 32px;border-radius:100px;border:1.5px solid rgba(0,167,209,.5);
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  transition:all .2s;letter-spacing:.4px;
+}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);box-shadow:0 0 20px rgba(0,167,209,.2)}
+.hero-stats{display:flex;gap:48px;margin-top:64px;opacity:0;flex-wrap:wrap}
+.stat-num{
+  font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--mango);
+  line-height:1;letter-spacing:1px;
+  text-shadow:0 0 24px rgba(250,168,60,.5);
+}
+.stat-lbl{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:1.5px;margin-top:4px;text-transform:uppercase}
+.hero-mascot{
+  position:absolute;right:3%;bottom:0;height:80vh;z-index:3;
+  pointer-events:none;filter:drop-shadow(0 0 50px rgba(241,98,67,.5));
+  transform:translateX(160px);opacity:0;
+}
+
+/* ── MARQUEE ── */
+.marquee-wrap{
+  background:linear-gradient(90deg,var(--terra),#CC3311,var(--terra));
+  padding:14px 0;overflow:hidden;white-space:nowrap;position:relative;
+}
+.marquee-wrap::before,.marquee-wrap::after{
+  content:'';position:absolute;top:0;bottom:0;width:2px;
+  background:rgba(255,255,255,.2);
+}
+.marquee-wrap::before{left:0}
+.marquee-wrap::after{right:0}
+.marquee-track{display:inline-flex;animation:marquee 28s linear infinite}
+.marquee-item{
+  font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3.5px;
+  color:#fff;padding:0 32px;display:inline-flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.marquee-item::after{content:'★';color:rgba(255,255,255,.35);margin-left:20px}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── FEATURES ── */
+.features-sec{background:var(--s1);padding:96px 60px;border-bottom:1px solid var(--b)}
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1280px;margin:0 auto}
+.feat-card{
+  background:var(--s2);border:1px solid var(--b);border-radius:20px;
+  padding:36px 28px;transition:border-color .3s,box-shadow .3s;
+  opacity:0;transform:translateY(40px);position:relative;overflow:hidden;
+}
+.feat-card::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--mango),var(--terra));
+  transform:scaleX(0);transition:transform .3s;transform-origin:left;
+}
+.feat-card:hover{border-color:rgba(250,168,60,.25);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.feat-card:hover::before{transform:scaleX(1)}
+.feat-ico{font-size:44px;margin-bottom:18px;display:block}
+.feat-t{font-weight:800;font-size:16px;margin-bottom:8px;letter-spacing:.3px}
+.feat-s{font-size:13px;color:var(--mu);line-height:1.65;font-weight:400}
+
+/* ── HISTORIA ── */
+.historia-sec{background:var(--bg);padding:120px 60px;position:relative;overflow:hidden}
+.historia-sec::before{
+  content:'2014';font-family:'Bebas Neue',sans-serif;font-size:360px;
+  color:rgba(250,168,60,.03);position:absolute;right:-40px;top:50%;
+  transform:translateY(-50%);line-height:1;pointer-events:none;letter-spacing:-10px;
+}
+.hist-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1280px;margin:0 auto}
+.hist-img-wrap{border-radius:24px;overflow:hidden;height:520px;position:relative}
+.hist-img-wrap img{width:100%;height:100%;object-fit:cover}
+.hist-img-wrap::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(241,98,67,.15),rgba(0,167,209,.1));
+  pointer-events:none;
+}
+.hist-neon-border{
+  position:absolute;inset:0;border-radius:24px;
+  box-shadow:inset 0 0 0 2px rgba(0,167,209,.2), 0 0 60px rgba(0,167,209,.1);
+}
+.hist-years{display:flex;gap:24px;margin-bottom:28px;align-items:center}
+.hist-year{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;
+  color:var(--mu);padding:6px 16px;border-radius:100px;
+  border:1px solid rgba(255,255,255,.1);
+}
+.hist-year.active{
+  color:var(--mango);border-color:rgba(250,168,60,.4);
+  background:rgba(250,168,60,.08);
+  text-shadow:0 0 16px rgba(250,168,60,.5);
+}
+.hist-arrow{color:var(--mu);font-size:18px}
+.hist-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,6vw,80px);letter-spacing:1.5px;
+  line-height:.92;margin-bottom:24px;
+}
+.hist-p{font-size:15px;color:rgba(245,240,232,.68);line-height:1.8;margin-bottom:18px;font-weight:400}
+.hist-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:32px}
+.hist-tag{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:8px 16px;border-radius:100px;border:1px solid;
+}
+.hist-tag.t1{color:var(--mango);border-color:rgba(250,168,60,.4);background:rgba(250,168,60,.08)}
+.hist-tag.t2{color:var(--blue);border-color:rgba(0,167,209,.4);background:rgba(0,167,209,.08)}
+.hist-tag.t3{color:var(--fucsia);border-color:rgba(203,92,149,.4);background:rgba(203,92,149,.08)}
+
+/* ── SECTION BASE ── */
+.sec{padding:120px 60px}
+.container{max-width:1280px;margin:0 auto}
+.sec-tag{
+  display:inline-block;
+  background:rgba(250,168,60,.08);border:1px solid rgba(250,168,60,.25);
+  border-radius:100px;padding:5px 18px;
+  font-size:10px;font-weight:800;color:var(--mango);letter-spacing:2.5px;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.sec-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(48px,7vw,84px);letter-spacing:1.5px;line-height:.92;margin-bottom:16px;
+}
+.sec-sub{color:var(--mu);font-size:15px;line-height:1.75;max-width:520px;font-weight:400}
+
+/* ── MENU GRID ── */
+.menu-section{background:var(--s1);border-top:1px solid var(--b);border-bottom:1px solid var(--b)}
+.menu-header{margin-bottom:40px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.promo-card{
+  background:linear-gradient(135deg,#1C0A00,#2E1400,#1C0A00);
+  border:1.5px solid rgba(250,168,60,.2);border-radius:24px;overflow:hidden;
+  margin-bottom:40px;display:grid;grid-template-columns:1fr 1fr;min-height:280px;
+  transition:border-color .3s;
+}
+.promo-card:hover{border-color:rgba(250,168,60,.4)}
+.promo-left{padding:44px;display:flex;flex-direction:column;justify-content:center}
+.promo-eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--terra);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.promo-title{font-family:'Bebas Neue',sans-serif;font-size:54px;color:var(--mango);letter-spacing:1px;line-height:.95;margin-bottom:12px;text-shadow:0 0 30px rgba(250,168,60,.3)}
+.promo-desc{font-size:14px;color:rgba(245,240,232,.6);line-height:1.65;margin-bottom:24px;font-weight:400}
+.promo-right{position:relative;overflow:hidden}
+.promo-right img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.promo-card:hover .promo-right img{transform:scale(1.04)}
+.promo-right::after{content:'';position:absolute;left:0;top:0;bottom:0;width:45%;background:linear-gradient(to right,#1C0A00,transparent)}
+.menu-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
+.tab{background:var(--s2);border:1.5px solid var(--b);border-radius:100px;padding:10px 24px;font-size:13px;font-weight:700;color:var(--mu);cursor:pointer;transition:all .2s}
+.tab:hover{border-color:var(--b2);color:var(--txt)}
+.tab.active{background:linear-gradient(135deg,var(--mango),var(--terra));border-color:transparent;color:#000}
+.menu-cat{display:none}
+.menu-cat.active{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.mcard{
+  background:var(--bg);border:1px solid var(--b);
+  border-radius:20px;overflow:hidden;transition:border-color .3s,transform .3s,box-shadow .3s;
+}
+.mcard:hover{border-color:rgba(250,168,60,.3);transform:translateY(-6px);box-shadow:0 24px 64px rgba(0,0,0,.6),0 0 40px rgba(250,168,60,.06)}
+.mcard-img{height:200px;overflow:hidden;position:relative}
+.mcard-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.mcard:hover .mcard-img img{transform:scale(1.07)}
+.mcard-badge{
+  position:absolute;top:12px;left:12px;
+  background:linear-gradient(135deg,var(--terra),#CC2200);
+  color:#fff;font-size:10px;font-weight:900;padding:4px 12px;
+  border-radius:100px;letter-spacing:.5px;text-transform:uppercase;
+}
+.mcard-badge.gold{background:linear-gradient(135deg,var(--mango),var(--terra));color:#000}
+.mcard-body{padding:20px}
+.mcard-name{font-weight:800;font-size:16px;margin-bottom:6px;letter-spacing:.2px}
+.mcard-desc{font-size:12px;color:var(--mu);margin-bottom:18px;line-height:1.6;font-weight:400}
+.mcard-footer{display:flex;align-items:center;justify-content:space-between}
+.mcard-price{
+  font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--mango);
+  letter-spacing:1px;text-shadow:0 0 20px rgba(250,168,60,.4);
+}
+.add-btn{
+  background:linear-gradient(135deg,var(--mango),var(--terra));color:#000;
+  border:none;border-radius:100px;width:42px;height:42px;
+  font-size:22px;font-weight:900;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:filter .15s,transform .15s;flex-shrink:0;
+}
+.add-btn:hover{filter:brightness(1.1);transform:scale(1.1)}
+
+/* ── DELIVERY ── */
+.delivery-sec{background:var(--bg);border-bottom:1px solid var(--b)}
+.delivery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:48px}
+.app-card{
+  background:var(--s1);border:1.5px solid var(--b);border-radius:20px;
+  padding:28px;display:flex;align-items:center;gap:20px;
+  transition:border-color .25s,transform .25s,box-shadow .25s;
+  opacity:0;transform:translateY(30px);
+}
+.app-card:hover{
+  border-color:rgba(250,168,60,.3);transform:translateY(-4px) !important;
+  box-shadow:0 16px 48px rgba(0,0,0,.4),0 0 30px rgba(250,168,60,.05);
+}
+.app-logo{
+  width:64px;height:64px;border-radius:16px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:#fff;line-height:1.2;text-align:center;
+}
+.app-info h3{font-weight:800;font-size:17px;margin-bottom:4px}
+.app-info p{font-size:12px;color:var(--mu);font-weight:400}
+.app-arrow{margin-left:auto;color:var(--mango);font-size:26px;flex-shrink:0;transition:transform .2s}
+.app-card:hover .app-arrow{transform:translateX(6px)}
+
+/* ── LOCATIONS ── */
+.loc-sec{background:var(--s1);border-bottom:1px solid var(--b)}
+.loc-list{margin-top:64px;display:flex;flex-direction:column;gap:80px}
+.loc-item{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.loc-item.rev{direction:rtl}
+.loc-item.rev>*{direction:ltr}
+.loc-img-wrap{border-radius:24px;overflow:hidden;height:440px;position:relative}
+.loc-img-wrap::after{
+  content:'';position:absolute;inset:0;
+  box-shadow:inset 0 0 0 1px rgba(0,167,209,.2);border-radius:24px;
+  pointer-events:none;
+}
+.loc-img-wrap img{width:100%;height:115%;object-fit:cover;will-change:transform}
+.loc-num{
+  font-family:'Bebas Neue',sans-serif;font-size:110px;
+  color:transparent;-webkit-text-stroke:1px rgba(250,168,60,.15);
+  line-height:1;margin-bottom:-14px;letter-spacing:-2px;
+}
+.loc-name{font-weight:900;font-size:34px;margin-bottom:12px;letter-spacing:.3px}
+.loc-addr{font-size:14px;color:var(--mu);line-height:1.8;margin-bottom:28px;font-weight:400}
+.loc-btns{display:flex;gap:10px;flex-wrap:wrap}
+.loc-btn{
+  font-size:12px;font-weight:700;padding:10px 20px;border-radius:100px;
+  border:1px solid var(--b2);color:var(--txt);background:none;cursor:pointer;
+  transition:border-color .15s,color .15s;
+  display:inline-flex;align-items:center;gap:6px;letter-spacing:.3px;
+}
+.loc-btn:hover{border-color:var(--mango);color:var(--mango)}
+.loc-btn.primary{
+  background:linear-gradient(135deg,var(--mango),var(--terra));
+  border-color:transparent;color:#000;font-weight:900;
+}
+
+/* ── REVIEWS ── */
+.reviews-sec{background:var(--bg)}
+.rev-hero{
+  display:grid;grid-template-columns:auto 1fr;gap:60px;align-items:center;
+  background:linear-gradient(135deg,rgba(250,168,60,.07),rgba(241,98,67,.04));
+  border:1px solid rgba(250,168,60,.2);border-radius:28px;
+  padding:52px 60px;margin-bottom:56px;position:relative;overflow:hidden;
+}
+.rev-hero::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--mango),var(--terra),var(--fucsia));
+}
+.rev-big-score{
+  font-family:'Bebas Neue',sans-serif;font-size:140px;color:var(--mango);
+  line-height:1;text-shadow:0 0 40px rgba(250,168,60,.5);
+}
+.rev-stars-big{font-size:30px;color:var(--mango);letter-spacing:4px;display:block;margin-bottom:8px;text-shadow:0 0 16px rgba(250,168,60,.5)}
+.rev-meta h3{font-size:22px;font-weight:800;margin-bottom:8px}
+.rev-meta p{color:var(--mu);font-size:14px;font-weight:400}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rev-card{
+  background:var(--s1);border:1px solid var(--b);border-radius:20px;
+  padding:28px;transition:border-color .2s;opacity:0;transform:translateY(30px);
+}
+.rev-card:hover{border-color:rgba(250,168,60,.2)}
+.rev-stars-sm{color:var(--mango);font-size:14px;letter-spacing:2px;margin-bottom:14px}
+.rev-text{font-size:13px;color:rgba(245,240,232,.68);line-height:1.8;margin-bottom:16px;font-weight:400}
+.rev-author{font-weight:800;font-size:12px;display:flex;align-items:center;gap:10px;letter-spacing:.5px}
+.rev-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--terra),var(--mango));border-radius:50%;flex-shrink:0}
+
+/* ── GALLERY ── */
+.gallery-sec{background:var(--s1);border-top:1px solid var(--b)}
+.gallery-grid{
+  margin-top:48px;display:grid;
+  grid-template-columns:2fr 1fr 1fr;grid-template-rows:280px 280px;gap:12px;
+}
+.g-item{border-radius:16px;overflow:hidden;background:var(--s2);position:relative;opacity:0;transform:scale(.97)}
+.g-item:first-child{grid-row:span 2}
+.g-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.g-item:hover img{transform:scale(1.07)}
+.g-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(10,10,10,.7),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.g-item:hover .g-overlay{opacity:1}
+
+/* ── SOCIAL ── */
+/* ── BOTTOM NAV (solo móvil) ── */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(10,10,10,.97);backdrop-filter:blur(24px);
+  border-top:1px solid rgba(250,168,60,.2);
+  padding:10px 0 env(safe-area-inset-bottom,8px);
+  flex-direction:row;justify-content:space-around;align-items:center;
+}
+.bn-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--mu);font-size:9px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;cursor:pointer;padding:4px 12px;
+  transition:color .2s;border:none;background:none;
+}
+.bn-item:hover,.bn-item.active{color:var(--mango)}
+.bn-ico{font-size:22px;line-height:1}
+.bn-cart{position:relative}
+.bn-badge{
+  position:absolute;top:-4px;right:-6px;
+  background:var(--terra);color:#fff;font-size:9px;font-weight:900;
+  padding:1px 5px;border-radius:100px;min-width:16px;text-align:center;
+}
+
+/* ── REELS ── */
+.reels-sec{background:var(--s1);border-top:1px solid var(--b)}
+.reels-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.reel-item{aspect-ratio:9/16;border-radius:20px;overflow:hidden;position:relative;background:var(--s3);cursor:pointer}
+.reel-item video{width:100%;height:100%;object-fit:cover;display:block}
+.reel-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);transition:opacity .3s;pointer-events:none}
+.reel-item.playing .reel-play{opacity:0}
+.reel-play-ico{width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.6);font-size:20px}
+@media(max-width:900px){.reels-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.reels-grid{grid-template-columns:repeat(2,1fr);gap:8px}}
+
+.social-sec{background:var(--bg);text-align:center;position:relative;overflow:hidden}
+.social-sec::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:800px;height:800px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,167,209,.04),transparent 70%);
+  pointer-events:none;
+}
+.soc-grid{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+.soc-btn{
+  display:flex;align-items:center;gap:12px;
+  background:var(--s1);border:1.5px solid var(--b);border-radius:16px;
+  padding:16px 28px;font-weight:700;font-size:14px;letter-spacing:.3px;
+  transition:border-color .2s,transform .2s,color .2s,box-shadow .2s;
+  opacity:0;transform:translateY(24px);
+}
+.soc-btn:hover{
+  border-color:rgba(0,167,209,.4);transform:translateY(-3px) !important;
+  color:var(--blue);box-shadow:0 0 30px rgba(0,167,209,.1);
+}
+
+/* ── FOOTER ── */
+footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px}
+.foot-top-line{height:2px;background:linear-gradient(90deg,var(--mango),var(--terra),var(--fucsia),var(--blue));margin-bottom:80px;border-radius:2px}
+.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;max-width:1280px;margin:0 auto 56px}
+.foot-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;
+  color:var(--mango);margin-bottom:14px;display:flex;align-items:center;gap:8px;
+  text-shadow:0 0 16px rgba(250,168,60,.4);
+}
+.foot-brand p{font-size:13px;color:var(--mu);line-height:1.8;font-weight:400}
+.foot-col h4{
+  font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--mu);margin-bottom:20px;
+}
+.foot-col a{display:block;font-size:13px;color:rgba(245,240,232,.4);margin-bottom:12px;transition:color .15s;font-weight:500}
+.foot-col a:hover{color:var(--mango)}
+.foot-bottom{
+  max-width:1280px;margin:0 auto;border-top:1px solid var(--b);
+  padding-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+.foot-bottom p{font-size:12px;color:var(--mu);font-weight:400}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  nav,.features-sec,.historia-sec,footer{padding-left:32px;padding-right:32px}
+  .sec{padding:80px 32px}
+  .hero-content{padding:0 32px}
+  .menu-header,.menu-track-wrap{padding-left:32px}
+  .loc-item,.hist-grid{grid-template-columns:1fr}
+  .loc-item.rev{direction:ltr}
+  .rev-grid{grid-template-columns:1fr 1fr}
+  .gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .g-item:first-child{grid-row:span 1}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .hist-img-wrap{height:300px}
+}
+@media(max-width:768px){
+  /* Ocultar nav superior completa en móvil */
+  nav{display:none}
+  .hero-tag{display:none}
+  .ham{display:none}
+  /* Bottom nav visible */
+  .bottom-nav{display:flex}
+  /* Padding para que el contenido no quede debajo del bottom nav */
+  body{padding-bottom:70px;background:transparent}
+  /* Fondo fijo real en móvil (background-attachment:fixed no funciona en móvil) */
+  body::before{
+    content:'';
+    position:fixed;inset:0;z-index:-1;
+    background:url('fotos/Miami%20Composition%20for%20HotDog%20Maracay%20_553315419.jpeg') center/cover no-repeat;
+    filter:brightness(.65) saturate(1.3);
+  }
+  /* Secciones semi-transparentes para que se vea el fondo */
+  .sec,.delivery-sec,.reviews-sec,.gallery-sec,.reels-sec,.historia-sec,footer{
+    background:rgba(10,10,10,0.80) !important;
+  }
+  /* Hero móvil: pantalla completa */
+  .hero{height:calc(100dvh - 70px);min-height:unset;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;height:100%}
+  .hero-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.75) saturate(1.3)}
+  .hero-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.82) 38%,rgba(0,0,0,0) 70%)}
+  /* Mascota: esquina inferior derecha, lo más grande posible */
+  .hero-mascot{
+    display:block !important;
+    height:76% !important;max-height:none !important;max-width:66vw;z-index:1;
+    right:0;left:auto;bottom:0;top:auto;
+    transform:none !important;
+    opacity:1 !important;
+    filter:drop-shadow(0 0 24px rgba(241,98,67,.8));
+  }
+  /* Texto: columna izquierda, centrado verticalmente, siempre encima */
+  .hero-content{
+    position:absolute;left:0;top:0;bottom:0;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:24px 16px;
+    max-width:54vw;
+    z-index:4;
+  }
+  .hero h1{font-size:clamp(22px,8.5vw,42px);line-height:1.0;margin:0}
+  .hero-desc{display:none}
+  .hero-stats{display:none}
+  .hero-btns{margin-top:12px;gap:8px;flex-wrap:wrap}
+  .hero-btns .btn-primary,.hero-btns .btn-outline{font-size:12px;padding:9px 14px}
+  /* Mobile nav drawer */
+  .mobile-nav{display:flex}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .features-sec{display:none}
+  .delivery-grid{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .rev-hero{grid-template-columns:1fr;gap:20px;padding:32px 24px}
+  .gallery-grid{grid-template-columns:1fr 1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .historia-sec::before{font-size:160px}
+  .promo-card{grid-template-columns:1fr}
+  .promo-right{height:220px}
+  .promo-left{padding:28px 24px}
+  .promo-title{font-size:40px}
+  .menu-cat.active{grid-template-columns:1fr 1fr}
+  .mcard-desc{display:none}
+}
+@media(max-width:480px){
+  .feat-grid{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:1fr}
+  .hero-stats{gap:24px}
+}
+
+/* ── NAV CART ── */
+.btn-cart{position:relative;background:var(--s2);border:1px solid var(--b2);color:var(--txt);font-weight:700;font-size:13px;padding:9px 18px;border-radius:100px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:border-color .15s;margin-right:8px}
+.btn-cart:hover{border-color:var(--mango)}
+.cart-badge{background:var(--red);color:#fff;font-size:10px;font-weight:900;padding:2px 6px;border-radius:100px;min-width:18px;text-align:center;transition:transform .2s;display:inline-block}
+
+
+/* ── CART DRAWER ── */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(4px)}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-drawer{position:fixed;right:0;top:0;bottom:0;width:min(440px,100vw);background:var(--s1);border-left:1px solid var(--b);z-index:201;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.cart-drawer.open{transform:translateX(0)}
+.cart-hdr{padding:22px 24px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
+.cart-hdr-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;display:flex;align-items:center;gap:8px}
+.cart-x{background:var(--s2);border:1px solid var(--b);color:var(--txt);font-size:16px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cart-x:hover{background:var(--s3)}
+.cart-list{flex:1;overflow-y:auto;padding:16px 24px}
+.cart-empty{text-align:center;padding:60px 24px;color:var(--mu)}
+.cart-empty .e-ico{font-size:56px;margin-bottom:16px}
+.ci{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--b);align-items:center}
+.ci:last-child{border-bottom:none}
+.ci-thumb{width:52px;height:52px;border-radius:12px;overflow:hidden;flex-shrink:0;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:26px}
+.ci-thumb img{width:100%;height:100%;object-fit:cover}
+.ci-info{flex:1;min-width:0}
+.ci-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-detail{font-size:11px;color:var(--mu);margin-top:2px;line-height:1.4}
+.ci-price{font-size:13px;color:var(--mango);font-weight:700;margin-top:2px}
+.ci-controls{display:flex;align-items:center;gap:8px;margin-top:8px}
+.q-btn{background:var(--s3);border:none;color:var(--txt);width:28px;height:28px;border-radius:7px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.q-btn:hover{background:var(--b2)}
+.q-val{font-weight:700;font-size:14px;min-width:22px;text-align:center}
+.ci-del{background:none;border:none;color:var(--mu);cursor:pointer;font-size:18px;margin-left:auto;padding:4px;transition:color .15s}
+.ci-del:hover{color:var(--red)}
+.cart-ftr{padding:20px 24px;padding-bottom:calc(20px + env(safe-area-inset-bottom,8px));border-top:1px solid var(--b)}
+.cart-row{display:flex;justify-content:space-between;font-size:14px;color:var(--mu);margin-bottom:8px}
+.cart-row.total{font-size:20px;font-weight:900;color:var(--txt);margin-top:12px;padding-top:12px;border-top:1px solid var(--b)}
+.cart-row.total span:last-child{color:var(--mango)}
+.checkout-btn{width:100%;background:linear-gradient(135deg,var(--mango),var(--terra));color:#000;font-family:'Montserrat',sans-serif;font-weight:900;font-size:15px;padding:15px;border:none;border-radius:14px;cursor:pointer;margin-top:16px;transition:filter .15s}
+.checkout-btn:hover{filter:brightness(1.08)}
+
+/* ── MODALES ── */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(6px)}
+.modal-wrap.open{display:flex}
+.modal{
+  background:var(--s1);border:1px solid var(--b2);
+  border-radius:24px 24px 0 0;
+  width:100%;max-width:500px;
+  max-height:90dvh;overflow-y:auto;
+  padding-bottom:env(safe-area-inset-bottom,16px);
+}
+@media(min-width:769px){
+  .modal-wrap{align-items:center;padding:16px}
+  .modal{border-radius:24px;max-height:92vh}
+}
+.modal-hdr{padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px}
+.modal-x{background:none;border:none;color:var(--mu);font-size:24px;cursor:pointer}
+.modal-body{padding:0 24px 24px}
+.form-grp{margin-bottom:16px}
+.form-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);display:block;margin-bottom:6px}
+.form-inp{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:14px;padding:12px 15px;outline:none;transition:border-color .15s}
+.form-inp:focus{border-color:var(--mango)}
+.form-sel{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:14px;padding:12px 15px;outline:none;appearance:none;cursor:pointer}
+.order-summary{background:var(--s2);border-radius:14px;padding:18px;margin-bottom:20px;border:1px solid var(--b)}
+.order-summary h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--mu);margin-bottom:12px}
+.os-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:rgba(245,240,232,.7)}
+.os-row.total{font-size:15px;font-weight:900;color:var(--txt);margin-top:10px;padding-top:10px;border-top:1px solid var(--b)}
+.os-row.total span:last-child{color:var(--mango)}
+.wa-btn{width:100%;background:#128C7E;color:#fff;font-family:'Montserrat',sans-serif;font-weight:900;font-size:15px;padding:15px;border:none;border-radius:14px;cursor:pointer;margin-top:16px;transition:filter .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.wa-btn:hover{filter:brightness(1.1)}
+.pay-note{font-size:12px;color:var(--mu);text-align:center;margin-top:12px;line-height:1.6}
+#sq-card-container{background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:10px;min-height:88px}
+#sq-pay-btn{width:100%;background:linear-gradient(135deg,var(--mango),var(--terra));color:#000;font-family:'Montserrat',sans-serif;font-weight:900;font-size:15px;padding:15px;border:none;border-radius:14px;cursor:pointer;margin-top:16px;transition:filter .15s}
+#sq-pay-btn:hover:not(:disabled){filter:brightness(1.08)}
+#sq-pay-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ── CUSTOM MODAL ── */
+.custom-item-preview{display:flex;align-items:center;gap:14px;padding:14px;background:var(--s2);border-radius:14px;margin-bottom:20px}
+.custom-item-preview img{width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0}
+.custom-item-preview .ci-emoji{width:64px;height:64px;border-radius:10px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.custom-item-preview h4{font-size:15px;font-weight:800;margin-bottom:4px}
+.custom-item-preview span{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--mango)}
+.custom-section-title{font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:12px;margin-top:20px;display:flex;align-items:center;gap:8px}
+.custom-section-title::after{content:'';flex:1;height:1px;background:var(--b)}
+.custom-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.custom-check{display:flex;align-items:center;gap:10px;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:10px 14px;cursor:pointer;transition:all .15s;user-select:none}
+.custom-check input{display:none}
+.custom-check .ck-box{width:20px;height:20px;border-radius:6px;border:2px solid var(--b2);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-size:12px}
+.custom-check.removed{border-color:var(--red);opacity:.6}
+.custom-check.selected{border-color:var(--mango);background:rgba(250,168,60,.08)}
+.custom-check.selected .ck-box{background:var(--mango);border-color:var(--mango);color:#000}
+.custom-check.salsa-disabled{opacity:.3;pointer-events:none}
+.custom-check span.ck-lbl{font-size:13px;font-weight:600}
+.drinks-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.drink-opt{display:flex;align-items:center;gap:10px;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:10px 14px;cursor:pointer;transition:all .15s;user-select:none}
+.drink-opt input{display:none}
+.drink-opt .dk-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--b2);transition:all .15s;flex-shrink:0}
+.drink-opt input:checked + .dk-dot{border-color:var(--mango);background:var(--mango)}
+.drink-opt.selected{border-color:var(--mango);background:rgba(250,168,60,.06)}
+.drink-opt span.dk-lbl{font-size:13px;font-weight:600}
+.custom-note-inp{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:12px 14px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--txt);outline:none;resize:none}
+.custom-note-inp:focus{border-color:var(--b2)}
+.salsa-error{color:var(--red);font-size:12px;font-weight:700;margin-top:8px;display:none}
+#customConfirmBtn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── SUCCESS ── */
+.success-body{text-align:center;padding:48px 32px}
+.success-ico{font-size:72px;margin-bottom:16px}
+.success-body h2{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--gr);letter-spacing:2px;margin-bottom:10px}
+.success-body p{color:var(--mu);font-size:15px;line-height:1.7}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:500;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.toast{background:var(--s2);border:1px solid var(--b2);border-radius:100px;padding:11px 22px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;white-space:nowrap;animation:toastIn .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast.ok{border-color:rgba(34,197,94,.4);color:#4ade80}
+.toast.info{border-color:rgba(250,168,60,.4);color:var(--mango)}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- BOTTOM NAV (móvil) -->
+<nav class="bottom-nav">
+  <button class="bn-item" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <span class="bn-ico">🏠</span>Inicio
+  </button>
+  <button class="bn-item" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">
+    <span class="bn-ico">🌭</span>Menú
+  </button>
+  <button class="bn-item" onclick="document.getElementById('delivery').scrollIntoView({behavior:'smooth'})">
+    <span class="bn-ico">🛵</span>Delivery
+  </button>
+  <button class="bn-item" onclick="document.getElementById('locations').scrollIntoView({behavior:'smooth'})">
+    <span class="bn-ico">📍</span>Lugares
+  </button>
+  <button class="bn-item bn-cart" onclick="toggleCart()">
+    <span class="bn-ico">🛒<span class="bn-badge" id="bnBadge">0</span></span>Carrito
+  </button>
+  <button class="bn-item" onclick="toggleMobileNav()">
+    <span class="bn-ico">☰</span>Más
+  </button>
+</nav>
+
+<!-- MOBILE NAV DRAWER -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mn-close" onclick="closeMobileNav()">✕</button>
+  <a href="#menu" onclick="closeMobileNav()">Menú</a>
+  <a href="#delivery" onclick="closeMobileNav()">Delivery</a>
+  <a href="#locations" onclick="closeMobileNav()">Ubicaciones</a>
+  <a href="#historia" onclick="closeMobileNav()">Historia</a>
+  <a href="#reviews" onclick="closeMobileNav()">Reseñas</a>
+  <a href="#reels" onclick="closeMobileNav()">Reels</a>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-logo">🌭 HOTDOG MARACAY</div>
+  <div class="nav-links">
+    <a href="#menu">Menú</a>
+    <a href="#delivery">Delivery</a>
+    <a href="#locations">Ubicaciones</a>
+    <a href="#historia">Historia</a>
+    <a href="#reviews">Reseñas</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="btn-cart" onclick="toggleCart()">🌭 <span class="cart-badge" id="cartBadge">0</span></button>
+    <button class="btn-order" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Ordenar →</button>
+  </div>
+  <div class="ham" id="ham" onclick="toggleMobileNav()"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg" id="heroBg">
+    <img src="fotos/Miami%20Composition%20for%20HotDog%20Maracay%20_553315419.jpeg" alt="Miami" id="heroBgImg" onerror="this.style.display='none'">
+  </div>
+  <div class="hero-overlay"></div>
+  <img src="fotos/mascot-nobg.png" class="hero-mascot" id="heroMascot" alt="Mascota Hotdog Maracay" onerror="this.style.display='none'">
+  <div class="hero-content">
+    <div class="hero-tag" id="heroTag">⭐ 4.9 · 564 Reseñas · Miami, FL</div>
+    <h1>
+      <span class="line"><span class="line-inner">UN PEDACITO</span></span>
+      <span class="line"><span class="line-inner">DE <span class="n-terra">VENE</span><span class="n-blue">ZUELA</span></span></span>
+      <span class="line"><span class="line-inner">EN <span class="n-mango">MIAMI</span></span></span>
+    </h1>
+    <p class="hero-desc">Los hot dogs venezolanos más auténticos de Miami — pan caliente, más de 12 salsas Fritz y el sabor de Maracay que llevas en el alma.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">🌭 Ver Menú</button>
+      <a href="#locations" class="btn-outline">📍 Ubicaciones</a>
+    </div>
+    <div class="hero-stats" id="heroStats">
+      <div class="stat"><div class="stat-num" id="s1">0</div><div class="stat-lbl">Calificación ★</div></div>
+      <div class="stat"><div class="stat-num" id="s2">0</div><div class="stat-lbl">Reseñas</div></div>
+      <div class="stat"><div class="stat-num" id="s3">0</div><div class="stat-lbl">Ubicaciones</div></div>
+      <div class="stat"><div class="stat-num" id="s4">0</div><div class="stat-lbl">+ Salsas</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">🌭 PAN FRESCO DIARIO</span>
+    <span class="marquee-item">✨ ES SABOR A CASA</span>
+    <span class="marquee-item">🥫 MÁS DE 12 SALSAS FRITZ</span>
+    <span class="marquee-item">🔥 ES CULTURA CALLEJERA</span>
+    <span class="marquee-item">🥩 CARNE MECHADA VENEZOLANA</span>
+    <span class="marquee-item">💃 ES UN RITUAL DESPUÉS DE UNA RUMBA</span>
+    <span class="marquee-item">🛵 DELIVERY EN MIAMI</span>
+    <span class="marquee-item">🌭 NO ES SOLO UN PERRO CALIENTE</span>
+    <span class="marquee-item">🎵 SALSA EN VIVO</span>
+    <span class="marquee-item">⭐ 4.9 ESTRELLAS</span>
+    <span class="marquee-item">🌭 PAN FRESCO DIARIO</span>
+    <span class="marquee-item">✨ ES SABOR A CASA</span>
+    <span class="marquee-item">🥫 MÁS DE 12 SALSAS FRITZ</span>
+    <span class="marquee-item">🔥 ES CULTURA CALLEJERA</span>
+    <span class="marquee-item">🥩 CARNE MECHADA VENEZOLANA</span>
+    <span class="marquee-item">💃 ES UN RITUAL DESPUÉS DE UNA RUMBA</span>
+    <span class="marquee-item">🛵 DELIVERY EN MIAMI</span>
+    <span class="marquee-item">🌭 NO ES SOLO UN PERRO CALIENTE</span>
+    <span class="marquee-item">🎵 SALSA EN VIVO</span>
+    <span class="marquee-item">⭐ 4.9 ESTRELLAS</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features-sec">
+  <div class="feat-grid">
+    <div class="feat-card"><span class="feat-ico">🍞</span><div class="feat-t">Pan Fresco Diario</div><div class="feat-s">Horneado cada día, suave por dentro y dorado por fuera. Igual que en Maracay.</div></div>
+    <div class="feat-card"><span class="feat-ico">🥫</span><div class="feat-t">Más de 12 Salsas</div><div class="feat-s">Fritz, BBQ, mostaza, mayonesa, ketchup, queso y más combinaciones que imagines.</div></div>
+    <div class="feat-card"><span class="feat-ico">🛵</span><div class="feat-t">Delivery Rápido</div><div class="feat-s">Disponible en Uber Eats, DoorDash, Postmates y GrubHub. ¡A tu puerta!</div></div>
+    <div class="feat-card"><span class="feat-ico">🎵</span><div class="feat-t">Ambiente Venezolano</div><div class="feat-s">Salsa en vivo, ambiente familiar y la nostalgia del sabor de casa en Miami.</div></div>
+  </div>
+</div>
+
+<!-- HISTORIA Y ORIGEN -->
+<section class="historia-sec" id="historia">
+  <div class="hist-grid">
+    <div style="position:relative">
+      <div class="hist-img-wrap">
+        <img src="fotos/historia-ambiente.jpg.jpg" alt="Historia Hotdog Maracay">
+        <div class="hist-neon-border"></div>
+      </div>
+    </div>
+    <div>
+      <div class="hist-years">
+        <span class="hist-year active">2014</span>
+        <span class="hist-arrow">→</span>
+        <span class="hist-year active">2022</span>
+        <span class="hist-arrow">→</span>
+        <span class="hist-year active">HOY</span>
+      </div>
+      <span class="sec-tag">Historia y Origen</span>
+      <h2 class="sec-title" style="margin-bottom:24px">
+        SABOR CON<br>
+        <span class="n-mango">HISTORIA.</span><br>
+        <span class="n-blue">ACTITUD</span><br>
+        <span class="n-terra">SIN FILTROS.</span>
+      </h2>
+      <p class="hist-p">Hotdog Maracay comenzó en 2014 como una idea sencilla: llevar el auténtico sabor del hotdog callejero venezolano al siguiente nivel. El primer carrito se instaló en una esquina popular de Maracay y rápidamente se convirtió en un fenómeno local.</p>
+      <p class="hist-p">En 2022, la marca aterrizó en Estados Unidos comenzando en Miami como food truck, conservando su esencia y autenticidad. Hoy somos una franquicia en expansión que combina la nostalgia del street food latino con una imagen moderna.</p>
+      <div class="hist-tags">
+        <span class="hist-tag t1">🇻🇪 Fundados en Maracay 2014</span>
+        <span class="hist-tag t2">🌴 Miami desde 2022</span>
+        <span class="hist-tag t3">5 Ciudades · En expansión</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu" class="sec menu-section">
+  <div class="container">
+    <div class="menu-header">
+      <div>
+        <span class="sec-tag">Menú</span>
+        <h2 class="sec-title" style="margin-bottom:0">EL SABOR QUE<br><span class="n-mango">TE ENAMORA</span></h2>
+      </div>
+      <p class="sec-sub" style="max-width:280px;text-align:right">Todo preparado al momento con ingredientes frescos. Personaliza como quieras.</p>
+    </div>
+
+    <!-- Promo Destacada -->
+    <div class="promo-card">
+      <div class="promo-left">
+        <div class="promo-eyebrow">🌭 LA MÁS PEDIDA</div>
+        <div class="promo-title">PROMO<br>CLÁSICA</div>
+        <p class="promo-desc">Dos hot dogs en pan caliente con salchicha mixta, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</p>
+        <button class="btn-primary" style="width:fit-content" onclick="openCustom('promo-clasica','Promo Clásica',12.50,'🌭','fotos/Promo%20Clasica.png',true,2)">Agregar — $12.50</button>
+      </div>
+      <div class="promo-right">
+        <img src="fotos/Promo%20Clasica.png" alt="Promo Clásica Hotdog Maracay">
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="menu-tabs">
+      <button class="tab active" onclick="switchTab('cat-hotdogs',this)">🌭 Hot Dogs</button>
+      <button class="tab" onclick="switchTab('cat-bebidas',this)">🥤 Bebidas</button>
+      <button class="tab" onclick="switchTab('cat-extras',this)">✨ Extras</button>
+    </div>
+
+    <!-- Hot Dogs -->
+    <div class="menu-cat active" id="cat-hotdogs">
+
+      <div class="mcard">
+        <div class="mcard-img"><img src="fotos/Promo%20Clasica.png" alt="Promo Clásica"><span class="mcard-badge gold">MÁS PEDIDO</span></div>
+        <div class="mcard-body"><div class="mcard-name">Promo Clásica</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$12.50</span><button class="add-btn" onclick="openCustom('promo-clasica','Promo Clásica',12.50,'🌭','fotos/Promo%20Clasica.png',true,2)">+</button></div></div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-img"><img src="fotos/Clasico%20Profesional.jpeg" alt="Hot Dog Clásico"></div>
+        <div class="mcard-body"><div class="mcard-name">Hot Dog Clásico</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$6.85</span><button class="add-btn" onclick="openCustom('hd-clasico','Hot Dog Clásico',6.85,'🌭','fotos/Clasico%20Profesional.jpeg',false)">+</button></div></div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-img"><img src="fotos/Promo%20Carne%20Desmechada.png" alt="Promo de Carne Mechada"><span class="mcard-badge">ESTRELLA</span></div>
+        <div class="mcard-body"><div class="mcard-name">Promo de Carne Mechada</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, carne mechada, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$19.99</span><button class="add-btn" onclick="openCustom('promo-mechada','Promo de Carne Mechada',19.99,'🔥','fotos/Promo%20Carne%20Desmechada.png',true,2)">+</button></div></div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-img"><img src="fotos/Carne%20Desmechada%20Profesional.jpeg" alt="Hot Dog con Carne Mechada"></div>
+        <div class="mcard-body"><div class="mcard-name">Hot Dog con Carne Mechada</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, carne mechada, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$10.99</span><button class="add-btn" onclick="openCustom('hd-mechada','Hot Dog con Carne Mechada',10.99,'🔥','fotos/Carne%20Desmechada%20Profesional.jpeg',false)">+</button></div></div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-img"><img src="fotos/hd-bacon.png" alt="Promo de Bacon"><span class="mcard-badge">ESPECIAL</span></div>
+        <div class="mcard-body"><div class="mcard-name">Promo de Bacon</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, bacon crujiente, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$16.50</span><button class="add-btn" onclick="openCustom('promo-bacon','Promo de Bacon',16.50,'🥓','fotos/hd-bacon.png',true,2)">+</button></div></div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-img"><img src="fotos/hd-bacon.png" alt="Hot Dog con Bacon"></div>
+        <div class="mcard-body"><div class="mcard-name">Hot Dog con Bacon</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, bacon crujiente, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$8.85</span><button class="add-btn" onclick="openCustom('hd-bacon','Hot Dog con Bacon',8.85,'🥓','fotos/hd-bacon.png',false)">+</button></div></div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-img"><img src="fotos/hd-queso-mano.png" alt="Promo de Queso de Mano"></div>
+        <div class="mcard-body"><div class="mcard-name">Promo de Queso de Mano</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, queso de mano, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$16.50</span><button class="add-btn" onclick="openCustom('promo-queso','Promo de Queso de Mano',16.50,'🧀','fotos/hd-queso-mano.png',true,2)">+</button></div></div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-img"><img src="fotos/hd-queso-mano.png" alt="Hot Dog con Queso de Mano"></div>
+        <div class="mcard-body"><div class="mcard-name">Hot Dog con Queso de Mano</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, queso de mano, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$8.85</span><button class="add-btn" onclick="openCustom('hd-queso','Hot Dog con Queso de Mano',8.85,'🧀','fotos/hd-queso-mano.png',false)">+</button></div></div>
+      </div>
+
+    </div>
+
+    <!-- Bebidas -->
+    <div class="menu-cat" id="cat-bebidas">
+      <div class="mcard"><div class="mcard-img"><img src="fotos/coca-cola.jpg" alt="Coca Cola"></div><div class="mcard-body"><div class="mcard-name">Coca Cola</div><div class="mcard-desc">La clásica bien fría.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-cola','🥤 Coca Cola',3.50,'🥤','fotos/coca-cola.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/coca-zero.jpg" alt="Coca Cola Zero"></div><div class="mcard-body"><div class="mcard-name">Coca Cola Zero</div><div class="mcard-desc">Todo el sabor, sin azúcar.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-zero','🥤 Coca Cola Zero',3.50,'🥤','fotos/coca-zero.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/diet-coke.jpg" alt="Diet Coke"></div><div class="mcard-body"><div class="mcard-name">Diet Coke</div><div class="mcard-desc">Ligera y refrescante.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-diet','🥤 Diet Coke',3.50,'🥤','fotos/diet-coke.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/sprite.jpg" alt="Sprite"></div><div class="mcard-body"><div class="mcard-name">Sprite</div><div class="mcard-desc">Limonada burbujeante fría.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-sprite','🥤 Sprite',3.50,'🥤','fotos/sprite.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/nestea.jpg" alt="Nestea Limón"></div><div class="mcard-body"><div class="mcard-name">Nestea Limón</div><div class="mcard-desc">Té helado sabor limón.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-neslim','🫖 Nestea Limón',3.50,'🫖','fotos/nestea.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/nestea.jpg" alt="Nestea Durazno"></div><div class="mcard-body"><div class="mcard-name">Nestea Durazno</div><div class="mcard-desc">Té helado sabor durazno.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-nesdur','🫖 Nestea Durazno',3.50,'🫖','fotos/nestea.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/coca-cola.jpg" alt="Frescolita"></div><div class="mcard-body"><div class="mcard-name">Frescolita</div><div class="mcard-desc">La bebida venezolana por excelencia.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-fre','🥤 Frescolita',3.50,'🥤','fotos/coca-cola.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/malta.jpg" alt="Malta"></div><div class="mcard-body"><div class="mcard-name">Malta</div><div class="mcard-desc">El acompañante clásico del hot dog venezolano.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-malta','🍺 Malta',3.50,'🍺','fotos/malta.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/uvita.jpg" alt="Uvita"></div><div class="mcard-body"><div class="mcard-name">Uvita</div><div class="mcard-desc">Refrescante bebida de uva venezolana.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-uvita','🍇 Uvita',3.50,'🍇','fotos/uvita.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/agua.jpg" alt="Agua"></div><div class="mcard-body"><div class="mcard-name">Agua</div><div class="mcard-desc">Bien fría.</div><div class="mcard-footer"><span class="mcard-price">$2.00</span><button class="add-btn" onclick="addToCart('beb-agua','💧 Agua',2.00,'💧','fotos/agua.jpg')">+</button></div></div></div>
+    </div>
+
+    <!-- Extras -->
+    <div class="menu-cat" id="cat-extras">
+      <div class="mcard"><div class="mcard-img"><img src="fotos/tocino.jpg" alt="Bacon Extra"></div><div class="mcard-body"><div class="mcard-name">Bacon Extra</div><div class="mcard-desc">Tocineta crujiente adicional para elevar tu hot dog.</div><div class="mcard-footer"><span class="mcard-price">$2.00</span><button class="add-btn" onclick="addToCart('ext-bacon','🥓 Bacon Extra',2.00,'🥓','fotos/tocino.jpg')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/queso.jpg" alt="Queso de Mano"></div><div class="mcard-body"><div class="mcard-name">Queso de Mano Extra</div><div class="mcard-desc">Queso venezolano de mano, derretido y cremoso.</div><div class="mcard-footer"><span class="mcard-price">$2.00</span><button class="add-btn" onclick="addToCart('ext-queso','🧀 Queso de Mano',2.00,'🧀','fotos/queso.jpg')">+</button></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERY -->
+<section class="sec delivery-sec" id="delivery">
+  <div class="container">
+    <span class="sec-tag">Delivery</span>
+    <h2 class="sec-title">PÍDELO DESDE<br><span class="n-blue">DONDE ESTÉS</span></h2>
+    <p class="sec-sub">Disponibles en las principales plataformas de Miami.</p>
+    <div class="delivery-grid">
+      <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" class="app-card">
+        <div class="app-logo" style="background:#000;font-size:13px;letter-spacing:-1px">Uber<br>Eats</div>
+        <div class="app-info"><h3>Uber Eats</h3><p>Pide y rastrea tu orden en tiempo real</p></div>
+        <span class="app-arrow">→</span>
+      </a>
+      <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" class="app-card">
+        <div class="app-logo" style="background:#FF3008;font-size:26px">🚪</div>
+        <div class="app-info"><h3>DoorDash</h3><p>Delivery rápido a tu puerta</p></div>
+        <span class="app-arrow">→</span>
+      </a>
+      <a href="https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152" target="_blank" class="app-card">
+        <div class="app-logo" style="background:#F63440;font-size:26px">🍽️</div>
+        <div class="app-info"><h3>GrubHub</h3><p>Ordena online con seguimiento</p></div>
+        <span class="app-arrow">→</span>
+      </a>
+      <a href="https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" class="app-card">
+        <div class="app-logo" style="background:#1A1A1A;font-size:26px">📦</div>
+        <div class="app-info"><h3>Postmates</h3><p>Delivery express en Miami</p></div>
+        <span class="app-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATIONS -->
+<section class="sec loc-sec" id="locations">
+  <div class="container">
+    <span class="sec-tag">Ubicaciones</span>
+    <h2 class="sec-title">ESTAMOS EN<br><span class="n-mango">TODO MIAMI</span></h2>
+    <p class="sec-sub">3 ubicaciones para servirte. Estacionamiento amplio y ambiente familiar en todas.</p>
+    <div class="loc-list">
+
+      <div class="loc-item loc-reveal">
+        <div class="loc-img-wrap">
+          <img src="https://lh3.googleusercontent.com/grass-cs/ANxoTn1wSbvSFyPYMuVkteRBpZ6_6BQUE8Iw2fL7LY8Lhi4o3Ouk0pTVqJYN_trn66OxhTcObVeU9HiiyRXJPqakQLKIvQwqHup4r76xOXxOtFL9NXrY4FB_rhNtmjzQozd3UYPwE4Is=k-no" alt="North Miami Beach" class="loc-par">
+        </div>
+        <div>
+          <div class="loc-num">01</div>
+          <div class="loc-name">North Miami Beach</div>
+          <div class="loc-addr">18315 West Dixie Highway<br>North Miami Beach, FL<br><span style="color:var(--blue)">📸 @hotdogmaracaynorthmiami</span></div>
+          <div class="loc-btns">
+            <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
+            <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank"><button class="loc-btn">Uber Eats</button></a>
+            <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank"><button class="loc-btn">DoorDash</button></a>
+            <a href="https://www.instagram.com/hotdogmaracaynorthmiami" target="_blank"><button class="loc-btn">Instagram</button></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="loc-item rev loc-reveal">
+        <div class="loc-img-wrap">
+          <img src="fotos/combo-clasico.jpg" alt="Doral" class="loc-par">
+        </div>
+        <div>
+          <div class="loc-num">02</div>
+          <div class="loc-name">Doral</div>
+          <div class="loc-addr">Doral, FL<br>La capital venezolana de Miami<br><span style="color:var(--blue)">📸 @hotdogmaracaydoral</span></div>
+          <div class="loc-btns">
+            <a href="https://maps.app.goo.gl/kardweeJUDwJCdUV7" target="_blank"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
+            <a href="https://www.ubereats.com/store/hot-dog-maracay-miami/CEtjUmJEUWWz1Rqa3tteIQ" target="_blank"><button class="loc-btn">Uber Eats</button></a>
+            <a href="https://www.doordash.com/store/26219712" target="_blank"><button class="loc-btn">DoorDash</button></a>
+            <a href="https://www.instagram.com/hotdogmaracaydoral" target="_blank"><button class="loc-btn">Instagram</button></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="loc-item loc-reveal">
+        <div class="loc-img-wrap">
+          <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFmeAD0xs20ixMl2HgjF4oM8QoHkVodf-X5nm93AgBedYiBwTuDac3QnHrU_4S7Lk1HJDmsEImdrB1Zxe_tvu3PWVJFavapP4Nwg8yWA_4-KvO8meHDo8QH0CYn1jtWOpGsj76VOHseoqD9=s680-w680-h510-rw" alt="Downtown Miami" class="loc-par">
+        </div>
+        <div>
+          <div class="loc-num">03</div>
+          <div class="loc-name">Downtown Miami</div>
+          <div class="loc-addr">Downtown Miami, FL<br>En el corazón de la ciudad<br><span style="color:var(--blue)">📸 @hotdogmaracaymiami</span></div>
+          <div class="loc-btns">
+            <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
+            <a href="https://www.ubereats.com/store/hot-dog-maracay-miamidowntown/xU2LTXX1VQioO0iuyW-Lvg" target="_blank"><button class="loc-btn">Uber Eats</button></a>
+            <a href="https://www.instagram.com/hotdogmaracaymiami" target="_blank"><button class="loc-btn">Instagram</button></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="sec reviews-sec" id="reviews">
+  <div class="container">
+    <span class="sec-tag">Reseñas</span>
+    <h2 class="sec-title">LO QUE DICE<br><span class="n-fucsia">NUESTRA FAMILIA</span></h2>
+    <div class="rev-hero">
+      <div class="rev-big-score" id="revScore">0</div>
+      <div class="rev-meta">
+        <span class="rev-stars-big">★★★★★</span>
+        <h3>La experiencia venezolana más auténtica de Miami</h3>
+        <p>564 reseñas verificadas · 82 menciones de servicio excepcional</p>
+      </div>
+    </div>
+    <div class="rev-grid">
+      <div class="rev-card">
+        <div class="rev-stars-sm">★★★★★</div>
+        <div class="rev-text">"El mejor hot dog venezolano que he comido fuera de Venezuela. El pan es suave, las salsas Fritz son perfectas y el servicio es increíble. Me recordó a Maracay."</div>
+        <div class="rev-author"><div class="rev-avatar"></div>María G. · North Miami</div>
+      </div>
+      <div class="rev-card">
+        <div class="rev-stars-sm">★★★★★</div>
+        <div class="rev-text">"Fui con toda la familia y quedamos encantados. La carne mechada es auténtica venezolana. El ambiente con salsa en vivo es espectacular. ¡Definitivamente volvemos!"</div>
+        <div class="rev-author"><div class="rev-avatar"></div>Carlos R. · Doral</div>
+      </div>
+      <div class="rev-card">
+        <div class="rev-stars-sm">★★★★★</div>
+        <div class="rev-text">"La Promo de $12.50 es imbatible. Dos hot dogs con todas las salsas + bebida. En Miami no hay nada igual. Personal súper amable y rapidísimo."</div>
+        <div class="rev-author"><div class="rev-avatar"></div>Ana M. · Downtown Miami</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="sec gallery-sec" id="gallery">
+  <div class="container">
+    <span class="sec-tag">Galería</span>
+    <h2 class="sec-title">UN VISTAZO A<br><span class="n-mango">NUESTRA COCINA</span></h2>
+    <div class="gallery-grid">
+      <div class="g-item"><img src="fotos/ig-queso-bowl.jpg" alt="Queso Amarillo Hotdog Maracay"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-promo-dos.jpg" alt="Promo Dos Hot Dogs"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-chica-mordiendo.jpg" alt="Hotdog Maracay Miami"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-rallando-queso.jpg" alt="Preparación Hotdog Maracay"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-queso-cayendo.jpg" alt="Queso Cayendo"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-hd-queso-logo.jpg" alt="Hot Dog Hotdog Maracay"><div class="g-overlay"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- REELS -->
+<section class="sec reels-sec" id="reels">
+  <div class="container">
+    <span class="sec-tag">Instagram Reels</span>
+    <h2 class="sec-title">NUESTRA<br><span class="n-fucsia">VIBRA EN VIDEO</span></h2>
+    <div class="reels-grid">
+      <div class="reel-item" onclick="toggleReel(this)">
+        <video src="fotos/videos/reel-1.mp4" loop muted playsinline preload="metadata"></video>
+        <div class="reel-play"><div class="reel-play-ico">▶</div></div>
+      </div>
+      <div class="reel-item" onclick="toggleReel(this)">
+        <video src="fotos/videos/reel-2.mp4" loop muted playsinline preload="metadata"></video>
+        <div class="reel-play"><div class="reel-play-ico">▶</div></div>
+      </div>
+      <div class="reel-item" onclick="toggleReel(this)">
+        <video src="fotos/videos/reel-3.mp4" loop muted playsinline preload="metadata"></video>
+        <div class="reel-play"><div class="reel-play-ico">▶</div></div>
+      </div>
+      <div class="reel-item" onclick="toggleReel(this)">
+        <video src="fotos/videos/reel-4.mp4" loop muted playsinline preload="metadata"></video>
+        <div class="reel-play"><div class="reel-play-ico">▶</div></div>
+      </div>
+      <div class="reel-item" onclick="toggleReel(this)">
+        <video src="fotos/videos/reel-5.mp4" loop muted playsinline preload="metadata"></video>
+        <div class="reel-play"><div class="reel-play-ico">▶</div></div>
+      </div>
+      <div class="reel-item" onclick="toggleReel(this)">
+        <video src="fotos/videos/reel-6.mp4" loop muted playsinline preload="metadata"></video>
+        <div class="reel-play"><div class="reel-play-ico">▶</div></div>
+      </div>
+      <div class="reel-item" onclick="toggleReel(this)">
+        <video src="fotos/videos/reel-7.mp4" loop muted playsinline preload="metadata"></video>
+        <div class="reel-play"><div class="reel-play-ico">▶</div></div>
+      </div>
+      <div class="reel-item" onclick="toggleReel(this)">
+        <video src="fotos/videos/reel-8.mp4" loop muted playsinline preload="metadata"></video>
+        <div class="reel-play"><div class="reel-play-ico">▶</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL -->
+<section class="sec social-sec" id="social">
+  <div class="container">
+    <span class="sec-tag">Síguenos</span>
+    <h2 class="sec-title" style="margin-bottom:16px">ÚNETE A LA<br><span class="n-blue">COMUNIDAD</span></h2>
+    <p class="sec-sub" style="margin:0 auto;text-align:center">Promociones, fotos y la vibra venezolana todos los días en Instagram.</p>
+    <div class="soc-grid">
+      <a href="https://www.instagram.com/hotdogmaracaynorthmiami" target="_blank" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaynorthmiami</a>
+      <a href="https://www.instagram.com/hotdogmaracaydoral" target="_blank" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaydoral</a>
+      <a href="https://www.instagram.com/hotdogmaracaymiami" target="_blank" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaymiami</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-top-line"></div>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <div class="foot-logo">🌭 HOTDOG MARACAY</div>
+      <p>Un pedacito de Venezuela en Miami.<br>El sabor auténtico que llevas en el corazón desde que eras chiquito.<br><br>Fundados en Maracay 2014 · Miami desde 2022</p>
+    </div>
+    <div class="foot-col">
+      <h4>Menú</h4>
+      <a href="#menu">Hot Dogs Venezolanos</a>
+      <a href="#menu">Bebidas</a>
+      <a href="#menu">Extras</a>
+      <a href="#menu">Combos y Promos</a>
+    </div>
+    <div class="foot-col">
+      <h4>Delivery</h4>
+      <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank">Uber Eats</a>
+      <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank">DoorDash</a>
+      <a href="https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152" target="_blank">GrubHub</a>
+      <a href="https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank">Postmates</a>
+    </div>
+    <div class="foot-col">
+      <h4>Ubicaciones</h4>
+      <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank">North Miami Beach</a>
+      <a href="https://maps.app.goo.gl/kardweeJUDwJCdUV7" target="_blank">Doral</a>
+      <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank">Downtown Miami</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <p>© 2026 Hotdog Maracay · hotdogmaracay.com · hotdogmaracay.net</p>
+    <p>Hecho con ❤️ para la comunidad venezolana en Miami</p>
+  </div>
+</footer>
+
+<!-- CUSTOM MODAL -->
+<div class="modal-wrap" id="customModal">
+  <div class="modal">
+    <div class="modal-hdr"><h2 id="customModalTitle">PERSONALIZA</h2><button class="modal-x" onclick="closeCustom()">✕</button></div>
+    <div class="modal-body">
+      <div class="custom-item-preview">
+        <div id="customThumb"></div>
+        <div><h4 id="customName"></h4><span id="customPrice"></span></div>
+      </div>
+      <div id="toppingsContainer"></div>
+      <div id="drinkSection" style="display:none">
+        <div class="custom-section-title" style="color:var(--mango);margin-top:20px">🥤 Bebida incluida <span style="color:var(--red);font-size:14px">*</span></div>
+        <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Elige tu bebida — <span style="color:var(--mango)">gratis</span> excepto Frescolita, Malta y Uvita (+$3.50):</p>
+        <div class="drinks-grid" id="drinksGrid"></div>
+      </div>
+      <div class="custom-section-title" style="margin-top:20px">🥫 Salsas de Acompañamiento</div>
+      <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Elige entre <strong style="color:var(--mango)">1 y 2 salsas</strong> (mínimo 1 obligatoria):</p>
+      <div class="custom-checks" id="customChecks"></div>
+      <div class="salsa-error" id="salsaError">⚠️ Debes elegir al menos una salsa</div>
+      <div class="custom-section-title" style="margin-top:20px">Nota adicional</div>
+      <textarea class="custom-note-inp" id="customNote" rows="2" placeholder="Ej: extra salsa Fritz, bien caliente..."></textarea>
+      <button class="btn-primary" id="customConfirmBtn" disabled style="width:100%;justify-content:center;margin-top:20px" onclick="confirmCustom()">Agregar al Carrito</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-hdr">
+    <span class="cart-hdr-title">🌭 Tu Pedido</span>
+    <button class="cart-x" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-list" id="cartList">
+    <div class="cart-empty"><div class="e-ico">🌭</div><p>Tu carrito está vacío.<br>¡Agrega algo delicioso!</p></div>
+  </div>
+  <div class="cart-ftr" id="cartFtr" style="display:none">
+    <div class="cart-row"><span>Subtotal</span><span id="cSub">$0.00</span></div>
+    <div class="cart-row"><span>Tax 7% (FL)</span><span id="cTax">$0.00</span></div>
+    <div class="cart-row total"><span>Total</span><span id="cTotal">$0.00</span></div>
+    <button class="checkout-btn" onclick="openCheckout()">Proceder al Pago →</button>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-wrap" id="checkoutModal">
+  <div class="modal">
+    <div class="modal-hdr"><h2>FINALIZAR PEDIDO</h2><button class="modal-x" onclick="closeCheckout()">✕</button></div>
+    <div class="modal-body">
+      <div class="order-summary" id="orderSummary"></div>
+      <div class="form-grp"><label class="form-lbl">Tu Nombre</label><input class="form-inp" id="cName" placeholder="Juan García" type="text"></div>
+      <div class="form-grp"><label class="form-lbl">Teléfono / WhatsApp</label><input class="form-inp" id="cPhone" placeholder="+1 (305) 000-0000" type="tel"></div>
+      <div class="form-grp"><label class="form-lbl">Correo Electrónico</label><input class="form-inp" id="cEmail" placeholder="tu@email.com" type="email"></div>
+      <div class="form-grp"><label class="form-lbl">Tipo de Orden</label>
+        <select class="form-sel" id="cType">
+          <option value="pickup">📍 Pickup — Recoger en el local</option>
+          <option value="delivery">🛵 Delivery (via app)</option>
+        </select>
+      </div>
+      <div class="form-grp"><label class="form-lbl">Ubicación</label>
+        <select class="form-sel" id="cLoc">
+          <option value="nmb">North Miami Beach — 18315 W Dixie Hwy</option>
+          <option value="doral">Doral</option>
+          <option value="downtown">Downtown Miami</option>
+        </select>
+      </div>
+      <div class="form-grp"><label class="form-lbl">Notas (opcional)</label><input class="form-inp" id="cNotes" placeholder="Ej: sin cebolla, extra salsa Fritz..."></div>
+      <div class="form-grp">
+        <label class="form-lbl">Datos de Tarjeta</label>
+        <div id="sq-loading" style="text-align:center;padding:18px;color:var(--mu);font-size:13px">⏳ Cargando sistema de pago...</div>
+        <div id="sq-card-container" style="display:none"></div>
+      </div>
+      <button id="sq-pay-btn" onclick="sendOrder()" disabled>💳 Pagar</button>
+      <p class="pay-note">🔒 Pago seguro con Square · Visa, Mastercard, Amex, Discover</p>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="modal-wrap" id="successModal">
+  <div class="modal">
+    <div class="success-body">
+      <div class="success-ico">✅</div>
+      <h2>¡PAGO EXITOSO!</h2>
+      <p>Tu pedido fue recibido y tu pago procesado.<br>¡Prepárate para el mejor hot dog venezolano!</p>
+      <a id="sq-receipt-link" href="#" target="_blank" style="display:none;color:var(--mango);font-size:14px;font-weight:700;margin-top:16px;text-decoration:underline">🧾 Ver Recibo</a>
+      <button class="btn-primary" style="margin-top:28px;justify-content:center;width:100%" onclick="closeSuccess()">Volver al Menú</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── NAV ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ── HERO ENTRANCE ── */
+const tl = gsap.timeline({ delay: 0.2 });
+tl.to('#heroTag',    { opacity:1, y:0, duration:.6, ease:'power2.out' })
+  .to('.line-inner', { y:0, duration:.95, stagger:.15, ease:'power3.out' }, '-=.3')
+  .to('.hero-desc',  { opacity:1, y:0, duration:.7, ease:'power2.out' }, '-=.4')
+  .to('.hero-btns',  { opacity:1, y:0, duration:.6, ease:'power2.out' }, '-=.4')
+  .to('#heroStats',  { opacity:1, duration:.7 }, '-=.3')
+  .to('#heroMascot', { opacity:1, x:0, duration:1.3, ease:'power3.out' }, '-=1.5');
+
+/* ── HERO PARALLAX ── */
+gsap.to('#heroBgImg', {
+  y:'22%', ease:'none',
+  scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:true }
+});
+
+/* ── COUNT UP ── */
+function toggleMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const ham = document.getElementById('ham');
+  nav.classList.toggle('open');
+  ham.classList.toggle('open');
+  document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+}
+function closeMobileNav() {
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('ham').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function toggleReel(el) {
+  const video = el.querySelector('video');
+  if (video.paused) {
+    document.querySelectorAll('.reel-item video').forEach(v => { v.pause(); v.closest('.reel-item').classList.remove('playing'); });
+    video.play();
+    el.classList.add('playing');
+  } else {
+    video.pause();
+    el.classList.remove('playing');
+  }
+}
+// Autoplay reels al entrar en pantalla, pausa al salir
+const reelObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    const v = e.target.querySelector('video');
+    if (!v) return;
+    if (e.isIntersecting) {
+      v.play().catch(()=>{});
+      e.target.classList.add('playing');
+    } else {
+      v.pause();
+      e.target.classList.remove('playing');
+    }
+  });
+}, {threshold: 0.4});
+document.querySelectorAll('.reel-item').forEach(r => reelObserver.observe(r));
+
+function countUp(el, target, decimals) {
+  const dur=1800, start=performance.now();
+  (function step(now){
+    const p=Math.min((now-start)/dur,1);
+    const e=1-Math.pow(1-p,3);
+    el.textContent=decimals?(target*e).toFixed(1):Math.round(target*e);
+    if(p<1)requestAnimationFrame(step);
+    else el.textContent=decimals?target.toFixed(1):target;
+  })(start);
+}
+ScrollTrigger.create({
+  trigger:'#heroStats', start:'top 90%', once:true,
+  onEnter:()=>{
+    countUp(document.getElementById('s1'),4.9,true);
+    countUp(document.getElementById('s2'),564);
+    countUp(document.getElementById('s3'),3);
+    countUp(document.getElementById('s4'),12);
+  }
+});
+
+/* ── FEATURES ── */
+gsap.to('.feat-card',{
+  opacity:1, y:0, duration:.7, stagger:.1, ease:'power2.out',
+  scrollTrigger:{ trigger:'.features-sec', start:'top 80%' }
+});
+
+/* ── HISTORIA ── */
+gsap.from('.hist-grid > *',{
+  opacity:0, y:60, duration:.9, stagger:.2, ease:'power2.out',
+  scrollTrigger:{ trigger:'.hist-grid', start:'top 80%' }
+});
+
+/* ── MENU TABS ── */
+function switchTab(cat, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.menu-cat').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(cat).classList.add('active');
+}
+
+/* ── DELIVERY ── */
+gsap.to('.app-card',{
+  opacity:1, y:0, duration:.7, stagger:.1, ease:'power2.out',
+  scrollTrigger:{ trigger:'.delivery-grid', start:'top 85%' }
+});
+
+/* ── LOCATION PARALLAX ── */
+document.querySelectorAll('.loc-par').forEach(img=>{
+  gsap.fromTo(img,{y:'-10%'},{
+    y:'10%', ease:'none',
+    scrollTrigger:{
+      trigger:img.closest('.loc-img-wrap'),
+      start:'top bottom', end:'bottom top', scrub:true
+    }
+  });
+});
+gsap.from('.loc-reveal',{
+  opacity:0, y:60, duration:.9, stagger:.2, ease:'power2.out',
+  scrollTrigger:{ trigger:'.loc-list', start:'top 80%' }
+});
+
+/* ── REVIEWS ── */
+ScrollTrigger.create({
+  trigger:'.rev-hero', start:'top 80%', once:true,
+  onEnter:()=>countUp(document.getElementById('revScore'),4.9,true)
+});
+gsap.to('.rev-card',{
+  opacity:1, y:0, duration:.7, stagger:.15, ease:'power2.out',
+  scrollTrigger:{ trigger:'.rev-grid', start:'top 85%' }
+});
+
+/* ── GALLERY ── */
+gsap.to('.g-item',{
+  opacity:1, scale:1, duration:.8, stagger:.08, ease:'power2.out',
+  scrollTrigger:{ trigger:'.gallery-grid', start:'top 85%' }
+});
+
+/* ── SOCIAL ── */
+gsap.to('.soc-btn',{
+  opacity:1, y:0, duration:.6, stagger:.12, ease:'power2.out',
+  scrollTrigger:{ trigger:'.soc-grid', start:'top 85%' }
+});
+
+/* ── CART ── */
+const TAX = 0.07;
+let cart = [];
+
+const TOPPINGS = ['Repollo','Cebolla','Papitas','Maíz','Ketchup','Mayonesa','Mostaza','Queso amarillo'];
+const EXTRAS   = [{name:'Queso de Mano',price:2.00},{name:'Tocineta',price:2.00}];
+const SALSAS   = ['Ajo','Chica Sexi','Maíz','Queso','Tocineta','Piña','Picante','BBQ','Queso de Año'];
+const DRINKS   = [
+  {name:'Coca Cola',price:0},{name:'Coca Cola Zero',price:0},{name:'Diet Coke',price:0},
+  {name:'Sprite',price:0},{name:'Nestea Limón',price:0},{name:'Nestea Durazno',price:0},
+  {name:'Frescolita',price:3.50},{name:'Malta',price:3.50},{name:'Uvita',price:3.50},{name:'Agua',price:0}
+];
+let _custom = null;
+
+function toppingBlockHTML(n, label) {
+  return `
+    <div class="custom-section-title" style="margin-top:${n===1?'0':'24px'}">${label}</div>
+    <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Desmarca lo que <strong>NO quieres</strong>:</p>
+    <div class="custom-checks" id="customChecks${n}">
+      ${TOPPINGS.map(t=>`<label class="custom-check" onclick="toggleTopping(this,event)"><input type="checkbox" value="${t}" checked><div class="ck-box">✓</div><span class="ck-lbl">${t}</span></label>`).join('')}
+    </div>
+    <p style="font-size:11px;font-weight:700;color:var(--mango);letter-spacing:.5px;margin:10px 0 6px">EXTRAS (+$2.00 c/u):</p>
+    <div class="custom-checks" id="customExtras${n}">
+      ${EXTRAS.map(e=>`<label class="custom-check" onclick="toggleExtra(this,event)"><input type="checkbox" value="${e.name}" data-price="${e.price}"><div class="ck-box">✓</div><span class="ck-lbl">${e.name} <em style="color:var(--mango);font-style:normal;font-size:11px">+$${e.price.toFixed(2)}</em></span></label>`).join('')}
+    </div>`;
+}
+
+function openCustom(id, name, price, emoji, img, hasDrink, numHD) {
+  numHD = numHD || 1;
+  _custom = {id, name, price, emoji, img: img||'', hasDrink:!!hasDrink, numHD};
+  document.getElementById('customModalTitle').textContent = name.toUpperCase();
+  document.getElementById('customName').textContent = name;
+  document.getElementById('customPrice').textContent = '$' + price.toFixed(2);
+  const thumb = document.getElementById('customThumb');
+  thumb.innerHTML = img
+    ? `<img src="${img}" alt="${name}" style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0">`
+    : `<div class="ci-emoji">${emoji}</div>`;
+  document.getElementById('toppingsContainer').innerHTML = numHD >= 2
+    ? toppingBlockHTML(1,'🌭 Toppings Hot Dog 1') + toppingBlockHTML(2,'🌭 Toppings Hot Dog 2')
+    : toppingBlockHTML(1,'🌭 Toppings');
+  const ds = document.getElementById('drinkSection');
+  if (hasDrink) {
+    ds.style.display = 'block';
+    document.getElementById('drinksGrid').innerHTML = DRINKS.map(d=>
+      `<label class="drink-opt" onclick="selectDrink(this,event)">
+         <input type="radio" name="customDrink" value="${d.name}" data-price="${d.price}">
+         <div class="dk-dot"></div>
+         <span class="dk-lbl">${d.name} ${d.price>0?`<em style="color:var(--red);font-style:normal;font-size:11px">+$${d.price.toFixed(2)}</em>`:`<em style="color:var(--gr);font-style:normal;font-size:11px">gratis</em>`}</span>
+       </label>`).join('');
+  } else { ds.style.display = 'none'; }
+  document.getElementById('customChecks').innerHTML = SALSAS.map(s=>
+    `<label class="custom-check" onclick="toggleSalsa(this,event)"><input type="checkbox" value="${s}"><div class="ck-box">✓</div><span class="ck-lbl">${s}</span></label>`).join('');
+  document.getElementById('salsaError').style.display = 'none';
+  document.getElementById('customConfirmBtn').disabled = true;
+  document.getElementById('customNote').value = '';
+  document.getElementById('customModal').classList.add('open');
+}
+function closeCustom(){ document.getElementById('customModal').classList.remove('open'); _custom=null; }
+function toggleTopping(lbl,ev){ ev.preventDefault(); const inp=lbl.querySelector('input'); inp.checked=!inp.checked; lbl.classList.toggle('removed',!inp.checked); lbl.querySelector('.ck-box').textContent=inp.checked?'✓':'✗'; }
+function toggleExtra(lbl,ev){ ev.preventDefault(); const inp=lbl.querySelector('input'); inp.checked=!inp.checked; lbl.classList.toggle('selected',inp.checked); }
+function toggleSalsa(lbl,ev){
+  ev.preventDefault();
+  const isSel = lbl.classList.contains('selected');
+  if(!isSel){
+    const count=document.querySelectorAll('#customChecks .custom-check.selected').length;
+    if(count>=2)return;
+    lbl.classList.add('selected'); lbl.querySelector('input').checked=true;
+  } else { lbl.classList.remove('selected'); lbl.querySelector('input').checked=false; }
+  const count=document.querySelectorAll('#customChecks .custom-check.selected').length;
+  document.querySelectorAll('#customChecks .custom-check:not(.selected)').forEach(el=>el.classList.toggle('salsa-disabled',count>=2));
+  document.getElementById('customConfirmBtn').disabled=count===0;
+  if(count>0)document.getElementById('salsaError').style.display='none';
+}
+function selectDrink(lbl,ev){ ev.preventDefault(); document.querySelectorAll('.drink-opt').forEach(l=>l.classList.remove('selected')); lbl.classList.add('selected'); lbl.querySelector('input').checked=true; }
+
+function confirmCustom(){
+  if(!_custom)return;
+  const salsas=[...document.querySelectorAll('#customChecks input:checked')].map(el=>el.value);
+  if(!salsas.length){ document.getElementById('salsaError').style.display='block'; return; }
+  if(_custom.hasDrink && !document.querySelector('input[name="customDrink"]:checked')){ showToast('⚠️ Debes seleccionar una bebida','info'); return; }
+  let extraCost=0, details=[];
+  for(let n=1;n<=_custom.numHD;n++){
+    const removed=[...document.querySelectorAll(`#customChecks${n} input:not(:checked)`)].map(el=>el.value);
+    const extraEls=[...document.querySelectorAll(`#customExtras${n} input:checked`)];
+    extraEls.forEach(el=>extraCost+=parseFloat(el.dataset.price));
+    const hdTag=_custom.numHD>1?`HD${n}`:'HD';
+    const parts=[];
+    if(removed.length)parts.push(`Sin: ${removed.join(', ')}`);
+    if(extraEls.length)parts.push(`Extra: ${extraEls.map(el=>el.value).join(', ')}`);
+    if(parts.length)details.push(`[${hdTag}] ${parts.join(' · ')}`);
+  }
+  const drinkEl=document.querySelector('input[name="customDrink"]:checked');
+  if(drinkEl){ const dp=parseFloat(drinkEl.dataset.price)||0; extraCost+=dp; details.push(`Bebida: ${drinkEl.value}${dp>0?` (+$${dp.toFixed(2)})`:''}`);}
+  details.push(`Salsas: ${salsas.join(', ')}`);
+  const note=document.getElementById('customNote').value.trim();
+  if(note)details.push(note);
+  const uid=_custom.id+'_'+Date.now();
+  cart.push({id:uid,name:_custom.name,price:_custom.price+extraCost,emoji:_custom.emoji,img:_custom.img,qty:1,details:details.join(' · ')});
+  renderCart(); bump();
+  showToast(`${_custom.emoji} Agregado al carrito`,'ok');
+  closeCustom();
+}
+
+function addToCart(id,name,price,emoji,img){
+  const ex=cart.find(i=>i.id===id);
+  if(ex){ex.qty++;}else{cart.push({id,name,price,emoji,img:img||'',qty:1,details:''});}
+  renderCart(); bump();
+  showToast(`${emoji} Agregado al carrito`,'ok');
+}
+
+function bump(){ const b=document.getElementById('cartBadge'); b.style.transform='scale(1.5)'; setTimeout(()=>b.style.transform='',250); }
+function changeQty(id,d){ const it=cart.find(i=>i.id===id); if(!it)return; it.qty=Math.max(0,it.qty+d); if(it.qty===0)cart=cart.filter(i=>i.id!==id); renderCart(); }
+function totals(){ const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); return{sub,tax:sub*TAX,total:sub+sub*TAX}; }
+
+function renderCart(){
+  const count=cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartBadge').textContent=count;
+  const bn=document.getElementById('bnBadge');if(bn)bn.textContent=count;
+  const list=document.getElementById('cartList');
+  const ftr=document.getElementById('cartFtr');
+  if(!cart.length){ list.innerHTML='<div class="cart-empty"><div class="e-ico">🌭</div><p>Tu carrito está vacío.<br>¡Agrega algo delicioso!</p></div>'; ftr.style.display='none'; return; }
+  list.innerHTML=cart.map(it=>`
+    <div class="ci">
+      <div class="ci-thumb">${it.img?`<img src="${it.img}" alt="${it.name}">`:`${it.emoji}`}</div>
+      <div class="ci-info">
+        <div class="ci-name">${it.name}</div>
+        ${it.details?`<div class="ci-detail">${it.details}</div>`:''}
+        <div class="ci-price">$${(it.price*it.qty).toFixed(2)}</div>
+        <div class="ci-controls">
+          <button class="q-btn" onclick="changeQty('${it.id}',-1)">−</button>
+          <span class="q-val">${it.qty}</span>
+          <button class="q-btn" onclick="changeQty('${it.id}',1)">+</button>
+        </div>
+      </div>
+      <button class="ci-del" onclick="changeQty('${it.id}',-99)">🗑</button>
+    </div>`).join('');
+  const{sub,tax,total}=totals();
+  document.getElementById('cSub').textContent='$'+sub.toFixed(2);
+  document.getElementById('cTax').textContent='$'+tax.toFixed(2);
+  document.getElementById('cTotal').textContent='$'+total.toFixed(2);
+  ftr.style.display='block';
+}
+
+function toggleCart(){ const d=document.getElementById('cartDrawer'),o=document.getElementById('cartOverlay'); d.classList.toggle('open'); o.classList.toggle('open'); document.body.style.overflow=d.classList.contains('open')?'hidden':''; }
+
+/* ── CHECKOUT ── */
+function openCheckout(){
+  if(!cart.length)return;
+  const{sub,tax,total}=totals();
+  document.getElementById('orderSummary').innerHTML=`<h4>Resumen del Pedido</h4>${cart.map(i=>`<div class="os-row"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}<div class="os-row"><span>Tax 7%</span><span>$${tax.toFixed(2)}</span></div><div class="os-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
+  const payBtn=document.getElementById('sq-pay-btn');
+  payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`;
+  payBtn.disabled=true;
+  document.getElementById('checkoutModal').classList.add('open');
+  toggleCart();
+  initSquare();
+}
+function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); }
+function closeSuccess(){ document.getElementById('successModal').classList.remove('open'); cart=[]; renderCart(); }
+
+/* ── SQUARE ── */
+let _sqPayments=null, _sqCard=null;
+async function initSquare(){
+  if(_sqCard){ document.getElementById('sq-loading').style.display='none'; document.getElementById('sq-card-container').style.display='block'; document.getElementById('sq-pay-btn').disabled=false; return; }
+  try{
+    const cfg=await fetch('/api/config').then(r=>r.json());
+    _sqPayments=Square.payments(cfg.applicationId,cfg.locationId);
+    _sqCard=await _sqPayments.card({style:{'.input-container':{borderColor:'rgba(255,255,255,0.15)',borderRadius:'8px'},'.input-container.is-focus':{borderColor:'#FAA83C'},'input':{color:'#F5F0E8',fontFamily:'Montserrat,sans-serif'},'input::placeholder':{color:'#888077'}}});
+    await _sqCard.attach('#sq-card-container');
+    document.getElementById('sq-loading').style.display='none';
+    document.getElementById('sq-card-container').style.display='block';
+    document.getElementById('sq-pay-btn').disabled=false;
+  }catch(e){ document.getElementById('sq-loading').innerHTML='⚠️ Error al cargar el sistema de pago. Asegúrate de que el servidor está corriendo.'; }
+}
+async function sendOrder(){
+  const name=document.getElementById('cName').value.trim();
+  const phone=document.getElementById('cPhone').value.trim();
+  if(!name||!phone){ showToast('⚠️ Ingresa tu nombre y teléfono','info'); return; }
+  if(!_sqCard){ showToast('⚠️ Sistema de pago no listo','info'); return; }
+  const{total}=totals();
+  const payBtn=document.getElementById('sq-pay-btn');
+  payBtn.disabled=true; payBtn.textContent='⏳ Procesando...';
+  try{
+    const result=await _sqCard.tokenize();
+    if(result.status!=='OK'){ showToast('⚠️ '+(result.errors?.[0]?.message||'Verifica los datos de tu tarjeta'),'info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; return; }
+    const resp=await fetch('/api/pago',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sourceId:result.token,total:Math.round(total*100),items:cart.map(i=>({id:i.id,name:i.name,price:i.price,qty:i.qty,details:i.details})),customer:{name,phone,email:document.getElementById('cEmail').value.trim()},orderType:document.getElementById('cType').value,location:document.getElementById('cLoc').value,notes:document.getElementById('cNotes').value.trim()})});
+    const data=await resp.json();
+    if(data.success){ const rl=document.getElementById('sq-receipt-link'); if(data.receiptUrl){rl.href=data.receiptUrl;rl.style.display='inline';}else{rl.style.display='none';} closeCheckout(); document.getElementById('successModal').classList.add('open'); }
+    else{ showToast('⚠️ '+(data.message||'No se pudo procesar el pago'),'info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
+  }catch(e){ showToast('⚠️ Error de conexión con el servidor','info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
+}
+
+/* ── TOAST ── */
+function showToast(msg,type='ok'){ const w=document.getElementById('toastWrap'),t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg; w.appendChild(t); setTimeout(()=>t.remove(),2800); }
+</script>
+</body>
+</html>
