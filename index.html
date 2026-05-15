@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+<script src="https://web.squarecdn.com/v1/square.js"></script>
 <style>
 :root{
   --bg:#0A0A0A;
@@ -1576,7 +1576,7 @@ let _sqPayments=null, _sqCard=null;
 async function initSquare(){
   if(_sqCard){ document.getElementById('sq-loading').style.display='none'; document.getElementById('sq-card-container').style.display='block'; document.getElementById('sq-pay-btn').disabled=false; return; }
   try{
-    _sqPayments=Square.payments('sandbox-sq0idb-XM1iXlxw-kXbVmS7Ry5C7g','LT874YA53K13J');
+    _sqPayments=Square.payments('sq0idp-CAxJsVjUl55Ulb7Nwekcjw','L2WHB70494FZB');
     _sqCard=await _sqPayments.card({style:{'.input-container':{borderColor:'rgba(255,255,255,0.15)',borderRadius:'8px'},'.input-container.is-focus':{borderColor:'#FAA83C'},'input':{color:'#F5F0E8'},'input::placeholder':{color:'#888077'}}});
     await _sqCard.attach('#sq-card-container');
     document.getElementById('sq-loading').style.display='none';
