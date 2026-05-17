@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Impresora de Tickets — Hot Dog Maracay</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; min-height: 100vh; }
+
+  .header {
+    background: #F16243;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header h1 { font-size: 20px; }
+  .status-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .counter {
+    background: #2a2a2a;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .counter-num {
+    font-size: 48px;
+    font-weight: bold;
+    color: #FAA83C;
+  }
+  .counter-label { color: #aaa; font-size: 14px; }
+
+  .orders-list {
+    margin: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .order-card {
+    background: #2a2a2a;
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 4px solid #FAA83C;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .order-card.new { border-left-color: #4ade80; animation: flashNew 1s ease; }
+  @keyframes flashNew {
+    0%,100% { background: #2a2a2a; }
+    50% { background: #1a3a1a; }
+  }
+
+  .order-info h3 { font-size: 16px; color: #FAA83C; margin-bottom: 4px; }
+  .order-info .items { font-size: 13px; color: #ccc; margin: 4px 0; }
+  .order-info .meta { font-size: 12px; color: #888; }
+  .order-total { font-size: 20px; font-weight: bold; color: #fff; white-space: nowrap; }
+
+  .btn-print {
+    background: #F16243;
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .btn-print:hover { background: #d4502e; }
+
+  .empty { text-align: center; color: #555; padding: 60px 20px; font-size: 16px; }
+
+  /* TICKET para imprimir */
+  @media print {
+    body > * { display: none !important; }
+    #ticket-print { display: block !important; }
+  }
+
+  #ticket-print {
+    display: none;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    width: 280px;
+    padding: 8px;
+  }
+  .ticket-header { text-align: center; margin-bottom: 8px; }
+  .ticket-header h2 { font-size: 16px; font-weight: bold; }
+  .ticket-header p { font-size: 11px; }
+  .ticket-divider { border-top: 1px dashed #000; margin: 6px 0; }
+  .ticket-row { display: flex; justify-content: space-between; margin: 2px 0; }
+  .ticket-total { font-weight: bold; font-size: 14px; }
+  .ticket-footer { text-align: center; margin-top: 8px; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="status-dot" id="statusDot"></div>
+  <h1>Hot Dog Maracay — Pedidos Online</h1>
+</div>
+
+<div class="counter">
+  <div class="counter-num" id="orderCount">0</div>
+  <div>
+    <div style="font-size:18px;font-weight:bold;">pedidos hoy</div>
+    <div class="counter-label" id="lastUpdate">Conectando...</div>
+  </div>
+</div>
+
+<div class="orders-list" id="ordersList">
+  <div class="empty">Esperando pedidos...</div>
+</div>
+
+<!-- Ticket oculto para imprimir -->
+<div id="ticket-print"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://ckzvjudhpbhzisrrhozk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_5cEosCpGfTIM-culYQ1ofA_xggsaIBc';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let orders = [];
+let audioCtx = null;
+
+function beep() {
+  try {
+    if (!audioCtx) audioCtx = new AudioContext();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+    setTimeout(() => {
+      const osc2 = audioCtx.createOscillator();
+      osc2.connect(gain); osc2.frequency.value = 1100;
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      osc2.start(); osc2.stop(audioCtx.currentTime + 0.4);
+    }, 200);
+  } catch(e) {}
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderTicket(order) {
+  const items = order.items || [];
+  const rows = items.map(i =>
+    `<div class="ticket-row"><span>${i.qty}x ${i.name}</span><span>$${(i.price * i.qty).toFixed(2)}</span></div>`
+  ).join('');
+
+  return `
+    <div class="ticket-header">
+      <h2>HOT DOG MARACAY</h2>
+      <p>Miami, FL</p>
+      <p>${new Date(order.created_at).toLocaleString('es-VE')}</p>
+    </div>
+    <div class="ticket-divider"></div>
+    <div class="ticket-row"><span>Cliente:</span><span>${order.customer_name}</span></div>
+    <div class="ticket-row"><span>Tel:</span><span>${order.customer_phone}</span></div>
+    <div class="ticket-row"><span>Tipo:</span><span>${order.order_type === 'pickup' ? 'Retirar en tienda' : 'Delivery'}</span></div>
+    ${order.notes ? `<div class="ticket-row"><span>Nota:</span><span>${order.notes}</span></div>` : ''}
+    <div class="ticket-divider"></div>
+    ${rows}
+    <div class="ticket-divider"></div>
+    <div class="ticket-row ticket-total"><span>TOTAL</span><span>$${parseFloat(order.total).toFixed(2)}</span></div>
+    <div class="ticket-divider"></div>
+    <div class="ticket-footer">
+      <p>Pago con tarjeta — APROBADO</p>
+      <p>Gracias por tu pedido!</p>
+    </div>
+  `;
+}
+
+function printOrder(order) {
+  document.getElementById('ticket-print').innerHTML = renderTicket(order);
+  setTimeout(() => window.print(), 100);
+}
+
+function renderOrders() {
+  const list = document.getElementById('ordersList');
+  if (orders.length === 0) {
+    list.innerHTML = '<div class="empty">Esperando pedidos...</div>';
+    return;
+  }
+  list.innerHTML = orders.map((o, i) => `
+    <div class="order-card ${i === 0 && o._new ? 'new' : ''}" id="order-${o.id}">
+      <div class="order-info">
+        <h3>${o.customer_name} ${o.order_type === 'delivery' ? '🚗' : '🏠'}</h3>
+        <div class="items">${(o.items || []).map(it => `${it.qty}x ${it.name}`).join(' • ')}</div>
+        <div class="meta">${formatTime(o.created_at)} · ${o.order_type === 'pickup' ? 'Retirar en tienda' : 'Delivery'} ${o.notes ? '· ' + o.notes : ''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <div class="order-total">$${parseFloat(o.total).toFixed(2)}</div>
+        <button class="btn-print" onclick="printOrder(orders[${i}])">🖨️ Imprimir</button>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('orderCount').textContent = orders.length;
+}
+
+async function loadTodayOrders() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const { data } = await db.from('web_orders')
+    .select('*')
+    .gte('created_at', today.toISOString())
+    .order('created_at', { ascending: false });
+  orders = data || [];
+  renderOrders();
+  document.getElementById('lastUpdate').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-VE');
+}
+
+// Escuchar pedidos nuevos en tiempo real
+db.channel('web_orders')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'web_orders' }, payload => {
+    const newOrder = { ...payload.new, _new: true };
+    orders.unshift(newOrder);
+    renderOrders();
+    beep();
+    document.getElementById('lastUpdate').textContent = '¡Nuevo pedido! ' + formatTime(newOrder.created_at);
+    // Auto-imprimir
+    setTimeout(() => printOrder(newOrder), 500);
+  })
+  .subscribe(status => {
+    const dot = document.getElementById('statusDot');
+    if (status === 'SUBSCRIBED') {
+      dot.style.background = '#4ade80';
+      document.getElementById('lastUpdate').textContent = 'Conectado · ' + new Date().toLocaleTimeString('es-VE');
+    } else {
+      dot.style.background = '#ef4444';
+    }
+  });
+
+loadTodayOrders();
+</script>
+</body>
+</html>
