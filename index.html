@@ -192,7 +192,7 @@ nav.scrolled{background:rgba(10,10,10,.94);backdrop-filter:blur(24px);border-col
 }
 .stat-lbl{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:1.5px;margin-top:4px;text-transform:uppercase}
 .hero-mascot{
-  position:absolute;right:3%;bottom:0;height:80vh;z-index:3;
+  position:absolute;right:3%;bottom:0;height:clamp(38vh,55vw,80vh);z-index:3;
   pointer-events:none;filter:drop-shadow(0 0 50px rgba(241,98,67,.5));
   transform:translateX(160px);opacity:0;
 }
@@ -547,6 +547,8 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
   .g-item:first-child{grid-row:span 1}
   .foot-grid{grid-template-columns:1fr 1fr}
   .hist-img-wrap{height:300px}
+  /* Mascota proporcional en tablet */
+  .hero-mascot{height:clamp(32vh,42vw,58vh);right:1%;}
 }
 @media(max-width:768px){
   /* Ocultar nav superior completa en móvil */
