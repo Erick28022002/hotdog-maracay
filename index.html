@@ -461,24 +461,30 @@ nav.scrolled{background:rgba(10,10,10,.94);backdrop-filter:blur(24px);border-col
 .bottom-nav{
   display:none;
   position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:rgba(10,10,10,.97);backdrop-filter:blur(24px);
-  border-top:1px solid rgba(250,168,60,.2);
-  padding:10px 0 env(safe-area-inset-bottom,8px);
+  background:rgba(12,12,12,.96);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border-top:1px solid rgba(255,255,255,.06);
+  padding:8px 0 env(safe-area-inset-bottom,10px);
   flex-direction:row;justify-content:space-around;align-items:center;
 }
 .bn-item{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  color:var(--mu);font-size:9px;font-weight:700;letter-spacing:.5px;
-  text-transform:uppercase;cursor:pointer;padding:4px 12px;
-  transition:color .2s;border:none;background:none;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  color:rgba(255,255,255,.35);font-size:9px;font-weight:600;letter-spacing:.4px;
+  text-transform:uppercase;cursor:pointer;padding:4px 10px;
+  transition:color .2s;border:none;background:none;min-width:44px;
 }
 .bn-item:hover,.bn-item.active{color:var(--mango)}
-.bn-ico{font-size:22px;line-height:1}
+.bn-item.active .bn-ico svg{stroke:var(--mango)}
+.bn-ico{
+  display:flex;align-items:center;justify-content:center;
+  width:24px;height:24px;position:relative;
+}
+.bn-ico svg{width:22px;height:22px;stroke:rgba(255,255,255,.35);transition:stroke .2s}
+.bn-item:hover .bn-ico svg,.bn-item.active .bn-ico svg{stroke:var(--mango)}
 .bn-cart{position:relative}
 .bn-badge{
-  position:absolute;top:-4px;right:-6px;
-  background:var(--terra);color:#fff;font-size:9px;font-weight:900;
-  padding:1px 5px;border-radius:100px;min-width:16px;text-align:center;
+  position:absolute;top:-5px;right:-8px;
+  background:var(--terra);color:#fff;font-size:8px;font-weight:900;
+  padding:1px 4px;border-radius:100px;min-width:15px;text-align:center;line-height:1.4;
 }
 
 /* ── REELS ── */
@@ -744,22 +750,22 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
 <!-- BOTTOM NAV (móvil) -->
 <nav class="bottom-nav">
   <button class="bn-item" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-    <span class="bn-ico">🏠</span>Inicio
+    <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Inicio
   </button>
   <button class="bn-item" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">
-    <span class="bn-ico">🌭</span>Menú
+    <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="2" x2="8" y2="6"/><line x1="8" y1="10" x2="8" y2="22"/><path d="M6 2v4a2 2 0 0 0 4 0V2"/><line x1="16" y1="2" x2="16" y2="22"/></svg></span>Menú
   </button>
   <button class="bn-item" onclick="document.getElementById('delivery').scrollIntoView({behavior:'smooth'})">
-    <span class="bn-ico">🛵</span>Delivery
+    <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>Delivery
   </button>
   <button class="bn-item" onclick="document.getElementById('locations').scrollIntoView({behavior:'smooth'})">
-    <span class="bn-ico">📍</span>Lugares
+    <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>Lugares
   </button>
   <button class="bn-item bn-cart" onclick="toggleCart()">
-    <span class="bn-ico">🛒<span class="bn-badge" id="bnBadge">0</span></span>Carrito
+    <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="bn-badge" id="bnBadge">0</span></span>Carrito
   </button>
   <button class="bn-item" onclick="toggleMobileNav()">
-    <span class="bn-ico">☰</span>Más
+    <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Más
   </button>
 </nav>
 
