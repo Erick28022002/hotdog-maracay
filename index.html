@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
 <!-- Favicon -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌭</text></svg>">
@@ -776,7 +776,7 @@ body{background:transparent}
 .checkout-btn:hover{filter:brightness(1.08)}
 
 /* ── MODALES ── */
-.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(6px)}
+.modal-wrap{position:fixed;inset:0;top:env(safe-area-inset-top,0);background:rgba(0,0,0,.85);z-index:300;display:none;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(8px)}
 .modal-wrap.open{display:flex}
 .modal{
   background:var(--s1);border:1px solid var(--b2);
@@ -1634,8 +1634,9 @@ function openCustom(id, name, price, emoji, img, hasDrink, numHD) {
   document.getElementById('customConfirmBtn').disabled = true;
   document.getElementById('customNote').value = '';
   document.getElementById('customModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-function closeCustom(){ document.getElementById('customModal').classList.remove('open'); _custom=null; }
+function closeCustom(){ document.getElementById('customModal').classList.remove('open'); document.body.style.overflow = ''; _custom=null; }
 function toggleTopping(lbl,ev){ ev.preventDefault(); const inp=lbl.querySelector('input'); inp.checked=!inp.checked; lbl.classList.toggle('removed',!inp.checked); lbl.querySelector('.ck-box').textContent=inp.checked?'✓':'✗'; }
 function toggleExtra(lbl,ev){ ev.preventDefault(); const inp=lbl.querySelector('input'); inp.checked=!inp.checked; lbl.classList.toggle('selected',inp.checked); }
 function toggleSalsa(lbl,ev){
