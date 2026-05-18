@@ -14,7 +14,7 @@
 <meta name="keywords" content="hot dog venezolano miami, hotdog maracay, comida venezolana miami, hot dog miami beach, pedir hot dog online miami, north miami beach, doral, downtown miami">
 <meta name="author" content="Hot Dog Maracay">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#FAA83C">
+<meta name="theme-color" content="#0A0A0A">
 <link rel="canonical" href="https://hotdogmaracay.com/">
 
 <!-- Content Security Policy -->
@@ -782,12 +782,23 @@ body{background:transparent}
   background:var(--s1);border:1px solid var(--b2);
   border-radius:24px 24px 0 0;
   width:100%;max-width:500px;
-  max-height:90dvh;overflow-y:auto;
+  max-height:92dvh;overflow-y:auto;
   padding-bottom:env(safe-area-inset-bottom,16px);
+}
+/* Pill indicador en móvil — visible solo cuando el modal es bottom-sheet */
+.modal::before{
+  content:'';display:block;width:40px;height:4px;
+  background:rgba(255,255,255,.2);border-radius:2px;
+  margin:12px auto 0;
 }
 @media(min-width:769px){
   .modal-wrap{align-items:center;padding:16px}
   .modal{border-radius:24px;max-height:92vh}
+  .modal::before{display:none}
+}
+@media(max-width:768px){
+  .modal{min-height:88dvh}
+  #successModal .modal{min-height:auto}
 }
 .modal-hdr{padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .modal-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px}
