@@ -776,7 +776,7 @@ body{background:transparent}
 .checkout-btn:hover{filter:brightness(1.08)}
 
 /* ── MODALES ── */
-.modal-wrap{position:fixed;inset:0;top:env(safe-area-inset-top,0);background:rgba(0,0,0,.85);z-index:300;display:none;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(8px)}
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:none;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(8px)}
 .modal-wrap.open{display:flex}
 .modal{
   background:var(--s1);border:1px solid var(--b2);
@@ -795,7 +795,7 @@ body{background:transparent}
 .modal-body{padding:0 24px 24px}
 .form-grp{margin-bottom:16px}
 .form-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);display:block;margin-bottom:6px}
-.form-inp{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:14px;padding:12px 15px;outline:none;transition:border-color .15s}
+.form-inp{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:16px;padding:12px 15px;outline:none;transition:border-color .15s}
 .form-inp:focus{border-color:var(--mango)}
 .form-sel{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:14px;padding:12px 15px;outline:none;appearance:none;cursor:pointer}
 .order-summary{background:var(--s2);border-radius:14px;padding:18px;margin-bottom:20px;border:1px solid var(--b)}
@@ -835,7 +835,7 @@ body{background:transparent}
 .drink-opt input:checked + .dk-dot{border-color:var(--mango);background:var(--mango)}
 .drink-opt.selected{border-color:var(--mango);background:rgba(250,168,60,.06)}
 .drink-opt span.dk-lbl{font-size:13px;font-weight:600}
-.custom-note-inp{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:12px 14px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--txt);outline:none;resize:none}
+.custom-note-inp{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:12px 14px;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--txt);outline:none;resize:none}
 .custom-note-inp:focus{border-color:var(--b2)}
 .salsa-error{color:var(--red);font-size:12px;font-weight:700;margin-top:8px;display:none}
 #customConfirmBtn:disabled{opacity:.4;cursor:not-allowed}
@@ -1634,9 +1634,9 @@ function openCustom(id, name, price, emoji, img, hasDrink, numHD) {
   document.getElementById('customConfirmBtn').disabled = true;
   document.getElementById('customNote').value = '';
   document.getElementById('customModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockScroll();
 }
-function closeCustom(){ document.getElementById('customModal').classList.remove('open'); document.body.style.overflow = ''; _custom=null; }
+function closeCustom(){ document.getElementById('customModal').classList.remove('open'); unlockScroll(); _custom=null; }
 function toggleTopping(lbl,ev){ ev.preventDefault(); const inp=lbl.querySelector('input'); inp.checked=!inp.checked; lbl.classList.toggle('removed',!inp.checked); lbl.querySelector('.ck-box').textContent=inp.checked?'✓':'✗'; }
 function toggleExtra(lbl,ev){ ev.preventDefault(); const inp=lbl.querySelector('input'); inp.checked=!inp.checked; lbl.classList.toggle('selected',inp.checked); }
 function toggleSalsa(lbl,ev){
@@ -1722,7 +1722,7 @@ function renderCart(){
   ftr.style.display='block';
 }
 
-function toggleCart(){ const d=document.getElementById('cartDrawer'),o=document.getElementById('cartOverlay'); d.classList.toggle('open'); o.classList.toggle('open'); document.body.style.overflow=d.classList.contains('open')?'hidden':''; }
+function toggleCart(){ const d=document.getElementById('cartDrawer'),o=document.getElementById('cartOverlay'); d.classList.toggle('open'); o.classList.toggle('open'); d.classList.contains('open')?lockScroll():unlockScroll(); }
 
 /* ── CHECKOUT ── */
 function openCheckout(){
@@ -1734,11 +1734,11 @@ function openCheckout(){
   payBtn.disabled=true;
   toggleCart();
   document.getElementById('checkoutModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockScroll();
   initSquare();
 }
-function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); document.body.style.overflow = ''; }
-function closeSuccess(){ document.getElementById('successModal').classList.remove('open'); document.body.style.overflow = ''; cart=[]; renderCart(); }
+function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); unlockScroll(); }
+function closeSuccess(){ document.getElementById('successModal').classList.remove('open'); unlockScroll(); cart=[]; renderCart(); }
 
 /* ── SQUARE ── */
 const BACKEND_URL='https://hotdog-backend-production-0c45.up.railway.app';
@@ -1779,6 +1779,21 @@ function showToast(msg,type='ok'){ const w=document.getElementById('toastWrap'),
 
 /* ── SECURITY: HTML escape helper ── */
 function escHtml(s){ const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+
+/* ── SCROLL LOCK (iOS safe) ── */
+let _scrollY=0;
+function lockScroll(){
+  _scrollY=window.scrollY;
+  document.body.style.position='fixed';
+  document.body.style.top=`-${_scrollY}px`;
+  document.body.style.width='100%';
+}
+function unlockScroll(){
+  document.body.style.position='';
+  document.body.style.top='';
+  document.body.style.width='';
+  window.scrollTo(0,_scrollY);
+}
 </script>
 </body>
 </html>
