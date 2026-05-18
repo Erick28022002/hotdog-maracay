@@ -521,9 +521,9 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
     background:rgba(10,10,10,0.80) !important;
   }
   /* Hero móvil: pantalla completa */
-  .hero{height:calc(100dvh - 70px);min-height:unset;overflow:hidden}
+  .hero{height:calc(100dvh - 70px);min-height:unset;overflow:hidden;transform:translateZ(0);will-change:transform}
   .hero-bg{position:absolute;inset:0;height:100%}
-  .hero-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.75) saturate(1.3)}
+  .hero-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.75) saturate(1.3);transform:translateZ(0)}
   .hero-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.82) 38%,rgba(0,0,0,0) 70%)}
   /* Mascota: esquina inferior derecha, lo más grande posible */
   .hero-mascot{
