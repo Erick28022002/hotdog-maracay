@@ -817,7 +817,7 @@ body{background:transparent}
 .wa-btn{width:100%;background:#128C7E;color:#fff;font-family:'Montserrat',sans-serif;font-weight:900;font-size:15px;padding:15px;border:none;border-radius:14px;cursor:pointer;margin-top:16px;transition:filter .15s;display:flex;align-items:center;justify-content:center;gap:8px}
 .wa-btn:hover{filter:brightness(1.1)}
 .pay-note{font-size:12px;color:var(--mu);text-align:center;margin-top:12px;line-height:1.6}
-#sq-card-container{background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:10px;min-height:88px}
+#sq-card-container{background:transparent;border:none;border-radius:12px;padding:0;min-height:88px}
 #sq-pay-btn{width:100%;background:linear-gradient(135deg,var(--mango),var(--terra));color:#000;font-family:'Montserrat',sans-serif;font-weight:900;font-size:15px;padding:15px;border:none;border-radius:14px;cursor:pointer;margin-top:16px;transition:filter .15s}
 #sq-pay-btn:hover:not(:disabled){filter:brightness(1.08)}
 #sq-pay-btn:disabled{opacity:.45;cursor:not-allowed}
@@ -1758,7 +1758,15 @@ async function initSquare(){
   if(_sqCard){ document.getElementById('sq-loading').style.display='none'; document.getElementById('sq-card-container').style.display='block'; document.getElementById('sq-pay-btn').disabled=false; return; }
   try{
     _sqPayments=Square.payments('sq0idp-CAxJsVjUl55Ulb7Nwekcjw','L2WHB70494FZB');
-    _sqCard=await _sqPayments.card({style:{'.input-container':{borderColor:'rgba(255,255,255,0.15)',borderRadius:'8px'},'.input-container.is-focus':{borderColor:'#FAA83C'},'input':{color:'#F5F0E8'},'input::placeholder':{color:'#888077'}}});
+    _sqCard=await _sqPayments.card({style:{
+      '.input-container':{borderColor:'rgba(255,255,255,0.12)',borderRadius:'10px',borderWidth:'1.5px'},
+      '.input-container.is-focus':{borderColor:'#FAA83C',borderWidth:'1.5px'},
+      '.input-container.is-error':{borderColor:'#E8272A',borderWidth:'1.5px'},
+      'input':{backgroundColor:'#181818',color:'#F5F0E8',fontSize:'15px',fontFamily:'Montserrat,sans-serif'},
+      'input::placeholder':{color:'#555'},
+      '.message-text':{color:'#ff6b6b',fontSize:'12px'},
+      '.message-icon':{color:'#ff6b6b'}
+    }});
     await _sqCard.attach('#sq-card-container');
     document.getElementById('sq-loading').style.display='none';
     document.getElementById('sq-card-container').style.display='block';
