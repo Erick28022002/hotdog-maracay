@@ -1759,13 +1759,13 @@ async function initSquare(){
   try{
     _sqPayments=Square.payments('sq0idp-CAxJsVjUl55Ulb7Nwekcjw','L2WHB70494FZB');
     _sqCard=await _sqPayments.card({style:{
-      '.input-container':{borderColor:'rgba(255,255,255,0.12)',borderRadius:'10px'},
+      '.input-container':{borderColor:'#ddd',borderRadius:'10px'},
       '.input-container.is-focus':{borderColor:'#FAA83C'},
       '.input-container.is-error':{borderColor:'#E8272A'},
-      'input':{backgroundColor:'#181818',color:'#F5F0E8'},
-      'input::placeholder':{color:'#555'},
-      '.message-text':{color:'#ff6b6b'},
-      '.message-icon':{color:'#ff6b6b'}
+      'input':{color:'#111111'},
+      'input::placeholder':{color:'#999'},
+      '.message-text':{color:'#E8272A'},
+      '.message-icon':{color:'#E8272A'}
     }});
     await _sqCard.attach('#sq-card-container');
     document.getElementById('sq-loading').style.display='none';
