@@ -559,7 +559,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
 @media(max-width:768px){
   /* Ocultar nav superior completa en móvil */
   nav{display:none}
-  .hero-tag{display:none}
+  .hero-tag{display:inline-flex;font-size:9px;padding:5px 12px;margin-bottom:10px}
   .ham{display:none}
   /* Bottom nav visible */
   .bottom-nav{display:flex}
@@ -594,11 +594,11 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
   .hero-content{
     position:absolute;left:0;top:0;bottom:auto;
     display:flex;flex-direction:column;justify-content:flex-start;
-    padding:20px 16px;
-    max-width:58vw;
+    padding:16px 14px 0;
+    max-width:62vw;
     z-index:4;
   }
-  .hero h1{font-size:clamp(30px,10.5vw,52px);line-height:.95;margin:0}
+  .hero h1{font-size:clamp(46px,15vw,82px);line-height:.86;margin:0;letter-spacing:-1px}
   .hero-desc{display:none}
   .hero-stats{display:none}
   .hero-btns{margin-top:12px;gap:8px;flex-wrap:wrap}
