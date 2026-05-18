@@ -12,6 +12,13 @@
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://hotdogmaracay.com/">
 
+<!-- Content Security Policy -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.cloudflare.com https://web.squarecdn.com https://connect.squareup.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://hotdog-backend-production-0c45.up.railway.app https://pci-connect.squareup.com https://connect.squareup.com; frame-src https://web.squarecdn.com https://connect.squareup.com https://sandbox.web.squarecdn.com; media-src 'self'; object-src 'none'; base-uri 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()">
+
 <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
 <meta property="og:type" content="restaurant">
 <meta property="og:title" content="Hot Dog Maracay — Un Pedacito de Venezuela en Miami">
@@ -53,12 +60,14 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECPCKE9MTX"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ECPCKE9MTX');</script>
 
-<base href="./">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://web.squarecdn.com/v1/square.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+        integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+        integrity="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 :root{
   --bg:#0A0A0A;
@@ -170,20 +179,28 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 }
 .hero-btns{display:flex;gap:14px;flex-wrap:wrap;opacity:0;transform:translateY(20px)}
 .btn-primary{
-  background:linear-gradient(135deg,var(--mango),var(--terra));
-  color:#000;font-weight:900;font-size:14px;padding:16px 36px;
-  border-radius:100px;border:none;cursor:pointer;
-  display:inline-flex;align-items:center;gap:8px;
-  transition:filter .15s,transform .15s;letter-spacing:.4px;text-transform:uppercase;
+  background:transparent;
+  color:var(--mango);font-weight:700;font-size:13px;padding:13px 32px;
+  border-radius:100px;border:1.5px solid var(--mango);cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;letter-spacing:1.5px;
+  text-transform:uppercase;transition:all .2s;
+  box-shadow:0 0 18px rgba(250,168,60,.25);
 }
-.btn-primary:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.btn-primary:hover{
+  background:var(--mango);color:#000;
+  box-shadow:0 0 32px rgba(250,168,60,.55);transform:translateY(-2px);
+}
 .btn-outline{
-  background:transparent;color:var(--txt);font-weight:700;font-size:14px;
-  padding:15px 32px;border-radius:100px;border:1.5px solid rgba(0,167,209,.5);
+  background:transparent;color:var(--blue);font-weight:700;font-size:13px;
+  padding:13px 32px;border-radius:100px;border:1.5px solid var(--blue);
   cursor:pointer;display:inline-flex;align-items:center;gap:8px;
-  transition:all .2s;letter-spacing:.4px;
+  letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;
+  box-shadow:0 0 18px rgba(0,167,209,.2);
 }
-.btn-outline:hover{border-color:var(--blue);color:var(--blue);box-shadow:0 0 20px rgba(0,167,209,.2)}
+.btn-outline:hover{
+  background:var(--blue);color:#000;
+  box-shadow:0 0 32px rgba(0,167,209,.5);transform:translateY(-2px);
+}
 .hero-stats{display:flex;gap:48px;margin-top:64px;opacity:0;flex-wrap:wrap}
 .stat-num{
   font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--mango);
@@ -316,9 +333,9 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 .promo-card:hover .promo-right img{transform:scale(1.04)}
 .promo-right::after{content:'';position:absolute;left:0;top:0;bottom:0;width:45%;background:linear-gradient(to right,#1C0A00,transparent)}
 .menu-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
-.tab{background:var(--s2);border:1.5px solid var(--b);border-radius:100px;padding:10px 24px;font-size:13px;font-weight:700;color:var(--mu);cursor:pointer;transition:all .2s}
-.tab:hover{border-color:var(--b2);color:var(--txt)}
-.tab.active{background:linear-gradient(135deg,var(--mango),var(--terra));border-color:transparent;color:#000}
+.tab{background:transparent;border:1.5px solid rgba(255,255,255,.15);border-radius:100px;padding:10px 28px;font-size:13px;font-weight:700;color:var(--mu);cursor:pointer;transition:all .2s;letter-spacing:1px;text-transform:uppercase}
+.tab:hover{border-color:var(--mango);color:var(--mango);box-shadow:0 0 16px rgba(250,168,60,.2)}
+.tab.active{background:transparent;border-color:var(--mango);color:var(--mango);box-shadow:0 0 22px rgba(250,168,60,.35)}
 .menu-cat{display:none}
 .menu-cat.active{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
 .mcard{
@@ -391,7 +408,8 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 .loc-img-wrap img{width:100%;height:115%;object-fit:cover;will-change:transform}
 .loc-num{
   font-family:'Bebas Neue',sans-serif;font-size:110px;
-  color:transparent;-webkit-text-stroke:1px rgba(250,168,60,.15);
+  color:transparent;-webkit-text-stroke:2px var(--mango);
+  text-shadow:0 0 40px rgba(250,168,60,.6),0 0 80px rgba(250,168,60,.25);
   line-height:1;margin-bottom:-14px;letter-spacing:-2px;
 }
 .loc-name{font-weight:900;font-size:34px;margin-bottom:12px;letter-spacing:.3px}
@@ -540,6 +558,20 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
 }
 .foot-bottom p{font-size:12px;color:var(--mu);font-weight:400}
 
+/* ── FONDO MIAMI GLOBAL ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;z-index:-1;
+  background:url('fotos/miami-neon.webp') center/cover no-repeat;
+  filter:brightness(.45) saturate(1.4);
+}
+body{background:transparent}
+.sec,.delivery-sec,.reviews-sec,.gallery-sec,.reels-sec,.social-sec,
+.historia-sec,.menu-section,footer{
+  background:rgba(10,10,10,0.82) !important;
+}
+.features-sec{background:rgba(10,10,10,0.78) !important}
+
 /* ── RESPONSIVE ── */
 @media(max-width:1024px){
   nav,.features-sec,.historia-sec,footer{padding-left:32px;padding-right:32px}
@@ -569,7 +601,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
   body::before{
     content:'';
     position:fixed;inset:0;z-index:-1;
-    background:url('fotos/Miami%20Composition%20for%20HotDog%20Maracay%20_553315419.jpeg') center/cover no-repeat;
+    background:url('fotos/miami-neon.webp') center/cover no-repeat;
     filter:brightness(.65) saturate(1.3);
   }
   /* Secciones semi-transparentes para que se vea el fondo */
@@ -800,7 +832,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-bg" id="heroBg">
-    <img src="fotos/Miami%20Composition%20for%20HotDog%20Maracay%20_553315419.jpeg" alt="Miami" id="heroBgImg" onerror="this.style.display='none'">
+    <img src="fotos/miami-neon.webp" alt="Miami" id="heroBgImg" onerror="this.style.display='none'">
   </div>
   <div class="hero-overlay"></div>
   <img src="fotos/mascot-nobg.webp" class="hero-mascot" id="heroMascot" alt="Mascota Hotdog Maracay" onerror="this.style.display='none'">
@@ -811,7 +843,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
       <span class="line"><span class="line-inner">DE <span class="n-terra">VENE</span><span class="n-blue">ZUELA</span></span></span>
       <span class="line"><span class="line-inner">EN <span class="n-mango">MIAMI</span></span></span>
     </h1>
-    <p class="hero-desc">Los hot dogs venezolanos más auténticos de Miami — pan caliente, más de 12 salsas Fritz y el sabor de Maracay que llevas en el alma.</p>
+    <p class="hero-desc">Los hot dogs venezolanos más auténticos de Miami — ingredientes frescos todos los días, más de 12 salsas para disfrutar y el sabor de Maracay que llevas en el alma.</p>
     <div class="hero-btns">
       <button class="btn-primary" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">🌭 Ver Menú</button>
       <a href="#locations" class="btn-outline">📍 Ubicaciones</a>
@@ -851,22 +883,13 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
   </div>
 </div>
 
-<!-- FEATURES -->
-<div class="features-sec">
-  <div class="feat-grid">
-    <div class="feat-card"><span class="feat-ico">🍞</span><div class="feat-t">Pan Fresco Diario</div><div class="feat-s">Horneado cada día, suave por dentro y dorado por fuera. Igual que en Maracay.</div></div>
-    <div class="feat-card"><span class="feat-ico">🥫</span><div class="feat-t">Más de 12 Salsas</div><div class="feat-s">Fritz, BBQ, mostaza, mayonesa, ketchup, queso y más combinaciones que imagines.</div></div>
-    <div class="feat-card"><span class="feat-ico">🛵</span><div class="feat-t">Delivery Rápido</div><div class="feat-s">Disponible en Uber Eats, DoorDash, Postmates y GrubHub. ¡A tu puerta!</div></div>
-    <div class="feat-card"><span class="feat-ico">🎵</span><div class="feat-t">Ambiente Venezolano</div><div class="feat-s">Salsa en vivo, ambiente familiar y la nostalgia del sabor de casa en Miami.</div></div>
-  </div>
-</div>
 
 <!-- HISTORIA Y ORIGEN -->
 <section class="historia-sec" id="historia">
   <div class="hist-grid">
     <div style="position:relative">
       <div class="hist-img-wrap">
-        <img src="fotos/historia-ambiente.jpg.webp" alt="Historia Hotdog Maracay">
+        <img src="fotos/historia-ambiente.webp" alt="Historia Hotdog Maracay">
         <div class="hist-neon-border"></div>
       </div>
     </div>
@@ -890,7 +913,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
       <div class="hist-tags">
         <span class="hist-tag t1">🇻🇪 Fundados en Maracay 2014</span>
         <span class="hist-tag t2">🌴 Miami desde 2022</span>
-        <span class="hist-tag t3">5 Ciudades · En expansión</span>
+        <span class="hist-tag t3">3 Ciudades · En expansión</span>
       </div>
     </div>
   </div>
@@ -924,7 +947,6 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
     <div class="menu-tabs">
       <button class="tab active" onclick="switchTab('cat-hotdogs',this)">🌭 Hot Dogs</button>
       <button class="tab" onclick="switchTab('cat-bebidas',this)">🥤 Bebidas</button>
-      <button class="tab" onclick="switchTab('cat-extras',this)">✨ Extras</button>
     </div>
 
     <!-- Hot Dogs -->
@@ -936,18 +958,18 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/Clasico%20Profesional.jpeg" alt="Hot Dog Clásico"></div>
-        <div class="mcard-body"><div class="mcard-name">Hot Dog Clásico</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$6.85</span><button class="add-btn" onclick="openCustom('hd-clasico','Hot Dog Clásico',6.85,'🌭','fotos/Clasico%20Profesional.jpeg',false)">+</button></div></div>
+        <div class="mcard-img"><img src="fotos/clasico-pro.webp" alt="Hot Dog Clásico"></div>
+        <div class="mcard-body"><div class="mcard-name">Hot Dog Clásico</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$6.85</span><button class="add-btn" onclick="openCustom('hd-clasico','Hot Dog Clásico',6.85,'🌭','fotos/clasico-pro.webp',false)">+</button></div></div>
       </div>
 
       <div class="mcard">
         <div class="mcard-img"><img src="fotos/promo-mechada.webp" alt="Promo de Carne Mechada"><span class="mcard-badge">ESTRELLA</span></div>
-        <div class="mcard-body"><div class="mcard-name">Promo de Carne Mechada</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, carne mechada, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$19.99</span><button class="add-btn" onclick="openCustom('promo-mechada','Promo de Carne Mechada',19.99,'🔥','fotos/Promo%20Carne%20Desmechada.png',true,2)">+</button></div></div>
+        <div class="mcard-body"><div class="mcard-name">Promo de Carne Mechada</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, carne mechada, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$19.99</span><button class="add-btn" onclick="openCustom('promo-mechada','Promo de Carne Mechada',19.99,'🔥','fotos/promo-mechada.webp',true,2)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/Carne%20Desmechada%20Profesional.jpeg" alt="Hot Dog con Carne Mechada"></div>
-        <div class="mcard-body"><div class="mcard-name">Hot Dog con Carne Mechada</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, carne mechada, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$10.99</span><button class="add-btn" onclick="openCustom('hd-mechada','Hot Dog con Carne Mechada',10.99,'🔥','fotos/Carne%20Desmechada%20Profesional.jpeg',false)">+</button></div></div>
+        <div class="mcard-img"><img src="fotos/hd-mechada-dark.webp" alt="Hot Dog con Carne Mechada"></div>
+        <div class="mcard-body"><div class="mcard-name">Hot Dog con Carne Mechada</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, carne mechada, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$10.99</span><button class="add-btn" onclick="openCustom('hd-mechada','Hot Dog con Carne Mechada',10.99,'🔥','fotos/hd-mechada-dark.webp',false)">+</button></div></div>
       </div>
 
       <div class="mcard">
@@ -985,12 +1007,6 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
       <div class="mcard"><div class="mcard-img"><img src="fotos/uvita.webp" alt="Uvita"></div><div class="mcard-body"><div class="mcard-name">Uvita</div><div class="mcard-desc">Refrescante bebida de uva venezolana.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-uvita','🍇 Uvita',3.50,'🍇','fotos/uvita.webp')">+</button></div></div></div>
       <div class="mcard"><div class="mcard-img"><img src="fotos/agua.webp" alt="Agua"></div><div class="mcard-body"><div class="mcard-name">Agua</div><div class="mcard-desc">Bien fría.</div><div class="mcard-footer"><span class="mcard-price">$2.00</span><button class="add-btn" onclick="addToCart('beb-agua','💧 Agua',2.00,'💧','fotos/agua.webp')">+</button></div></div></div>
     </div>
-
-    <!-- Extras -->
-    <div class="menu-cat" id="cat-extras">
-      <div class="mcard"><div class="mcard-img"><img src="fotos/tocino.webp" alt="Bacon Extra"></div><div class="mcard-body"><div class="mcard-name">Bacon Extra</div><div class="mcard-desc">Tocineta crujiente adicional para elevar tu hot dog.</div><div class="mcard-footer"><span class="mcard-price">$2.00</span><button class="add-btn" onclick="addToCart('ext-bacon','🥓 Bacon Extra',2.00,'🥓','fotos/tocino.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/queso.webp" alt="Queso de Mano"></div><div class="mcard-body"><div class="mcard-name">Queso de Mano Extra</div><div class="mcard-desc">Queso venezolano de mano, derretido y cremoso.</div><div class="mcard-footer"><span class="mcard-price">$2.00</span><button class="add-btn" onclick="addToCart('ext-queso','🧀 Queso de Mano',2.00,'🧀','fotos/queso.webp')">+</button></div></div></div>
-    </div>
   </div>
 </section>
 
@@ -1001,23 +1017,23 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
     <h2 class="sec-title">PÍDELO DESDE<br><span class="n-blue">DONDE ESTÉS</span></h2>
     <p class="sec-sub">Disponibles en las principales plataformas de Miami.</p>
     <div class="delivery-grid">
-      <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" class="app-card">
-        <div class="app-logo" style="background:#000;font-size:13px;letter-spacing:-1px">Uber<br>Eats</div>
+      <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer" class="app-card">
+        <div class="app-logo" style="background:#142328;padding:8px"><img src="fotos/logo-ubereats.webp" style="width:100%;height:100%;object-fit:contain"></div>
         <div class="app-info"><h3>Uber Eats</h3><p>Pide y rastrea tu orden en tiempo real</p></div>
         <span class="app-arrow">→</span>
       </a>
-      <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" class="app-card">
-        <div class="app-logo" style="background:#FF3008;font-size:26px">🚪</div>
+      <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" rel="noopener noreferrer" class="app-card">
+        <div class="app-logo" style="background:#fff;padding:8px"><img src="fotos/logo-doordash.webp" style="width:100%;height:100%;object-fit:contain"></div>
         <div class="app-info"><h3>DoorDash</h3><p>Delivery rápido a tu puerta</p></div>
         <span class="app-arrow">→</span>
       </a>
-      <a href="https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152" target="_blank" class="app-card">
-        <div class="app-logo" style="background:#F63440;font-size:26px">🍽️</div>
+      <a href="https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152" target="_blank" rel="noopener noreferrer" class="app-card">
+        <div class="app-logo" style="background:#fff;padding:8px"><img src="fotos/logo-grubhub.webp" style="width:100%;height:100%;object-fit:contain"></div>
         <div class="app-info"><h3>GrubHub</h3><p>Ordena online con seguimiento</p></div>
         <span class="app-arrow">→</span>
       </a>
-      <a href="https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" class="app-card">
-        <div class="app-logo" style="background:#1A1A1A;font-size:26px">📦</div>
+      <a href="https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer" class="app-card">
+        <div class="app-logo" style="background:#000;padding:8px"><img src="fotos/logo-postmates.webp" style="width:100%;height:100%;object-fit:contain"></div>
         <div class="app-info"><h3>Postmates</h3><p>Delivery express en Miami</p></div>
         <span class="app-arrow">→</span>
       </a>
@@ -1035,50 +1051,51 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
 
       <div class="loc-item loc-reveal">
         <div class="loc-img-wrap">
-          <img src="https://lh3.googleusercontent.com/grass-cs/ANxoTn1wSbvSFyPYMuVkteRBpZ6_6BQUE8Iw2fL7LY8Lhi4o3Ouk0pTVqJYN_trn66OxhTcObVeU9HiiyRXJPqakQLKIvQwqHup4r76xOXxOtFL9NXrY4FB_rhNtmjzQozd3UYPwE4Is=k-no" alt="North Miami Beach" class="loc-par">
+          <img src="fotos/sede-northmiami.webp" alt="North Miami Beach" class="loc-par">
         </div>
         <div>
           <div class="loc-num">01</div>
           <div class="loc-name">North Miami Beach</div>
           <div class="loc-addr">18315 West Dixie Highway<br>North Miami Beach, FL<br><span style="color:var(--blue)">📸 @hotdogmaracaynorthmiami</span></div>
           <div class="loc-btns">
-            <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
-            <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank"><button class="loc-btn">Uber Eats</button></a>
-            <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank"><button class="loc-btn">DoorDash</button></a>
-            <a href="https://www.instagram.com/hotdogmaracaynorthmiami" target="_blank"><button class="loc-btn">Instagram</button></a>
+            <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank" rel="noopener noreferrer"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
+            <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Uber Eats</button></a>
+            <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" rel="noopener noreferrer"><button class="loc-btn">DoorDash</button></a>
+            <a href="https://www.instagram.com/hotdogmaracaynorthmiami" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Instagram</button></a>
           </div>
         </div>
       </div>
 
       <div class="loc-item rev loc-reveal">
         <div class="loc-img-wrap">
-          <img src="fotos/combo-clasico.webp" alt="Doral" class="loc-par">
+          <img src="fotos/sede-doral.webp" alt="Doral" class="loc-par">
         </div>
         <div>
           <div class="loc-num">02</div>
           <div class="loc-name">Doral</div>
           <div class="loc-addr">Doral, FL<br>La capital venezolana de Miami<br><span style="color:var(--blue)">📸 @hotdogmaracaydoral</span></div>
           <div class="loc-btns">
-            <a href="https://maps.app.goo.gl/kardweeJUDwJCdUV7" target="_blank"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
-            <a href="https://www.ubereats.com/store/hot-dog-maracay-miami/CEtjUmJEUWWz1Rqa3tteIQ" target="_blank"><button class="loc-btn">Uber Eats</button></a>
-            <a href="https://www.doordash.com/store/26219712" target="_blank"><button class="loc-btn">DoorDash</button></a>
-            <a href="https://www.instagram.com/hotdogmaracaydoral" target="_blank"><button class="loc-btn">Instagram</button></a>
+            <a href="https://maps.app.goo.gl/kardweeJUDwJCdUV7" target="_blank" rel="noopener noreferrer"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
+            <a href="https://www.ubereats.com/store/hot-dog-maracay-miami/CEtjUmJEUWWz1Rqa3tteIQ" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Uber Eats</button></a>
+            <a href="https://www.doordash.com/store/26219712" target="_blank" rel="noopener noreferrer"><button class="loc-btn">DoorDash</button></a>
+            <a href="https://www.instagram.com/hotdogmaracaydoral" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Instagram</button></a>
           </div>
         </div>
       </div>
 
       <div class="loc-item loc-reveal">
         <div class="loc-img-wrap">
-          <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAFmeAD0xs20ixMl2HgjF4oM8QoHkVodf-X5nm93AgBedYiBwTuDac3QnHrU_4S7Lk1HJDmsEImdrB1Zxe_tvu3PWVJFavapP4Nwg8yWA_4-KvO8meHDo8QH0CYn1jtWOpGsj76VOHseoqD9=s680-w680-h510-rw" alt="Downtown Miami" class="loc-par">
+          <img src="fotos/sede-downtown.webp" alt="Downtown Miami" class="loc-par">
         </div>
         <div>
           <div class="loc-num">03</div>
           <div class="loc-name">Downtown Miami</div>
           <div class="loc-addr">Downtown Miami, FL<br>En el corazón de la ciudad<br><span style="color:var(--blue)">📸 @hotdogmaracaymiami</span></div>
           <div class="loc-btns">
-            <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
-            <a href="https://www.ubereats.com/store/hot-dog-maracay-miamidowntown/xU2LTXX1VQioO0iuyW-Lvg" target="_blank"><button class="loc-btn">Uber Eats</button></a>
-            <a href="https://www.instagram.com/hotdogmaracaymiami" target="_blank"><button class="loc-btn">Instagram</button></a>
+            <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank" rel="noopener noreferrer"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
+            <a href="https://www.ubereats.com/store/hot-dog-maracay-miamidowntown/xU2LTXX1VQioO0iuyW-Lvg" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Uber Eats</button></a>
+            <a href="https://www.doordash.com/store/hot-dog-maracay-miami-27691950/31795151/" target="_blank" rel="noopener noreferrer"><button class="loc-btn">DoorDash</button></a>
+            <a href="https://www.instagram.com/hotdogmaracaymiami" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Instagram</button></a>
           </div>
         </div>
       </div>
@@ -1103,7 +1120,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
     <div class="rev-grid">
       <div class="rev-card">
         <div class="rev-stars-sm">★★★★★</div>
-        <div class="rev-text">"El mejor hot dog venezolano que he comido fuera de Venezuela. El pan es suave, las salsas Fritz son perfectas y el servicio es increíble. Me recordó a Maracay."</div>
+        <div class="rev-text">"El mejor hot dog venezolano que he comido fuera de Venezuela. El pan es suave, las salsas son perfectas y el servicio es increíble. Me recordó a Maracay."</div>
         <div class="rev-author"><div class="rev-avatar"></div>María G. · North Miami</div>
       </div>
       <div class="rev-card">
@@ -1185,9 +1202,9 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
     <h2 class="sec-title" style="margin-bottom:16px">ÚNETE A LA<br><span class="n-blue">COMUNIDAD</span></h2>
     <p class="sec-sub" style="margin:0 auto;text-align:center">Promociones, fotos y la vibra venezolana todos los días en Instagram.</p>
     <div class="soc-grid">
-      <a href="https://www.instagram.com/hotdogmaracaynorthmiami" target="_blank" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaynorthmiami</a>
-      <a href="https://www.instagram.com/hotdogmaracaydoral" target="_blank" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaydoral</a>
-      <a href="https://www.instagram.com/hotdogmaracaymiami" target="_blank" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaymiami</a>
+      <a href="https://www.instagram.com/hotdogmaracaynorthmiami" target="_blank" rel="noopener noreferrer" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaynorthmiami</a>
+      <a href="https://www.instagram.com/hotdogmaracaydoral" target="_blank" rel="noopener noreferrer" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaydoral</a>
+      <a href="https://www.instagram.com/hotdogmaracaymiami" target="_blank" rel="noopener noreferrer" class="soc-btn"><span style="font-size:22px">📸</span>@hotdogmaracaymiami</a>
     </div>
   </div>
 </section>
@@ -1209,16 +1226,16 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
     </div>
     <div class="foot-col">
       <h4>Delivery</h4>
-      <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank">Uber Eats</a>
-      <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank">DoorDash</a>
-      <a href="https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152" target="_blank">GrubHub</a>
-      <a href="https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank">Postmates</a>
+      <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer">Uber Eats</a>
+      <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" rel="noopener noreferrer">DoorDash</a>
+      <a href="https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152" target="_blank" rel="noopener noreferrer">GrubHub</a>
+      <a href="https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer">Postmates</a>
     </div>
     <div class="foot-col">
       <h4>Ubicaciones</h4>
-      <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank">North Miami Beach</a>
-      <a href="https://maps.app.goo.gl/kardweeJUDwJCdUV7" target="_blank">Doral</a>
-      <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank">Downtown Miami</a>
+      <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank" rel="noopener noreferrer">North Miami Beach</a>
+      <a href="https://maps.app.goo.gl/kardweeJUDwJCdUV7" target="_blank" rel="noopener noreferrer">Doral</a>
+      <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank" rel="noopener noreferrer">Downtown Miami</a>
     </div>
   </div>
   <div class="foot-bottom">
@@ -1247,7 +1264,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
       <div class="custom-checks" id="customChecks"></div>
       <div class="salsa-error" id="salsaError">⚠️ Debes elegir al menos una salsa</div>
       <div class="custom-section-title" style="margin-top:20px">Nota adicional</div>
-      <textarea class="custom-note-inp" id="customNote" rows="2" placeholder="Ej: extra salsa Fritz, bien caliente..."></textarea>
+      <textarea class="custom-note-inp" id="customNote" rows="2" maxlength="200" placeholder="Ej: extra salsa, bien caliente..."></textarea>
       <button class="btn-primary" id="customConfirmBtn" disabled style="width:100%;justify-content:center;margin-top:20px" onclick="confirmCustom()">Agregar al Carrito</button>
     </div>
   </div>
@@ -1277,9 +1294,9 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
     <div class="modal-hdr"><h2>FINALIZAR PEDIDO</h2><button class="modal-x" onclick="closeCheckout()">✕</button></div>
     <div class="modal-body">
       <div class="order-summary" id="orderSummary"></div>
-      <div class="form-grp"><label class="form-lbl">Tu Nombre</label><input class="form-inp" id="cName" placeholder="Juan García" type="text"></div>
-      <div class="form-grp"><label class="form-lbl">Teléfono / WhatsApp</label><input class="form-inp" id="cPhone" placeholder="+1 (305) 000-0000" type="tel"></div>
-      <div class="form-grp"><label class="form-lbl">Correo Electrónico</label><input class="form-inp" id="cEmail" placeholder="tu@email.com" type="email"></div>
+      <div class="form-grp"><label class="form-lbl">Tu Nombre</label><input class="form-inp" id="cName" placeholder="Juan García" type="text" maxlength="80" autocomplete="name"></div>
+      <div class="form-grp"><label class="form-lbl">Teléfono / WhatsApp</label><input class="form-inp" id="cPhone" placeholder="+1 (305) 000-0000" type="tel" maxlength="20" autocomplete="tel"></div>
+      <div class="form-grp"><label class="form-lbl">Correo Electrónico</label><input class="form-inp" id="cEmail" placeholder="tu@email.com" type="email" maxlength="120" autocomplete="email"></div>
       <div class="form-grp"><label class="form-lbl">Tipo de Orden</label>
         <select class="form-sel" id="cType">
           <option value="pickup">📍 Pickup — Recoger en el local</option>
@@ -1293,7 +1310,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
           <option value="downtown">Downtown Miami</option>
         </select>
       </div>
-      <div class="form-grp"><label class="form-lbl">Notas (opcional)</label><input class="form-inp" id="cNotes" placeholder="Ej: sin cebolla, extra salsa Fritz..."></div>
+      <div class="form-grp"><label class="form-lbl">Notas (opcional)</label><input class="form-inp" id="cNotes" placeholder="Ej: sin cebolla, extra salsa..." maxlength="300"></div>
       <div class="form-grp">
         <label class="form-lbl">Datos de Tarjeta</label>
         <div id="sq-loading" style="text-align:center;padding:18px;color:var(--mu);font-size:13px">⏳ Cargando sistema de pago...</div>
@@ -1312,7 +1329,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
       <div class="success-ico">✅</div>
       <h2>¡PAGO EXITOSO!</h2>
       <p>Tu pedido fue recibido y tu pago procesado.<br>¡Prepárate para el mejor hot dog venezolano!</p>
-      <a id="sq-receipt-link" href="#" target="_blank" style="display:none;color:var(--mango);font-size:14px;font-weight:700;margin-top:16px;text-decoration:underline">🧾 Ver Recibo</a>
+      <a id="sq-receipt-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none;color:var(--mango);font-size:14px;font-weight:700;margin-top:16px;text-decoration:underline">🧾 Ver Recibo</a>
       <button class="btn-primary" style="margin-top:28px;justify-content:center;width:100%" onclick="closeSuccess()">Volver al Menú</button>
     </div>
   </div>
@@ -1320,6 +1337,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
 
 <div class="toast-wrap" id="toastWrap"></div>
 
+<script src="https://web.squarecdn.com/v1/square.js" async></script>
 <script>
 /* Fija el alto del viewport en móvil una sola vez — evita el salto por la barra del URL */
 (function(){
@@ -1601,10 +1619,10 @@ function renderCart(){
   if(!cart.length){ list.innerHTML='<div class="cart-empty"><div class="e-ico">🌭</div><p>Tu carrito está vacío.<br>¡Agrega algo delicioso!</p></div>'; ftr.style.display='none'; return; }
   list.innerHTML=cart.map(it=>`
     <div class="ci">
-      <div class="ci-thumb">${it.img?`<img src="${it.img}" alt="${it.name}">`:`${it.emoji}`}</div>
+      <div class="ci-thumb">${it.img?`<img src="${escHtml(it.img)}" alt="${escHtml(it.name)}">`:`${it.emoji}`}</div>
       <div class="ci-info">
-        <div class="ci-name">${it.name}</div>
-        ${it.details?`<div class="ci-detail">${it.details}</div>`:''}
+        <div class="ci-name">${escHtml(it.name)}</div>
+        ${it.details?`<div class="ci-detail">${escHtml(it.details)}</div>`:''}
         <div class="ci-price">$${(it.price*it.qty).toFixed(2)}</div>
         <div class="ci-controls">
           <button class="q-btn" onclick="changeQty('${it.id}',-1)">−</button>
@@ -1627,7 +1645,7 @@ function toggleCart(){ const d=document.getElementById('cartDrawer'),o=document.
 function openCheckout(){
   if(!cart.length)return;
   const{sub,tax,total}=totals();
-  document.getElementById('orderSummary').innerHTML=`<h4>Resumen del Pedido</h4>${cart.map(i=>`<div class="os-row"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}<div class="os-row"><span>Tax 7%</span><span>$${tax.toFixed(2)}</span></div><div class="os-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
+  document.getElementById('orderSummary').innerHTML=`<h4>Resumen del Pedido</h4>${cart.map(i=>`<div class="os-row"><span>${i.emoji} ${escHtml(i.name)} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}<div class="os-row"><span>Tax 7%</span><span>$${tax.toFixed(2)}</span></div><div class="os-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
   const payBtn=document.getElementById('sq-pay-btn');
   payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`;
   payBtn.disabled=true;
@@ -1650,12 +1668,14 @@ async function initSquare(){
     document.getElementById('sq-loading').style.display='none';
     document.getElementById('sq-card-container').style.display='block';
     document.getElementById('sq-pay-btn').disabled=false;
-  }catch(e){ document.getElementById('sq-loading').innerHTML='⚠️ Error: '+( e?.message||e?.toString()||'desconocido'); console.error('Square init error:',e); }
+  }catch(e){ document.getElementById('sq-loading').textContent='⚠️ Error: '+(e?.message||e?.toString()||'desconocido'); console.error('Square init error:',e); }
 }
 async function sendOrder(){
   const name=document.getElementById('cName').value.trim();
   const phone=document.getElementById('cPhone').value.trim();
+  const emailVal=document.getElementById('cEmail').value.trim();
   if(!name||!phone){ showToast('⚠️ Ingresa tu nombre y teléfono','info'); return; }
+  if(emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){ showToast('⚠️ El correo electrónico no es válido','info'); return; }
   if(!_sqCard){ showToast('⚠️ Sistema de pago no listo','info'); return; }
   const{total}=totals();
   const payBtn=document.getElementById('sq-pay-btn');
@@ -1672,6 +1692,9 @@ async function sendOrder(){
 
 /* ── TOAST ── */
 function showToast(msg,type='ok'){ const w=document.getElementById('toastWrap'),t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg; w.appendChild(t); setTimeout(()=>t.remove(),2800); }
+
+/* ── SECURITY: HTML escape helper ── */
+function escHtml(s){ const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
 </script>
 </body>
 </html>

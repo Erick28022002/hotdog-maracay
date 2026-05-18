@@ -1,0 +1,16 @@
+# Scripts de utilidad (solo para uso local)
+*.py
+.claude/
+CLAUDE.md
+INSTRUCCIONES.md
+.DS_Store
+.htaccess
+
+# Archivos de video grandes (servir por separado)
+fotos/videos/
+assets/
+
+# Archivos temporales
+*.tmp
+*.log
+Thumbs.db
