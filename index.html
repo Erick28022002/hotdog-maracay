@@ -81,7 +81,7 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;padding-bottom:68px}
 a{color:inherit;text-decoration:none}
 
 /* ── NEON UTILITIES ── */
@@ -95,13 +95,13 @@ a{color:inherit;text-decoration:none}
 
 /* ── NAV ── */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:0 60px;height:72px;
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  padding:0 60px;height:68px;
   display:flex;align-items:center;justify-content:space-between;
-  transition:background .4s,border-color .4s;
-  border-bottom:1px solid transparent;
+  background:rgba(12,12,12,.96);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border-top:1px solid rgba(255,255,255,.06);
 }
-nav.scrolled{background:rgba(10,10,10,.94);backdrop-filter:blur(24px);border-color:rgba(250,168,60,.15)}
+nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)}
 .nav-logo{
   font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;
   color:var(--mango);display:flex;align-items:center;gap:8px;
@@ -782,7 +782,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
 
 <!-- NAV -->
 <nav id="mainNav">
-  <div class="nav-logo">🌭 HOTDOG MARACAY</div>
+  <div class="nav-logo">HOTDOG MARACAY</div>
   <div class="nav-links">
     <a href="#menu">Menú</a>
     <a href="#delivery">Delivery</a>
@@ -791,7 +791,7 @@ footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px
     <a href="#reviews">Reseñas</a>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <button class="btn-cart" onclick="toggleCart()">🌭 <span class="cart-badge" id="cartBadge">0</span></button>
+    <button class="btn-cart" onclick="toggleCart()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> <span class="cart-badge" id="cartBadge">0</span></button>
     <button class="btn-order" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Ordenar →</button>
   </div>
   <div class="ham" id="ham" onclick="toggleMobileNav()"><span></span><span></span><span></span></div>
