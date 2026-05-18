@@ -1759,12 +1759,12 @@ async function initSquare(){
   try{
     _sqPayments=Square.payments('sq0idp-CAxJsVjUl55Ulb7Nwekcjw','L2WHB70494FZB');
     _sqCard=await _sqPayments.card({style:{
-      '.input-container':{borderColor:'rgba(255,255,255,0.12)',borderRadius:'10px',borderWidth:'1.5px'},
-      '.input-container.is-focus':{borderColor:'#FAA83C',borderWidth:'1.5px'},
-      '.input-container.is-error':{borderColor:'#E8272A',borderWidth:'1.5px'},
+      '.input-container':{borderColor:'rgba(255,255,255,0.12)',borderRadius:'10px'},
+      '.input-container.is-focus':{borderColor:'#FAA83C'},
+      '.input-container.is-error':{borderColor:'#E8272A'},
       'input':{backgroundColor:'#181818',color:'#F5F0E8'},
       'input::placeholder':{color:'#555'},
-      '.message-text':{color:'#ff6b6b',fontSize:'12px'},
+      '.message-text':{color:'#ff6b6b'},
       '.message-icon':{color:'#ff6b6b'}
     }});
     await _sqCard.attach('#sq-card-container');
