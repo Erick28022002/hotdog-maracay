@@ -4,12 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌭</text></svg>">
+<link rel="apple-touch-icon" href="https://hotdogmaracay.com/fotos/mascot-nobg.webp">
+
 <!-- SEO Primary -->
 <title>Hot Dog Maracay Miami | Hot Dogs Venezolanos en Miami</title>
-<meta name="description" content="Los mejores hot dogs venezolanos en Miami. Pide online para retirar o delivery en North Miami Beach, Doral y Downtown. ¡Un pedacito de Venezuela en Miami!">
-<meta name="keywords" content="hot dog venezolano miami, hotdog maracay, comida venezolana miami, hot dog miami beach, pedir hot dog online miami">
+<meta name="description" content="Los mejores hot dogs venezolanos en Miami. Pide online para retirar o delivery en North Miami Beach, Doral y Downtown. Más de 12 salsas, ingredientes frescos todos los días.">
+<meta name="keywords" content="hot dog venezolano miami, hotdog maracay, comida venezolana miami, hot dog miami beach, pedir hot dog online miami, north miami beach, doral, downtown miami">
 <meta name="author" content="Hot Dog Maracay">
 <meta name="robots" content="index, follow">
+<meta name="theme-color" content="#FAA83C">
 <link rel="canonical" href="https://hotdogmaracay.com/">
 
 <!-- Content Security Policy -->
@@ -22,37 +27,106 @@
 <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
 <meta property="og:type" content="restaurant">
 <meta property="og:title" content="Hot Dog Maracay — Un Pedacito de Venezuela en Miami">
-<meta property="og:description" content="Los mejores hot dogs venezolanos en Miami. Pide online ahora 🌭">
-<meta property="og:image" content="https://erick28022002.github.io/hotdog-maracay/fotos/portada.png">
+<meta property="og:description" content="Los mejores hot dogs venezolanos en Miami. Ingredientes frescos, más de 12 salsas. Pide online en North Miami Beach, Doral y Downtown.">
+<meta property="og:image" content="https://hotdogmaracay.com/fotos/miami-neon.webp">
+<meta property="og:image:width" content="1620">
+<meta property="og:image:height" content="1080">
+<meta property="og:image:alt" content="Hot Dog Maracay Miami — Hot Dogs Venezolanos">
 <meta property="og:url" content="https://hotdogmaracay.com/">
 <meta property="og:site_name" content="Hot Dog Maracay">
 <meta property="og:locale" content="es_US">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Hot Dog Maracay Miami">
-<meta name="twitter:description" content="Los mejores hot dogs venezolanos en Miami. ¡Pide online!">
-<meta name="twitter:image" content="https://erick28022002.github.io/hotdog-maracay/fotos/portada.png">
+<meta name="twitter:site" content="@hotdogmaracay">
+<meta name="twitter:title" content="Hot Dog Maracay Miami — Hot Dogs Venezolanos">
+<meta name="twitter:description" content="Los mejores hot dogs venezolanos en Miami. Ingredientes frescos y más de 12 salsas. Pide online ahora.">
+<meta name="twitter:image" content="https://hotdogmaracay.com/fotos/miami-neon.webp">
+<meta name="twitter:image:alt" content="Hot Dog Maracay Miami">
 
 <!-- Schema.org Restaurant -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "FastFoodRestaurant",
-  "name": "Hot Dog Maracay",
-  "description": "Los mejores hot dogs venezolanos en Miami",
-  "url": "https://hotdogmaracay.com",
-  "image": "https://erick28022002.github.io/hotdog-maracay/fotos/portada.png",
-  "priceRange": "$$",
-  "servesCuisine": ["Venezuelan", "Hot Dogs"],
-  "address": [
-    {"@type":"PostalAddress","addressLocality":"North Miami Beach","addressRegion":"FL","addressCountry":"US"},
-    {"@type":"PostalAddress","addressLocality":"Doral","addressRegion":"FL","addressCountry":"US"},
-    {"@type":"PostalAddress","addressLocality":"Downtown Miami","addressRegion":"FL","addressCountry":"US"}
-  ],
-  "hasMenu": "https://hotdogmaracay.com/#menu",
-  "acceptsReservations": false,
-  "openingHours": "Mo-Su 11:00-22:00"
+  "@graph": [
+    {
+      "@type": "FastFoodRestaurant",
+      "@id": "https://hotdogmaracay.com/#restaurant",
+      "name": "Hot Dog Maracay",
+      "description": "Los mejores hot dogs venezolanos en Miami. Ingredientes frescos todos los días, más de 12 salsas artesanales. Fundados en Maracay 2014, en Miami desde 2022.",
+      "url": "https://hotdogmaracay.com",
+      "image": "https://hotdogmaracay.com/fotos/miami-neon.webp",
+      "logo": "https://hotdogmaracay.com/fotos/mascot-nobg.webp",
+      "priceRange": "$$",
+      "currenciesAccepted": "USD",
+      "paymentAccepted": "Cash, Credit Card",
+      "servesCuisine": ["Venezuelan", "Hot Dogs", "Fast Food"],
+      "hasMenu": "https://hotdogmaracay.com/#menu",
+      "acceptsReservations": false,
+      "openingHours": "Mo-Su 11:00-22:00",
+      "sameAs": [
+        "https://www.instagram.com/hotdogmaracaynorthmiami",
+        "https://www.instagram.com/hotdogmaracaydoral",
+        "https://www.instagram.com/hotdogmaracaymiami"
+      ]
+    },
+    {
+      "@type": "FastFoodRestaurant",
+      "@id": "https://hotdogmaracay.com/#sede-northmiami",
+      "name": "Hot Dog Maracay — North Miami Beach",
+      "url": "https://hotdogmaracay.com/#locations",
+      "image": "https://hotdogmaracay.com/fotos/sede-northmiami.webp",
+      "priceRange": "$$",
+      "servesCuisine": ["Venezuelan", "Hot Dogs"],
+      "openingHours": "Mo-Su 11:00-22:00",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "18315 West Dixie Highway",
+        "addressLocality": "North Miami Beach",
+        "addressRegion": "FL",
+        "postalCode": "33160",
+        "addressCountry": "US"
+      },
+      "geo": {"@type":"GeoCoordinates","latitude":"25.9307","longitude":"-80.1619"},
+      "hasMap": "https://maps.app.goo.gl/udhXrQAexfawSpyk9"
+    },
+    {
+      "@type": "FastFoodRestaurant",
+      "@id": "https://hotdogmaracay.com/#sede-doral",
+      "name": "Hot Dog Maracay — Doral",
+      "url": "https://hotdogmaracay.com/#locations",
+      "image": "https://hotdogmaracay.com/fotos/sede-doral.webp",
+      "priceRange": "$$",
+      "servesCuisine": ["Venezuelan", "Hot Dogs"],
+      "openingHours": "Mo-Su 11:00-22:00",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Doral",
+        "addressRegion": "FL",
+        "postalCode": "33122",
+        "addressCountry": "US"
+      },
+      "hasMap": "https://maps.app.goo.gl/kardweeJUDwJCdUV7"
+    },
+    {
+      "@type": "FastFoodRestaurant",
+      "@id": "https://hotdogmaracay.com/#sede-downtown",
+      "name": "Hot Dog Maracay — Downtown Miami",
+      "url": "https://hotdogmaracay.com/#locations",
+      "image": "https://hotdogmaracay.com/fotos/sede-downtown.webp",
+      "priceRange": "$$",
+      "servesCuisine": ["Venezuelan", "Hot Dogs"],
+      "openingHours": "Mo-Su 11:00-22:00",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Miami",
+        "addressRegion": "FL",
+        "postalCode": "33132",
+        "addressCountry": "US"
+      },
+      "hasMap": "https://maps.app.goo.gl/j9nM2PnfRcf7auty7"
+    }
+  ]
 }
 </script>
 
@@ -61,6 +135,8 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ECPCKE9MTX');</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="fotos/miami-neon.webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
         integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
@@ -780,7 +856,7 @@ body{background:transparent}
 <body>
 
 <!-- BOTTOM NAV (móvil) -->
-<nav class="bottom-nav">
+<nav class="bottom-nav" aria-label="Navegación principal móvil">
   <button class="bn-item" onclick="window.scrollTo({top:0,behavior:'smooth'})">
     <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Inicio
   </button>
@@ -813,7 +889,7 @@ body{background:transparent}
 </div>
 
 <!-- NAV -->
-<nav id="mainNav">
+<nav id="mainNav" aria-label="Navegación principal">
   <div class="nav-logo">HOTDOG MARACAY</div>
   <div class="nav-links">
     <a href="#menu">Menú</a>
@@ -829,10 +905,13 @@ body{background:transparent}
   <div class="ham" id="ham" onclick="toggleMobileNav()"><span></span><span></span><span></span></div>
 </nav>
 
+<!-- MAIN CONTENT -->
+<main>
+
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-bg" id="heroBg">
-    <img src="fotos/miami-neon.webp" alt="Miami" id="heroBgImg" onerror="this.style.display='none'">
+    <img src="fotos/miami-neon.webp" alt="Miami skyline de noche" id="heroBgImg" fetchpriority="high" loading="eager" onerror="this.style.display='none'">
   </div>
   <div class="hero-overlay"></div>
   <img src="fotos/mascot-nobg.webp" class="hero-mascot" id="heroMascot" alt="Mascota Hotdog Maracay" onerror="this.style.display='none'">
@@ -889,7 +968,7 @@ body{background:transparent}
   <div class="hist-grid">
     <div style="position:relative">
       <div class="hist-img-wrap">
-        <img src="fotos/historia-ambiente.webp" alt="Historia Hotdog Maracay">
+        <img src="fotos/historia-ambiente.webp" alt="Interior del restaurante Hot Dog Maracay" loading="lazy" width="800" height="534">
         <div class="hist-neon-border"></div>
       </div>
     </div>
@@ -1018,22 +1097,22 @@ body{background:transparent}
     <p class="sec-sub">Disponibles en las principales plataformas de Miami.</p>
     <div class="delivery-grid">
       <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer" class="app-card">
-        <div class="app-logo" style="background:#142328;padding:8px"><img src="fotos/logo-ubereats.webp" style="width:100%;height:100%;object-fit:contain"></div>
+        <div class="app-logo" style="background:#142328;padding:8px"><img src="fotos/logo-ubereats.webp" alt="Uber Eats" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
         <div class="app-info"><h3>Uber Eats</h3><p>Pide y rastrea tu orden en tiempo real</p></div>
         <span class="app-arrow">→</span>
       </a>
       <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" rel="noopener noreferrer" class="app-card">
-        <div class="app-logo" style="background:#fff;padding:8px"><img src="fotos/logo-doordash.webp" style="width:100%;height:100%;object-fit:contain"></div>
+        <div class="app-logo" style="background:#fff;padding:8px"><img src="fotos/logo-doordash.webp" alt="DoorDash" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
         <div class="app-info"><h3>DoorDash</h3><p>Delivery rápido a tu puerta</p></div>
         <span class="app-arrow">→</span>
       </a>
       <a href="https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152" target="_blank" rel="noopener noreferrer" class="app-card">
-        <div class="app-logo" style="background:#fff;padding:8px"><img src="fotos/logo-grubhub.webp" style="width:100%;height:100%;object-fit:contain"></div>
+        <div class="app-logo" style="background:#fff;padding:8px"><img src="fotos/logo-grubhub.webp" alt="GrubHub" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
         <div class="app-info"><h3>GrubHub</h3><p>Ordena online con seguimiento</p></div>
         <span class="app-arrow">→</span>
       </a>
       <a href="https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer" class="app-card">
-        <div class="app-logo" style="background:#000;padding:8px"><img src="fotos/logo-postmates.webp" style="width:100%;height:100%;object-fit:contain"></div>
+        <div class="app-logo" style="background:#000;padding:8px"><img src="fotos/logo-postmates.webp" alt="Postmates" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
         <div class="app-info"><h3>Postmates</h3><p>Delivery express en Miami</p></div>
         <span class="app-arrow">→</span>
       </a>
@@ -1051,7 +1130,7 @@ body{background:transparent}
 
       <div class="loc-item loc-reveal">
         <div class="loc-img-wrap">
-          <img src="fotos/sede-northmiami.webp" alt="North Miami Beach" class="loc-par">
+          <img src="fotos/sede-northmiami.webp" alt="Hot Dog Maracay North Miami Beach" class="loc-par" loading="lazy" width="600" height="400">
         </div>
         <div>
           <div class="loc-num">01</div>
@@ -1068,7 +1147,7 @@ body{background:transparent}
 
       <div class="loc-item rev loc-reveal">
         <div class="loc-img-wrap">
-          <img src="fotos/sede-doral.webp" alt="Doral" class="loc-par">
+          <img src="fotos/sede-doral.webp" alt="Hot Dog Maracay Doral Miami" class="loc-par" loading="lazy" width="600" height="400">
         </div>
         <div>
           <div class="loc-num">02</div>
@@ -1085,7 +1164,7 @@ body{background:transparent}
 
       <div class="loc-item loc-reveal">
         <div class="loc-img-wrap">
-          <img src="fotos/sede-downtown.webp" alt="Downtown Miami" class="loc-par">
+          <img src="fotos/sede-downtown.webp" alt="Hot Dog Maracay Downtown Miami" class="loc-par" loading="lazy" width="600" height="400">
         </div>
         <div>
           <div class="loc-num">03</div>
@@ -1208,6 +1287,8 @@ body{background:transparent}
     </div>
   </div>
 </section>
+
+</main>
 
 <!-- FOOTER -->
 <footer>
