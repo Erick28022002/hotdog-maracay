@@ -167,6 +167,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;padding-bottom:68px}
+main{display:block;margin:0;padding:0}
 a{color:inherit;text-decoration:none}
 
 /* ── NEON UTILITIES ── */
@@ -1730,12 +1731,13 @@ function openCheckout(){
   const payBtn=document.getElementById('sq-pay-btn');
   payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`;
   payBtn.disabled=true;
-  document.getElementById('checkoutModal').classList.add('open');
   toggleCart();
+  document.getElementById('checkoutModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
   initSquare();
 }
-function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); }
-function closeSuccess(){ document.getElementById('successModal').classList.remove('open'); cart=[]; renderCart(); }
+function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); document.body.style.overflow = ''; }
+function closeSuccess(){ document.getElementById('successModal').classList.remove('open'); document.body.style.overflow = ''; cart=[]; renderCart(); }
 
 /* ── SQUARE ── */
 const BACKEND_URL='https://hotdog-backend-production-0c45.up.railway.app';
