@@ -1,0 +1,17 @@
+{
+  "name": "hotdog-maracay-backend",
+  "version": "2.0.0",
+  "description": "Backend KDS + pagos para Hot Dog Maracay",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.3"
+  }
+}

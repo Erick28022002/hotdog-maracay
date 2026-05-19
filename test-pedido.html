@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Test Pedidos → KDS</title>
+  <style>
+    :root {
+      --mango:#FAA83C; --bg:#0D0D0D; --card:#1C1C1C; --border:#2E2E2E;
+      --green:#4CAF50; --red:#E8272A; --text:#FFF; --muted:#888;
+    }
+    * { margin:0; padding:0; box-sizing:border-box }
+    body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; min-height:100vh; padding:24px }
+
+    h1 { font-size:22px; color:var(--mango); margin-bottom:4px }
+    .sub { font-size:13px; color:var(--muted); margin-bottom:28px }
+
+    .layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:960px; margin:0 auto }
+    @media(max-width:700px){ .layout{grid-template-columns:1fr} }
+
+    .panel { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px }
+    .panel h2 { font-size:15px; font-weight:700; margin-bottom:16px; color:var(--mango) }
+
+    label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.7px; display:block; margin-bottom:6px; margin-top:14px }
+    label:first-of-type { margin-top:0 }
+
+    input, select, textarea {
+      width:100%; padding:10px 14px; background:#111; border:1px solid var(--border);
+      border-radius:8px; color:var(--text); font-size:14px; outline:none; transition:border-color .2s
+    }
+    input:focus, select:focus, textarea:focus { border-color:var(--mango) }
+    textarea { resize:vertical; min-height:60px }
+    select option { background:#1C1C1C }
+
+    /* items */
+    .items-list { display:flex; flex-direction:column; gap:8px; margin-bottom:12px }
+    .item-row {
+      display:grid; grid-template-columns:1fr auto auto;
+      gap:8px; align-items:center; background:#111; border:1px solid var(--border);
+      border-radius:8px; padding:10px 12px
+    }
+    .item-row .iname { font-size:14px; font-weight:600 }
+    .item-row .idetail { font-size:11px; color:var(--muted); margin-top:2px }
+    .qty-ctrl { display:flex; align-items:center; gap:6px }
+    .qty-btn {
+      width:28px; height:28px; border-radius:6px; border:1px solid var(--border);
+      background:#222; color:var(--text); font-size:16px; cursor:pointer; display:flex;
+      align-items:center; justify-content:center; transition:all .15s
+    }
+    .qty-btn:hover { border-color:var(--mango); color:var(--mango) }
+    .qty-num { min-width:20px; text-align:center; font-weight:700 }
+    .remove-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; padding:0 4px; line-height:1 }
+    .remove-btn:hover { color:var(--red) }
+
+    .add-item-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:end }
+    .add-btn {
+      padding:10px 18px; background:var(--mango); color:#000; border:none;
+      border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; transition:all .2s
+    }
+    .add-btn:hover { opacity:.85 }
+
+    .send-btn {
+      width:100%; margin-top:20px; padding:14px; background:var(--mango); color:#000;
+      border:none; border-radius:10px; font-size:16px; font-weight:800; cursor:pointer;
+      letter-spacing:.5px; transition:all .2s
+    }
+    .send-btn:hover { opacity:.85 }
+    .send-btn:disabled { opacity:.4; cursor:not-allowed }
+
+    /* log */
+    .log { display:flex; flex-direction:column; gap:8px; max-height:480px; overflow-y:auto }
+    .log-entry {
+      padding:10px 14px; border-radius:8px; font-size:13px; border-left:3px solid var(--border)
+    }
+    .log-entry.ok   { background:#0A1F0A; border-color:var(--green) }
+    .log-entry.err  { background:#1F0A0A; border-color:var(--red) }
+    .log-entry.info { background:#111; border-color:var(--border) }
+    .log-time { font-size:11px; color:var(--muted); margin-bottom:3px }
+    .log-msg  { font-weight:600 }
+    .log-detail { font-size:12px; color:var(--muted); margin-top:4px; font-family:monospace }
+
+    .empty-log { color:var(--muted); font-size:13px; text-align:center; padding:40px 0 }
+
+    /* badge */
+    .badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; margin-left:8px }
+    .badge.sq { background:rgba(250,168,60,.15); color:var(--mango); border:1px solid rgba(250,168,60,.3) }
+    .badge.web { background:rgba(76,175,80,.15); color:var(--green); border:1px solid rgba(76,175,80,.3) }
+
+    .backend-status { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-bottom:20px; padding:10px 14px; background:var(--card); border:1px solid var(--border); border-radius:8px; max-width:960px; margin:0 auto 20px }
+    .dot { width:8px; height:8px; border-radius:50%; background:#E8272A }
+    .dot.on { background:var(--green) }
+  </style>
+</head>
+<body>
+
+<div style="max-width:960px;margin:0 auto">
+  <h1>🧪 Test Pedidos → KDS</h1>
+  <p class="sub">Crea pedidos de prueba y observa cómo llegan al KDS en tiempo real</p>
+
+  <div class="backend-status">
+    <div class="dot" id="connDot"></div>
+    <span id="connTxt">Verificando backend…</span>
+    <span style="margin-left:auto;font-family:monospace;font-size:11px" id="backendUrl"></span>
+  </div>
+
+  <div class="layout">
+
+    <!-- FORMULARIO -->
+    <div class="panel">
+      <h2>📋 Nuevo pedido de prueba</h2>
+
+      <label>Sede</label>
+      <select id="location">
+        <option value="North Miami">North Miami</option>
+        <option value="Doral">Doral</option>
+        <option value="Downtown Miami">Downtown Miami</option>
+      </select>
+
+      <label>Tipo de pedido</label>
+      <select id="orderType">
+        <option value="pickup">🏠 Pickup</option>
+        <option value="delivery">🚗 Delivery</option>
+      </select>
+
+      <label>Nombre del cliente</label>
+      <input type="text" id="custName" value="Cliente Test" placeholder="Nombre">
+
+      <label>Teléfono</label>
+      <input type="text" id="custPhone" value="+1 786-555-0000" placeholder="+1 786-...">
+
+      <label>Ítems del pedido</label>
+      <div class="items-list" id="itemsList"></div>
+
+      <div class="add-item-row">
+        <select id="itemSelect">
+          <option value="">— Selecciona un producto —</option>
+          <optgroup label="Hot Dogs">
+            <option value="Clásico Pro">Clásico Pro</option>
+            <option value="Miami Style">Miami Style</option>
+            <option value="HD con Carne Mechada">HD con Carne Mechada</option>
+            <option value="Hot Dog Venezolano">Hot Dog Venezolano</option>
+            <option value="Reina Pepiada">Reina Pepiada</option>
+            <option value="HD con Pernil">HD con Pernil</option>
+          </optgroup>
+          <optgroup label="Extras / Combos">
+            <option value="Combo Clásico">Combo Clásico</option>
+            <option value="Papas Fritas">Papas Fritas</option>
+          </optgroup>
+          <optgroup label="Bebidas">
+            <option value="Coca-Cola">Coca-Cola</option>
+            <option value="Coca-Cola Zero">Coca-Cola Zero</option>
+            <option value="Sprite">Sprite</option>
+            <option value="Malta">Malta</option>
+            <option value="Agua">Agua</option>
+          </optgroup>
+        </select>
+        <button class="add-btn" onclick="addItem()">+ Agregar</button>
+      </div>
+
+      <label>Personalizaciones (opcional)</label>
+      <input type="text" id="itemDetails" placeholder="Sin: Mostaza · Extra: Queso · Salsas: Ajo, Rosada">
+
+      <label>Notas del pedido</label>
+      <textarea id="notes" placeholder="Ej: Sin cebolla en todo, segunda planta…"></textarea>
+
+      <button class="send-btn" id="sendBtn" onclick="enviarPedido()">
+        🚀 Enviar pedido al KDS
+      </button>
+    </div>
+
+    <!-- LOG -->
+    <div class="panel">
+      <h2>📡 Registro de envíos</h2>
+      <div class="log" id="log">
+        <div class="empty-log">Los pedidos enviados aparecerán aquí</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const BACKEND = 'https://hotdog-backend-production-0c45.up.railway.app';
+
+/* Ítems acumulados en el pedido */
+let items = [];
+
+/* ── Verificar backend ── */
+async function checkBackend() {
+  document.getElementById('backendUrl').textContent = BACKEND;
+  try {
+    const r = await fetch(BACKEND + '/health', { signal: AbortSignal.timeout(5000) });
+    const ok = r.ok;
+    document.getElementById('connDot').classList.toggle('on', ok);
+    document.getElementById('connTxt').textContent = ok
+      ? 'Backend conectado ✓'
+      : 'Backend responde con error ' + r.status;
+  } catch(e) {
+    document.getElementById('connTxt').textContent = 'Backend sin respuesta — ¿está desplegado en Railway?';
+  }
+}
+checkBackend();
+
+/* ── Agregar ítem ── */
+function addItem() {
+  const sel  = document.getElementById('itemSelect');
+  const name = sel.value;
+  if (!name) return;
+  const details = document.getElementById('itemDetails').value.trim();
+  items.push({ name, qty: 1, details });
+  document.getElementById('itemDetails').value = '';
+  sel.value = '';
+  renderItems();
+}
+
+function renderItems() {
+  const list = document.getElementById('itemsList');
+  if (!items.length) { list.innerHTML = ''; return; }
+  list.innerHTML = items.map((it, i) => `
+    <div class="item-row">
+      <div>
+        <div class="iname">${esc(it.name)}</div>
+        ${it.details ? `<div class="idetail">${esc(it.details)}</div>` : ''}
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+        <span class="qty-num">${it.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+      </div>
+      <button class="remove-btn" onclick="removeItem(${i})">✕</button>
+    </div>`).join('');
+}
+
+function changeQty(i, d) {
+  items[i].qty = Math.max(1, items[i].qty + d);
+  renderItems();
+}
+function removeItem(i) {
+  items.splice(i, 1);
+  renderItems();
+}
+
+/* ── Enviar pedido ── */
+async function enviarPedido() {
+  if (!items.length) { alert('Agrega al menos un producto'); return; }
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Enviando…';
+
+  const body = {
+    items,
+    customer: {
+      name:  document.getElementById('custName').value.trim()  || 'Cliente Test',
+      phone: document.getElementById('custPhone').value.trim() || '',
+    },
+    orderType: document.getElementById('orderType').value,
+    location:  document.getElementById('location').value,
+    notes:     document.getElementById('notes').value.trim(),
+  };
+
+  const t0 = Date.now();
+  try {
+    const r    = await fetch(BACKEND + '/api/test-order', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body),
+    });
+    const data = await r.json();
+    const ms   = Date.now() - t0;
+
+    if (r.ok && data.success) {
+      addLog('ok',
+        `✓ Pedido #${String(data.orderNum).padStart(3,'0')} enviado a ${body.location}`,
+        `${body.items.length} ítem(s) · ${body.orderType} · ${ms}ms · ID: ${data.orderId}`
+      );
+      // Limpiar
+      items = [];
+      renderItems();
+      document.getElementById('notes').value = '';
+    } else {
+      addLog('err', '✗ Error del backend', data.error || JSON.stringify(data));
+    }
+  } catch(e) {
+    addLog('err', '✗ No se pudo conectar al backend', e.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🚀 Enviar pedido al KDS';
+}
+
+/* ── Log ── */
+function addLog(type, msg, detail) {
+  const log = document.getElementById('log');
+  const empties = log.querySelectorAll('.empty-log');
+  empties.forEach(e => e.remove());
+
+  const el = document.createElement('div');
+  el.className = `log-entry ${type}`;
+  const now = new Date().toLocaleTimeString('es-VE', { hour12: false });
+  el.innerHTML = `
+    <div class="log-time">${now}</div>
+    <div class="log-msg">${msg}</div>
+    ${detail ? `<div class="log-detail">${detail}</div>` : ''}
+  `;
+  log.prepend(el);
+}
+
+/* ── Helper ── */
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Agregar con Enter en el select */
+document.getElementById('itemSelect').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addItem();
+});
+</script>
+</body>
+</html>
