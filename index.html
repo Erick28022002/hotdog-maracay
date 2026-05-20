@@ -18,11 +18,20 @@
 <link rel="canonical" href="https://hotdogmaracay.com/">
 
 <!-- Content Security Policy -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.cloudflare.com https://web.squarecdn.com https://sandbox.web.squarecdn.com https://connect.squareup.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://web.squarecdn.com https://sandbox.web.squarecdn.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://hotdog-backend-production-0c45.up.railway.app https://pci-connect.squareup.com https://connect.squareup.com https://api.squareup.com https://squareup.com; frame-src https://web.squarecdn.com https://sandbox.web.squarecdn.com https://connect.squareup.com https://squareup.com; media-src 'self'; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.cloudflare.com https://web.squarecdn.com https://sandbox.web.squarecdn.com https://connect.squareup.com https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://web.squarecdn.com https://sandbox.web.squarecdn.com;
+  font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:;
+  img-src 'self' data: https: blob:;
+  connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://hotdog-backend-production-0c45.up.railway.app https://pci-connect.squareup.com https://connect.squareup.com https://api.squareup.com https://squareup.com https://ckzvjudhpbhzisrrhozk.supabase.co wss://ckzvjudhpbhzisrrhozk.supabase.co https://realtime.supabase.co wss://realtime.supabase.co;
+  frame-src https://web.squarecdn.com https://sandbox.web.squarecdn.com https://connect.squareup.com https://squareup.com https://www.securesuite.net;
+  media-src 'self';
+  object-src 'none';
+  base-uri 'self';
+">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()">
 
 <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
 <meta property="og:type" content="restaurant">
@@ -1532,10 +1541,12 @@ ScrollTrigger.create({
 });
 
 /* ── FEATURES ── */
-gsap.to('.feat-card',{
-  opacity:1, y:0, duration:.7, stagger:.1, ease:'power2.out',
-  scrollTrigger:{ trigger:'.features-sec', start:'top 80%' }
-});
+if (document.querySelector('.features-sec')) {
+  gsap.to('.feat-card',{
+    opacity:1, y:0, duration:.7, stagger:.1, ease:'power2.out',
+    scrollTrigger:{ trigger:'.features-sec', start:'top 80%' }
+  });
+}
 
 /* ── HISTORIA ── */
 gsap.from('.hist-grid > *',{
