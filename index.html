@@ -24,14 +24,16 @@
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://web.squarecdn.com https://sandbox.web.squarecdn.com;
   font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:;
   img-src 'self' data: https: blob:;
-  connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://hotdog-backend.vercel.app https://pci-connect.squareup.com https://connect.squareup.com https://api.squareup.com https://squareup.com https://ckzvjudhpbhzisrrhozk.supabase.co wss://ckzvjudhpbhzisrrhozk.supabase.co https://realtime.supabase.co wss://realtime.supabase.co https://o160250.ingest.sentry.io;
+  connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://hotdog-backend.vercel.app https://pci-connect.squareup.com https://connect.squareup.com https://api.squareup.com https://squareup.com;
   frame-src https://web.squarecdn.com https://sandbox.web.squarecdn.com https://connect.squareup.com https://api.squareup.com https://squareup.com https://www.securesuite.net;
   media-src 'self';
   object-src 'none';
   base-uri 'self';
+  form-action 'self';
 ">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(self)">
 
 <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
 <meta property="og:type" content="restaurant">
@@ -1686,10 +1688,12 @@ function confirmCustom(){
   const salsas=[...document.querySelectorAll('#customChecks input:checked')].map(el=>el.value);
   if(!salsas.length){ document.getElementById('salsaError').style.display='block'; return; }
   if(_custom.hasDrink && !document.querySelector('input[name="customDrink"]:checked')){ showToast('⚠️ Debes seleccionar una bebida','info'); return; }
-  let extraCost=0, details=[];
+  let extraCost=0, details=[], removedToppings=[], selectedExtras=[];
   for(let n=1;n<=_custom.numHD;n++){
     const removed=[...document.querySelectorAll(`#customChecks${n} input:not(:checked)`)].map(el=>el.value);
     const extraEls=[...document.querySelectorAll(`#customExtras${n} input:checked`)];
+    removedToppings.push(removed);
+    selectedExtras.push(extraEls.map(el=>el.value));
     extraEls.forEach(el=>extraCost+=parseFloat(el.dataset.price));
     const hdTag=_custom.numHD>1?`HD${n}`:'HD';
     const parts=[];
@@ -1703,7 +1707,11 @@ function confirmCustom(){
   const note=document.getElementById('customNote').value.trim();
   if(note)details.push(note);
   const uid=_custom.id+'_'+Date.now();
-  cart.push({id:uid,name:_custom.name,price:_custom.price+extraCost,emoji:_custom.emoji,img:_custom.img,qty:1,details:details.join(' · ')});
+  cart.push({
+    id:uid, productId:_custom.id, name:_custom.name, price:_custom.price+extraCost,
+    emoji:_custom.emoji, img:_custom.img, qty:1, details:details.join(' · '),
+    selections:{removedToppings,extras:selectedExtras,drink:drinkEl?.value||'',sauces:salsas,note}
+  });
   renderCart(); bump();
   showToast(`${_custom.emoji} Agregado al carrito`,'ok');
   closeCustom();
@@ -1711,7 +1719,7 @@ function confirmCustom(){
 
 function addToCart(id,name,price,emoji,img){
   const ex=cart.find(i=>i.id===id);
-  if(ex){ex.qty++;}else{cart.push({id,name,price,emoji,img:img||'',qty:1,details:''});}
+  if(ex){ex.qty++;}else{cart.push({id,productId:id,name,price,emoji,img:img||'',qty:1,details:'',selections:null});}
   renderCart(); bump();
   showToast(`${emoji} Agregado al carrito`,'ok');
 }
@@ -1754,6 +1762,7 @@ function toggleCart(){ const d=document.getElementById('cartDrawer'),o=document.
 /* ── CHECKOUT ── */
 function openCheckout(){
   if(!cart.length)return;
+  _checkoutAttemptId=createCheckoutAttemptId();
   const{sub,tax,total}=totals();
   document.getElementById('orderSummary').innerHTML=`<h4>Resumen del Pedido</h4>${cart.map(i=>`<div class="os-row"><span>${i.emoji} ${escHtml(i.name)} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}<div class="os-row"><span>Tax 7%</span><span>$${tax.toFixed(2)}</span></div><div class="os-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
   const payBtn=document.getElementById('sq-pay-btn');
@@ -1769,7 +1778,17 @@ function closeSuccess(){ document.getElementById('successModal').classList.remov
 
 /* ── SQUARE ── */
 const BACKEND_URL='https://hotdog-backend.vercel.app';
+const CHECKOUT_LIMITS={name:80,phone:25,email:120,notes:300,details:500,maxItems:25,maxQty:20};
 let _sqPayments=null, _sqCard=null;
+let _checkoutAttemptId=null;
+
+function createCheckoutAttemptId(){
+  if(crypto.randomUUID)return crypto.randomUUID();
+  const bytes=crypto.getRandomValues(new Uint8Array(16));
+  bytes[6]=(bytes[6]&15)|64; bytes[8]=(bytes[8]&63)|128;
+  const hex=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+}
 async function initSquare(){
   if(_sqCard){ document.getElementById('sq-loading').style.display='none'; document.getElementById('sq-card-container').style.display='block'; document.getElementById('sq-pay-btn').disabled=false; return; }
   try{
@@ -1787,14 +1806,23 @@ async function initSquare(){
     document.getElementById('sq-loading').style.display='none';
     document.getElementById('sq-card-container').style.display='block';
     document.getElementById('sq-pay-btn').disabled=false;
-  }catch(e){ document.getElementById('sq-loading').textContent='⚠️ Error: '+(e?.message||e?.toString()||'desconocido'); console.error('Square init error:',e); }
+  }catch(e){
+    document.getElementById('sq-loading').textContent='⚠️ No se pudo cargar el sistema de pago. Intenta de nuevo.';
+    console.error('Square init error:',e);
+  }
 }
 async function sendOrder(){
-  const name=document.getElementById('cName').value.trim();
-  const phone=document.getElementById('cPhone').value.trim();
-  const emailVal=document.getElementById('cEmail').value.trim();
+  const name=cleanText(document.getElementById('cName').value,CHECKOUT_LIMITS.name);
+  const phone=cleanPhone(document.getElementById('cPhone').value);
+  const emailVal=cleanText(document.getElementById('cEmail').value,CHECKOUT_LIMITS.email).toLowerCase();
+  const notes=cleanText(document.getElementById('cNotes').value,CHECKOUT_LIMITS.notes);
+  const orderType=document.getElementById('cType').value;
+  const location=document.getElementById('cLoc').value;
   if(!name||!phone){ showToast('⚠️ Ingresa tu nombre y teléfono','info'); return; }
+  if(phone.length<7||phone.length>CHECKOUT_LIMITS.phone){ showToast('⚠️ El teléfono no es válido','info'); return; }
   if(emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){ showToast('⚠️ El correo electrónico no es válido','info'); return; }
+  if(!['pickup','delivery'].includes(orderType)||!['nmb','doral','downtown'].includes(location)){ showToast('⚠️ Revisa el tipo de orden y la ubicación','info'); return; }
+  if(cart.length>CHECKOUT_LIMITS.maxItems||cart.some(i=>i.qty<1||i.qty>CHECKOUT_LIMITS.maxQty)){ showToast('⚠️ Tu pedido es demasiado grande. Llámanos para ayudarte.','info'); return; }
   if(!_sqCard){ showToast('⚠️ Sistema de pago no listo','info'); return; }
   const{total}=totals();
   const payBtn=document.getElementById('sq-pay-btn');
@@ -1802,10 +1830,27 @@ async function sendOrder(){
   try{
     const result=await _sqCard.tokenize();
     if(result.status!=='OK'){ showToast('⚠️ '+(result.errors?.[0]?.message||'Verifica los datos de tu tarjeta'),'info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; return; }
-    const resp=await fetch(BACKEND_URL+'/api/pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sourceId:result.token,amount:total,items:cart.map(i=>({id:i.id,name:i.name,price:i.price,qty:i.qty,details:i.details})),customer:{name,phone,email:document.getElementById('cEmail').value.trim()},orderType:document.getElementById('cType').value,location:document.getElementById('cLoc').value,notes:document.getElementById('cNotes').value.trim()})});
-    const data=await resp.json();
-    if(data.success){ const rl=document.getElementById('sq-receipt-link'); if(data.receiptUrl){rl.href=data.receiptUrl;rl.style.display='inline';}else{rl.style.display='none';} closeCheckout(); document.getElementById('successModal').classList.add('open'); }
-    else{ showToast('⚠️ '+(data.message||data.error||'No se pudo procesar el pago'),'info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
+    const orderPayload={
+      sourceId:result.token,
+      checkoutAttemptId:_checkoutAttemptId,
+      items:cart.map(i=>({
+        productId:String(i.productId||'').slice(0,80),
+        qty:Number(i.qty)||1,
+        selections:i.selections
+      })),
+      customer:{name,phone,email:emailVal},
+      orderType,
+      location,
+      notes
+    };
+    const resp=await fetch(BACKEND_URL+'/api/pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(orderPayload)});
+    const data=await resp.json().catch(()=>({}));
+    if(resp.ok&&data.success){
+      const rl=document.getElementById('sq-receipt-link');
+      if(isSafeHttpsUrl(data.receiptUrl)){rl.href=data.receiptUrl;rl.style.display='inline';}else{rl.removeAttribute('href');rl.style.display='none';}
+      closeCheckout(); document.getElementById('successModal').classList.add('open');
+    }
+    else{ showToast('⚠️ No se pudo procesar el pago. Verifica tus datos o intenta de nuevo.','info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
   }catch(e){ showToast('⚠️ Error de conexión con el servidor','info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
 }
 
@@ -1814,6 +1859,13 @@ function showToast(msg,type='ok'){ const w=document.getElementById('toastWrap'),
 
 /* ── SECURITY: HTML escape helper ── */
 function escHtml(s){ const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+function cleanText(s,max){ return String(s||'').replace(/[\u0000-\u001F\u007F]/g,' ').replace(/\s+/g,' ').trim().slice(0,max); }
+function cleanPhone(s){ return String(s||'').replace(/[^\d+\-().\s]/g,'').replace(/\s+/g,' ').trim().slice(0,CHECKOUT_LIMITS.phone); }
+function isSafeHttpsUrl(url){
+  if(!url)return false;
+  try{ const u=new URL(url); return u.protocol==='https:' && (u.hostname==='squareup.com'||u.hostname.endsWith('.squareup.com')); }
+  catch(e){ return false; }
+}
 
 /* ── SCROLL LOCK (iOS safe) ── */
 let _scrollY=0;

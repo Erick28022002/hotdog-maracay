@@ -15,6 +15,14 @@
     gap: 12px;
   }
   .header h1 { font-size: 20px; }
+  .header .logout { margin-left:auto; border:1px solid rgba(255,255,255,.5); background:transparent; color:#fff; padding:8px 12px; border-radius:6px; cursor:pointer; }
+  .auth-screen { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; background:#1a1a1a; }
+  .auth-screen.hidden { display:none; }
+  .auth-form { width:min(360px,calc(100vw - 40px)); display:flex; flex-direction:column; gap:12px; }
+  .auth-form h1 { color:#FAA83C; font-size:22px; text-align:center; margin-bottom:8px; }
+  .auth-form input { padding:14px; border:1px solid #444; border-radius:8px; background:#2a2a2a; color:#fff; font:inherit; }
+  .auth-form button { padding:14px; border:0; border-radius:8px; background:#FAA83C; color:#111; font-weight:bold; cursor:pointer; }
+  .auth-error { color:#ff7777; min-height:20px; text-align:center; font-size:13px; }
   .status-dot {
     width: 12px; height: 12px;
     border-radius: 50%;
@@ -108,9 +116,21 @@
 </head>
 <body>
 
+<div class="auth-screen" id="authScreen">
+  <form class="auth-form" onsubmit="loginPrinter(event)">
+    <h1>Acceso a impresora</h1>
+    <input id="authEmail" type="email" autocomplete="username" placeholder="Correo del empleado" required>
+    <input id="authPassword" type="password" autocomplete="current-password" placeholder="Contraseña" required minlength="8">
+    <button id="authBtn" type="submit">Iniciar sesión</button>
+    <div class="auth-error" id="authError"></div>
+  </form>
+</div>
+
+<div id="printerApp" hidden>
 <div class="header">
   <div class="status-dot" id="statusDot"></div>
   <h1>Hot Dog Maracay — Pedidos Online</h1>
+  <button class="logout" onclick="logoutPrinter()">Cerrar sesión</button>
 </div>
 
 <div class="counter">
@@ -123,6 +143,7 @@
 
 <div class="orders-list" id="ordersList">
   <div class="empty">Esperando pedidos...</div>
+</div>
 </div>
 
 <!-- Ticket oculto para imprimir -->
@@ -137,6 +158,45 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let orders = [];
 let audioCtx = null;
+let realtimeChannel = null;
+
+async function bootPrinter() {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return;
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('printerApp').hidden = false;
+  startPrinter();
+}
+
+async function loginPrinter(event) {
+  event.preventDefault();
+  const button = document.getElementById('authBtn');
+  const errorBox = document.getElementById('authError');
+  button.disabled = true; errorBox.textContent = '';
+  const { error } = await db.auth.signInWithPassword({
+    email: document.getElementById('authEmail').value.trim(),
+    password: document.getElementById('authPassword').value
+  });
+  button.disabled = false;
+  if (error) { errorBox.textContent = 'Correo o contraseña incorrectos'; return; }
+  document.getElementById('authPassword').value = '';
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('printerApp').hidden = false;
+  startPrinter();
+}
+
+async function logoutPrinter() {
+  if (realtimeChannel) await db.removeChannel(realtimeChannel);
+  realtimeChannel = null;
+  await db.auth.signOut();
+  orders = [];
+  document.getElementById('printerApp').hidden = true;
+  document.getElementById('authScreen').classList.remove('hidden');
+}
+
+function esc(value) {
+  return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 
 function beep() {
   try {
@@ -165,7 +225,7 @@ function formatTime(ts) {
 function renderTicket(order) {
   const items = order.items || [];
   const rows = items.map(i =>
-    `<div class="ticket-row"><span>${i.qty}x ${i.name}</span><span>$${(i.price * i.qty).toFixed(2)}</span></div>`
+    `<div class="ticket-row"><span>${Number(i.qty)||1}x ${esc(i.name)}</span><span>$${((Number(i.price)||0) * (Number(i.qty)||1)).toFixed(2)}</span></div>`
   ).join('');
 
   return `
@@ -175,14 +235,14 @@ function renderTicket(order) {
       <p>${new Date(order.created_at).toLocaleString('es-VE')}</p>
     </div>
     <div class="ticket-divider"></div>
-    <div class="ticket-row"><span>Cliente:</span><span>${order.customer_name}</span></div>
-    <div class="ticket-row"><span>Tel:</span><span>${order.customer_phone}</span></div>
+    <div class="ticket-row"><span>Cliente:</span><span>${esc(order.customer_name)}</span></div>
+    <div class="ticket-row"><span>Tel:</span><span>${esc(order.customer_phone)}</span></div>
     <div class="ticket-row"><span>Tipo:</span><span>${order.order_type === 'pickup' ? 'Retirar en tienda' : 'Delivery'}</span></div>
-    ${order.notes ? `<div class="ticket-row"><span>Nota:</span><span>${order.notes}</span></div>` : ''}
+    ${order.notes ? `<div class="ticket-row"><span>Nota:</span><span>${esc(order.notes)}</span></div>` : ''}
     <div class="ticket-divider"></div>
     ${rows}
     <div class="ticket-divider"></div>
-    <div class="ticket-row ticket-total"><span>TOTAL</span><span>$${parseFloat(order.total).toFixed(2)}</span></div>
+    <div class="ticket-row ticket-total"><span>TOTAL</span><span>$${(Number(order.total)||0).toFixed(2)}</span></div>
     <div class="ticket-divider"></div>
     <div class="ticket-footer">
       <p>Pago con tarjeta — APROBADO</p>
@@ -205,12 +265,12 @@ function renderOrders() {
   list.innerHTML = orders.map((o, i) => `
     <div class="order-card ${i === 0 && o._new ? 'new' : ''}" id="order-${o.id}">
       <div class="order-info">
-        <h3>${o.customer_name} ${o.order_type === 'delivery' ? '🚗' : '🏠'}</h3>
-        <div class="items">${(o.items || []).map(it => `${it.qty}x ${it.name}`).join(' • ')}</div>
-        <div class="meta">${formatTime(o.created_at)} · ${o.order_type === 'pickup' ? 'Retirar en tienda' : 'Delivery'} ${o.notes ? '· ' + o.notes : ''}</div>
+        <h3>${esc(o.customer_name)} ${o.order_type === 'delivery' ? '🚗' : '🏠'}</h3>
+        <div class="items">${(o.items || []).map(it => `${Number(it.qty)||1}x ${esc(it.name)}`).join(' • ')}</div>
+        <div class="meta">${formatTime(o.created_at)} · ${o.order_type === 'pickup' ? 'Retirar en tienda' : 'Delivery'} ${o.notes ? '· ' + esc(o.notes) : ''}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-        <div class="order-total">$${parseFloat(o.total).toFixed(2)}</div>
+        <div class="order-total">$${(Number(o.total)||0).toFixed(2)}</div>
         <button class="btn-print" onclick="printOrder(orders[${i}])">🖨️ Imprimir</button>
       </div>
     </div>
@@ -230,8 +290,10 @@ async function loadTodayOrders() {
   document.getElementById('lastUpdate').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-VE');
 }
 
-// Escuchar pedidos nuevos en tiempo real
-db.channel('web_orders')
+function startPrinter() {
+  if (realtimeChannel) return;
+  loadTodayOrders();
+  realtimeChannel = db.channel('web_orders-printer')
   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'web_orders' }, payload => {
     const newOrder = { ...payload.new, _new: true };
     orders.unshift(newOrder);
@@ -250,8 +312,9 @@ db.channel('web_orders')
       dot.style.background = '#ef4444';
     }
   });
+}
 
-loadTodayOrders();
+bootPrinter();
 </script>
 </body>
 </html>

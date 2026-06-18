@@ -21,7 +21,7 @@
     * { margin:0; padding:0; box-sizing:border-box }
     body { background:var(--bg); color:var(--text); font-family:var(--font); height:100vh; overflow:hidden }
 
-    /* ── PIN ── */
+    /* ── ACCESO ── */
     .screen { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999 }
     .screen.hidden { display:none }
     .scr-logo  { font-size:52px; margin-bottom:8px }
@@ -36,6 +36,10 @@
     .pin-btn:active { background:var(--accent); color:#000; transform:scale(.92) }
     .pin-btn.sp { font-size:15px; color:var(--muted) }
     .pin-err   { color:var(--urgent); font-size:12px; margin-top:16px; min-height:18px; text-align:center }
+    .auth-form { width:min(340px,calc(100vw - 40px)); display:flex; flex-direction:column; gap:12px }
+    .auth-inp { width:100%; padding:14px 16px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font:inherit }
+    .auth-inp:focus { outline:2px solid var(--accent); outline-offset:1px }
+    .auth-btn { padding:14px 16px; border:0; border-radius:8px; background:var(--accent); color:#000; font-weight:800; cursor:pointer }
 
     /* ── SEDE ── */
     .sede-list { display:flex; flex-direction:column; gap:10px; width:100%; max-width:320px }
@@ -157,30 +161,16 @@
 </head>
 <body>
 
-<!-- PIN -->
+<!-- ACCESO -->
 <div id="pinScreen" class="screen">
   <div class="scr-logo">🌭</div>
   <div class="scr-brand">Hot Dog Maracay</div>
   <div class="scr-sub">Sistema de Cocina · KDS</div>
-  <div class="pin-label">Código de acceso</div>
-  <div class="pin-dots">
-    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
-  </div>
-  <div class="pin-pad">
-    <button class="pin-btn" onclick="pk('1')">1</button>
-    <button class="pin-btn" onclick="pk('2')">2</button>
-    <button class="pin-btn" onclick="pk('3')">3</button>
-    <button class="pin-btn" onclick="pk('4')">4</button>
-    <button class="pin-btn" onclick="pk('5')">5</button>
-    <button class="pin-btn" onclick="pk('6')">6</button>
-    <button class="pin-btn" onclick="pk('7')">7</button>
-    <button class="pin-btn" onclick="pk('8')">8</button>
-    <button class="pin-btn" onclick="pk('9')">9</button>
-    <button class="pin-btn sp" onclick="pk('c')">✕</button>
-    <button class="pin-btn" onclick="pk('0')">0</button>
-    <button class="pin-btn sp" onclick="pk('b')">⌫</button>
-  </div>
+  <form class="auth-form" onsubmit="loginKDS(event)">
+    <input class="auth-inp" id="authEmail" type="email" autocomplete="username" placeholder="Correo del empleado" required>
+    <input class="auth-inp" id="authPassword" type="password" autocomplete="current-password" placeholder="Contraseña" required minlength="8">
+    <button class="auth-btn" id="authBtn" type="submit">Iniciar sesión</button>
+  </form>
   <div class="pin-err" id="pinErr"></div>
 </div>
 
@@ -190,11 +180,11 @@
   <div class="scr-brand">Hot Dog Maracay</div>
   <div class="scr-sub" style="margin-bottom:28px">Selecciona tu sede</div>
   <div class="sede-list">
-    <button class="sede-btn" onclick="selectSede('North Miami')">North Miami <span style="color:var(--muted)">›</span></button>
-    <button class="sede-btn" onclick="selectSede('Doral')">Doral <span style="color:var(--muted)">›</span></button>
-    <button class="sede-btn" onclick="selectSede('Downtown Miami')">Downtown Miami <span style="color:var(--muted)">›</span></button>
+    <button class="sede-btn" onclick="selectSede('North Miami','nmb')">North Miami <span style="color:var(--muted)">›</span></button>
+    <button class="sede-btn" onclick="selectSede('Doral','doral')">Doral <span style="color:var(--muted)">›</span></button>
+    <button class="sede-btn" onclick="selectSede('Downtown Miami','downtown')">Downtown Miami <span style="color:var(--muted)">›</span></button>
   </div>
-  <span class="logout-lnk" onclick="logout()">← Cambiar PIN</span>
+  <span class="logout-lnk" onclick="logout()">Cerrar sesión</span>
 </div>
 
 <!-- KDS -->
@@ -253,69 +243,68 @@ const SUPABASE_URL = 'https://ckzvjudhpbhzisrrhozk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_5cEosCpGfTIM-culYQ1ofA_xggsaIBc';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const PIN     = '2802';
-const AUTH_KEY = 'hdm_kds_v2';
 const SEDE_KEY = 'hdm_kds_sede';
+const SEDE_CODE_KEY = 'hdm_kds_sede_code';
 
 let orders    = [], history = [], knownIds = new Set();
-let soundOn   = true, firstLoad = true, activeSede = null, toastTmr = null;
+let soundOn   = true, firstLoad = true, activeSede = null, activeLocationCode = null, toastTmr = null;
 let realtimeCh = null;
 
 /* ── BOOT ── */
-(function boot() {
-  const auth = sessionStorage.getItem(AUTH_KEY);
+(async function boot() {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return;
   const sede = sessionStorage.getItem(SEDE_KEY);
-  if (auth === PIN && sede) { activeSede = sede; unlockKDS(); }
-  else if (auth === PIN) {
+  const sedeCode = sessionStorage.getItem(SEDE_CODE_KEY);
+  document.getElementById('pinScreen').classList.add('hidden');
+  if (sede && sedeCode) { activeSede = sede; activeLocationCode = sedeCode; unlockKDS(); }
+  else {
     document.getElementById('pinScreen').classList.add('hidden');
     document.getElementById('sedeScreen').classList.remove('hidden');
   }
 })();
 
-/* ── PIN ── */
-let pinEntry = '';
-function pk(k) {
+/* ── ACCESO ── */
+async function loginKDS(event) {
+  event.preventDefault();
   const err = document.getElementById('pinErr');
   err.textContent = '';
-  if (k==='c') pinEntry='';
-  else if (k==='b') pinEntry=pinEntry.slice(0,-1);
-  else if (pinEntry.length<4) pinEntry+=k;
-  for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('on',i<pinEntry.length);
-  if (pinEntry.length===4) {
-    if (pinEntry===PIN) {
-      sessionStorage.setItem(AUTH_KEY,PIN);
-      document.getElementById('pinScreen').classList.add('hidden');
-      document.getElementById('sedeScreen').classList.remove('hidden');
-    } else {
-      err.textContent='Código incorrecto';
-      setTimeout(()=>{ pinEntry=''; for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('on'); err.textContent=''; },900);
-    }
+  const button = document.getElementById('authBtn');
+  button.disabled = true;
+  const { error } = await db.auth.signInWithPassword({
+    email: document.getElementById('authEmail').value.trim(),
+    password: document.getElementById('authPassword').value
+  });
+  button.disabled = false;
+  if (error) {
+    err.textContent = 'Correo o contraseña incorrectos';
+    return;
   }
+  document.getElementById('authPassword').value = '';
+  document.getElementById('pinScreen').classList.add('hidden');
+  document.getElementById('sedeScreen').classList.remove('hidden');
 }
-document.addEventListener('keydown',e=>{
-  if(!document.getElementById('pinScreen').classList.contains('hidden')){
-    if(e.key>='0'&&e.key<='9') pk(e.key);
-    if(e.key==='Backspace') pk('b');
-    if(e.key==='Escape') pk('c');
-  }
-});
 
 /* ── SEDE ── */
-function selectSede(nombre) {
-  activeSede=nombre; sessionStorage.setItem(SEDE_KEY,nombre);
+function selectSede(nombre, code) {
+  activeSede=nombre; activeLocationCode=code;
+  sessionStorage.setItem(SEDE_KEY,nombre);
+  sessionStorage.setItem(SEDE_CODE_KEY,code);
   document.getElementById('sedeScreen').classList.add('hidden');
   unlockKDS();
 }
 function changeSede() {
-  sessionStorage.removeItem(SEDE_KEY); activeSede=null; orders=[]; knownIds.clear(); firstLoad=true;
+  sessionStorage.removeItem(SEDE_KEY); sessionStorage.removeItem(SEDE_CODE_KEY);
+  activeSede=null; activeLocationCode=null; orders=[]; knownIds.clear(); firstLoad=true;
   document.getElementById('kds').style.display='none';
   document.getElementById('sedeScreen').classList.remove('hidden');
 }
-function logout() {
-  sessionStorage.clear(); pinEntry='';
-  for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('on');
+async function logout() {
+  await db.auth.signOut();
+  sessionStorage.clear();
   document.getElementById('sedeScreen').classList.add('hidden');
   document.getElementById('pinScreen').classList.remove('hidden');
+  document.getElementById('kds').style.display='none';
 }
 
 /* ── KDS ── */
@@ -373,7 +362,8 @@ function timeAgo(ts){
 function parseMods(details) {
   if(!details) return '';
   let html='';
-  details.split('·').map(p=>p.trim()).filter(Boolean).forEach(part=>{
+  details.split(/[·|]/).map(p=>p.trim()).filter(Boolean).forEach(part=>{
+    part = part.replace(/^\[HD\d+\]\s*/i, '');
     if(/^Sin:/i.test(part)) part.replace(/^Sin:\s*/i,'').split(',').forEach(v=>{const t=v.trim();if(t)html+=`<div class="tk-mod sin">✕ ${esc(t)}</div>`;});
     else if(/^Extra:/i.test(part)) part.replace(/^Extra:\s*/i,'').split(',').forEach(v=>{const t=v.trim();if(t)html+=`<div class="tk-mod extra">+ ${esc(t)}</div>`;});
     else if(/^Salsas:/i.test(part)) part.replace(/^Salsas:\s*/i,'').split(',').forEach(v=>{const t=v.trim();if(t)html+=`<div class="tk-mod salsa">~ ${esc(t)}</div>`;});
@@ -506,6 +496,7 @@ async function loadOrders() {
   const { data, error } = await db
     .from('web_orders')
     .select('*')
+    .eq('location', activeLocationCode)
     .gte('created_at', today.toISOString())
     .neq('status', 'completed')
     .order('created_at', { ascending: true });
@@ -521,7 +512,7 @@ async function loadOrders() {
 function subscribeRealtime() {
   if (realtimeCh) db.removeChannel(realtimeCh);
   realtimeCh = db.channel('kds-realtime')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'web_orders' }, payload => {
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'web_orders', filter: `location=eq.${activeLocationCode}` }, payload => {
       const o = payload.new;
       if (knownIds.has(o.id)) return;
       knownIds.add(o.id);
@@ -530,7 +521,7 @@ function subscribeRealtime() {
       beep();
       toast('🌭 Nuevo pedido — ' + (o.customer_name || ''));
     })
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'web_orders' }, payload => {
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'web_orders', filter: `location=eq.${activeLocationCode}` }, payload => {
       const updated = payload.new;
       const idx = orders.findIndex(o => o.id === updated.id);
       if (idx !== -1) { orders[idx] = { ...orders[idx], ...updated }; render(); }
