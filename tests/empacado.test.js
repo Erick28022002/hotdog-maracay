@@ -5,10 +5,9 @@ function requiresPacking(o) {
   if (['uber', 'doordash'].includes((o.channel || '').toLowerCase())) return false;
   let items = o.items || [];
   if (typeof items === 'string') { try { items = JSON.parse(items); } catch (e) { items = []; } }
-  const anyItemLlevar = items.some(it => /para\s+llevar/i.test(it.details || it.note || ''));
-  return o.order_type === 'pickup'
-      || (o.notes || '').toLowerCase().includes('para llevar')
-      || anyItemLlevar;
+  const hay = s => /llevar/i.test(s || '');
+  const anyItemLlevar = items.some(it => hay(it.details) || hay(it.note) || hay(it.note_text) || hay(it.name));
+  return o.order_type === 'pickup' || hay(o.notes) || hay(o.customer_name) || anyItemLlevar;
 }
 const kitchenComplete = o => { o.status = requiresPacking(o) ? 'packing' : 'completed'; }; // Cocina "Preparado"
 const meserasEmpacar  = o => { o.status = 'completed'; };                                  // Meseras "Empacada"
@@ -88,6 +87,25 @@ t('Extra: delivery (uber/doordash) NO se trata como empacado', () => {
 t('Extra: items como string JSON también se parsean', () => {
   const o = { status: 'new', order_type: 'dinein', notes: '', items: JSON.stringify([{ name: 'X', details: 'PARA LLEVAR' }]) };
   assert.strictEqual(requiresPacking(o), true);
+});
+
+console.log('== Detección ampliada de "llevar" ==');
+t('Nombre/título "Llevar" → para llevar', () => {
+  const o = { status: 'new', order_type: 'dinein', customer_name: 'Llevar', notes: '', items: [{ name: 'Promo', details: '' }] };
+  assert.strictEqual(requiresPacking(o), true);
+});
+t('Nota del producto (note_text) "LLEVAR" → para llevar', () => {
+  const o = { status: 'new', order_type: 'dinein', customer_name: 'Pepe', notes: '', items: [
+    { name: 'Promo', details: '', note_text: '' }, { name: 'Promo', details: '', note_text: 'LLEVAR' } ] };
+  assert.strictEqual(requiresPacking(o), true);
+});
+t('"llevar" suelto (sin "para") en detalles → para llevar', () => {
+  const o = { status: 'new', order_type: 'dinein', notes: '', items: [{ name: 'Promo', details: 'llevar' }] };
+  assert.strictEqual(requiresPacking(o), true);
+});
+t('Orden normal (sin "llevar" en ningún lado) → NO para llevar', () => {
+  const o = { status: 'new', order_type: 'dinein', customer_name: 'Maria', notes: '', items: [{ name: 'Promo', details: 'No Maiz', note_text: '' }] };
+  assert.strictEqual(requiresPacking(o), false);
 });
 
 console.log('\nResultado: ' + pass + ' OK, ' + fail + ' fallos');

@@ -1045,10 +1045,10 @@ function requiresPacking(o) {
   if (['uber', 'doordash'].includes((o.channel || '').toLowerCase())) return false; // delivery: lo lleva el courier
   let items = o.items || [];
   if (typeof items === 'string') { try { items = JSON.parse(items); } catch (e) { items = []; } }
-  const anyItemLlevar = items.some(it => /para\s+llevar/i.test(it.details || it.note || ''));
-  return o.order_type === 'pickup'
-      || (o.notes || '').toLowerCase().includes('para llevar')
-      || anyItemLlevar;
+  const hay = s => /llevar/i.test(s || '');
+  // "llevar" en cualquier lugar: nombre, notas de la orden, o cualquier ítem (detalles/nota/note_text/nombre)
+  const anyItemLlevar = items.some(it => hay(it.details) || hay(it.note) || hay(it.note_text) || hay(it.name));
+  return o.order_type === 'pickup' || hay(o.notes) || hay(o.customer_name) || anyItemLlevar;
 }
 
 /* ── RENDER ── */
@@ -1088,21 +1088,26 @@ function render() {
     const tl           = timeLevel(mins);
     const isDeliveryApp  = ['uber', 'doordash'].includes((o.channel || '').toLowerCase());
     const notesLower     = (o.notes || '').toLowerCase();
-    const allItemsLlevar = items.length > 0 && items.every(it => /para\s+llevar/i.test(it.details || it.note || ''));
-    const isTakeout      = (o.order_type === 'pickup' || notesLower.includes('para llevar') || allItemsLlevar) && !isDeliveryApp;
+    // "llevar" en CUALQUIER lugar (nombre/título, notas, ítems) ⇒ orden para llevar
+    const hasLlevar      = s => /llevar/i.test(s || '');
+    const allItemsLlevar = items.length > 0 && items.every(it => hasLlevar(it.details || it.note || '') || hasLlevar(it.note_text || ''));
+    const isTakeout      = (o.order_type === 'pickup' || hasLlevar(o.notes) || hasLlevar(o.customer_name) || allItemsLlevar) && !isDeliveryApp;
     const custName     = o.customer_name || 'Cliente';
 
     const groupedItems = groupAndSortItems(items);
     const itemsHtml = groupedItems.map((it, idx) => {
       const rawDetails    = it.details || it.note || '';
-      const isItemTakeout = /para\s+llevar/i.test(rawDetails);
-      // Quitar "para llevar" antes de parsear mods — así si queda vacío aparece CON TODO
-      const cleanDetails  = stripDrinkMods(rawDetails.replace(/\s*·?\s*para\s+llevar\s*·?\s*/gi, ' ').trim().replace(/^\s*·|·\s*$/g, '').trim());
+      // ítem "para llevar" si lo dice en detalles O en su nota (📝)
+      const isItemTakeout = hasLlevar(rawDetails) || hasLlevar(it.note_text || '');
+      // Quitar "llevar"/"para llevar" antes de parsear mods — así si queda vacío aparece CON TODO
+      const cleanDetails  = stripDrinkMods(rawDetails.replace(/\s*·?\s*(para\s+)?llevar\s*·?\s*/gi, ' ').trim().replace(/^\s*·|·\s*$/g, '').trim());
       const modsHtml      = parseMods(cleanDetails, it.name || '');
       const pm            = productMatch(it.name || '');
       const contentHtml   = modsHtml || (pm ? '<div class="tk-mod keep">✔ CON TODO</div>' : '');
       const noteText      = (it.note_text || '').trim();
-      const noteHtml      = noteText ? '<div class="tk-mod item-note">📝 ' + esc(noteText.toUpperCase()) + '</div>' : '';
+      // si la nota es solo "llevar"/"para llevar" no la repetimos (ya se muestra como PARA LLEVAR)
+      const noteIsJustLlevar = /^(para\s+)?llevar$/i.test(noteText);
+      const noteHtml      = (noteText && !noteIsJustLlevar) ? '<div class="tk-mod item-note">📝 ' + esc(noteText.toUpperCase()) + '</div>' : '';
       const llevarHtml    = isItemTakeout ? '<div class="tk-mod" style="color:#555;font-weight:700;font-size:13px;margin-top:1px">PARA LLEVAR</div>' : '';
       const displayMods   = contentHtml + noteHtml + llevarHtml;
       const drinkCls = isDrink(it.name) ? ' is-drink' : '';
