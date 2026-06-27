@@ -1333,7 +1333,11 @@ function shiftAutoCloseAt() {
 async function autoCloseShift() {
   if (!activeSede) return;
   const closeAt = shiftAutoCloseAt();
-  if (Date.now() < closeAt.getTime()) return; // aún no es la hora
+  const now = Date.now();
+  // Solo dentro de la VENTANA de cierre (desde closeAt hasta 3h después). Evita que en
+  // horas muertas (ej. la tarde antes de abrir) se archiven órdenes recién hechas: a esa
+  // hora shiftSince apunta al turno de ayer y su cierre ya pasó hace rato.
+  if (now < closeAt.getTime() || now >= closeAt.getTime() + 3 * 60 * 60 * 1000) return;
 
   const key = 'hdm_autoclose_' + activeSede + '_' + closeAt.getTime();
   if (localStorage.getItem(key)) return; // ya se ejecutó este turno
