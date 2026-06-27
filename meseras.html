@@ -1321,7 +1321,7 @@ async function autoCloseShift() {
 
   try {
     await db.from('web_orders').update({ status: 'completed' })
-      .eq('location', activeSede).eq('status', 'new');
+      .eq('location', activeSede).in('status', ['new', 'packing']); // incluye pendientes de empacar
     toast('🔒 Cierre automático — ' + open.length + ' orden(es) archivadas');
   } catch(e) {
     localStorage.removeItem(key);
