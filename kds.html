@@ -179,6 +179,20 @@
     .mod-wine  { color:var(--wine);  font-weight:700 }
     .mod-green { color:var(--green); font-weight:700 }
 
+    /* ═══ Cuadro de adicionales PREMIUM (Bacon / Queso de mano) ═══
+       Color provisional — ajustar borde/fondo/texto aquí cuando se decida. */
+    .kds-premium-modifiers {
+      margin:4px 0 2px; padding:5px 9px;
+      border:2px solid #9E9E9E;     /* ← color del borde */
+      background:#F7F7F7;           /* ← color de fondo */
+      border-radius:7px;
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .kds-premium-modifier {
+      font-weight:800; font-size:15px; letter-spacing:.2px; text-transform:uppercase;
+      color:#1B5E20;               /* ← color del texto */
+    }
+
     /* #1 Encabezado de color único por producto */
     .ph {
       display:inline-block; padding:5px 11px; border-radius:7px;
@@ -888,11 +902,17 @@ function autoSplitCombo(parts) {
 }
 
 /* ── CONSTRUIR HTML DE MODIFICADORES PARA UN GRUPO DE PARTES ── */
+// Bacon / Queso de mano (incl. "QS de mano"). Tocineta/tocino = bacon. No incluye "queso" solo.
+function isPremiumMod(s) {
+  return /\bbacon\b|tocin(o|eta)|q(?:ueso|s)\.?\s*de\s*mano/i.test(s || '');
+}
 function buildModsHtml(parts) {
-  const sins = [], extras = [], neutrals = [];
+  const sins = [], extras = [], neutrals = [], premium = [];
   parts.forEach(part => {
     if (/^(sin|no)\s+/i.test(part))
       sins.push(part.replace(/^(sin|no)\s+/i, '').trim());
+    else if (isPremiumMod(part))            // bacon / queso de mano (positivo) → cuadro destacado
+      premium.push(part);
     else if (/^(extra|con|mas|más)\s+/i.test(part))
       extras.push(part);
     else
@@ -924,8 +944,18 @@ function buildModsHtml(parts) {
     html += '<div class="tk-mod extra">➕ ' + colorizeRaw(ex) + suffix + '</div>';
   });
 
-  // Variantes (Bacon, QS De Mano…) siempre al final, antes de "PARA LLEVAR"
+  // Variantes neutras siempre al final, antes de "PARA LLEVAR"
   neutrals.forEach(p => { html += '<div class="tk-mod extra">➕ ' + colorizeRaw(p) + '</div>'; });
+
+  // Cuadro destacado para adicionales premium (Bacon / Queso de mano) — color provisional
+  if (premium.length) {
+    html += '<div class="kds-premium-modifiers">' +
+      premium.map(p => {
+        const ic = /q(?:ueso|s)\.?\s*de\s*mano/i.test(p) ? ' 🧀' : ' 🥓';
+        return '<div class="kds-premium-modifier">➕ ' + colorizeRaw(p) + ic + '</div>';
+      }).join('') +
+    '</div>';
+  }
 
   return html;
 }
