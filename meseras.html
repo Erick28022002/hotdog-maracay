@@ -1283,6 +1283,9 @@ function initDrag() {
 /* ── EMPACADO (solo órdenes para llevar) ── */
 // Órdenes recién empacadas (id → ts). Evita re-mostrarlas por carrera con el polling.
 const pendingDone = new Map();
+// Órdenes recién llegadas (id → ts). Las conserva visibles aunque un poll con lag aún
+// no las devuelva (evita que una orden nueva parpadee: entra, se borra y vuelve).
+const pendingActive = new Map();
 
 async function empacar(id, ev) {
   if (ev) ev.stopPropagation();
@@ -1422,6 +1425,20 @@ async function loadOrders() {
       return false;
     });
   }
+  // Anti-parpadeo de órdenes nuevas: conservar las recién llegadas que un poll con lag
+  // todavía no devuelve, hasta que la BD las confirme.
+  if (pendingActive.size) {
+    const now = Date.now();
+    for (const [pid, ts] of pendingActive) if (now - ts > 8000) pendingActive.delete(pid);
+    pendingActive.forEach((ts, pid) => {
+      const f = fresh.find(o => o.id === pid);
+      if (f) pendingActive.delete(pid);               // BD ya la devuelve
+      else {
+        const local = orders.find(o => o.id === pid);
+        if (local) fresh.push(local);                 // conservar visible
+      }
+    });
+  }
 
   const newOnes = fresh.filter(o => !knownIds.has(o.id));
   if (newOnes.length && !firstLoad) beep();
@@ -1441,6 +1458,7 @@ function subscribeRealtime() {
       if (o.location !== activeSede) return; // aislamiento por sede
       if (knownIds.has(o.id)) return;
       knownIds.add(o.id); orders.push(o);
+      pendingActive.set(o.id, Date.now()); // proteger del polling hasta que la BD la confirme
       render(); beep();
       toast('🌭 Nuevo pedido — ' + (o.customer_name || ''));
     })
@@ -1455,6 +1473,7 @@ function subscribeRealtime() {
         // Orden reactivada (estaba completada, le agregaron más productos)
         orders.push(updated);
         knownIds.add(updated.id);
+        pendingActive.set(updated.id, Date.now()); // proteger del polling hasta confirmar
         render();
         beep();
         toast('🌭 Pedido actualizado — ' + (updated.customer_name || ''));

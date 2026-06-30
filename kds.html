@@ -1488,6 +1488,7 @@ function subscribeRealtime() {
       if (o.location !== activeSede) return; // aislamiento por sede
       if (knownIds.has(o.id)) return;
       knownIds.add(o.id); orders.push(o);
+      pendingActive.set(o.id, Date.now()); // proteger del polling hasta que la BD la confirme
       render(); beep();
       toast('🌭 Nuevo pedido — ' + (o.customer_name || ''));
     })
@@ -1502,6 +1503,7 @@ function subscribeRealtime() {
         // Orden reactivada (estaba completada, le agregaron más productos)
         orders.push(updated);
         knownIds.add(updated.id);
+        pendingActive.set(updated.id, Date.now()); // proteger del polling hasta confirmar
         render();
         beep();
         toast('🌭 Pedido actualizado — ' + (updated.customer_name || ''));
