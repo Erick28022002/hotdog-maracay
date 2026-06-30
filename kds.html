@@ -1294,6 +1294,9 @@ function initDrag() {
 // Órdenes recién marcadas (id → ts). Evita que el polling las re-muestre 1-2s
 // por carrera (el update a la BD aún no se reflejó cuando loadOrders re-consulta).
 const pendingDone = new Map();
+// Órdenes recién devueltas del historial (id → ts). Las conserva visibles aunque un
+// poll con lag de réplica todavía las devuelva como completadas (evita el rebote inverso).
+const pendingActive = new Map();
 
 async function completar(id, ev) {
   if (ev) ev.stopPropagation();
@@ -1344,10 +1347,15 @@ async function recuperar(id) {
   const o = history[i];
   history.splice(i, 1);
   saveHistory();
-  await db.from('web_orders').update({ status: 'new' }).eq('id', o.id);
+  // Optimista: mostrar de inmediato y proteger del polling (lag de réplica) hasta confirmar.
+  o.status = 'new';
+  pendingDone.delete(id);
+  pendingActive.set(id, Date.now());
+  if (!orders.find(x => x.id === id)) orders.push(o);
   closeHist();
-  await loadOrders();
+  render();
   toast('Pedido devuelto a cocina');
+  await db.from('web_orders').update({ status: 'new' }).eq('id', id);
 }
 
 /* ── TURNO: siempre desde las 6pm del día actual o del anterior ── */
@@ -1424,6 +1432,7 @@ async function loadOrders() {
   if (done) {
     const cut = Date.now() - HIST_MAX_MS;
     done.forEach(o => {
+      if (pendingActive.has(o.id)) return; // recién devuelta del historial → no re-archivar por lag
       const completedAt = o.updated_at || o.created_at;
       if (new Date(completedAt).getTime() < cut) return; // más de 1 hora → fuera del historial
       if (!history.find(h => h.id === o.id))
@@ -1445,6 +1454,20 @@ async function loadOrders() {
       if (!pendingDone.has(o.id)) return true;
       if (o.status !== 'new') { pendingDone.delete(o.id); return true; } // BD ya confirmó → render la oculta
       return false; // BD aún 'new' (stale) → no re-mostrar
+    });
+  }
+  // Anti-rebote inverso: órdenes recién devueltas del historial que un poll con lag aún
+  // devuelve como completadas → reinyectar la copia local hasta que la BD confirme 'new'.
+  if (pendingActive.size) {
+    const now = Date.now();
+    for (const [pid, ts] of pendingActive) if (now - ts > 8000) pendingActive.delete(pid);
+    pendingActive.forEach((ts, pid) => {
+      const f = fresh.find(o => o.id === pid);
+      if (f) { if (f.status === 'new') pendingActive.delete(pid); }   // BD confirmó
+      else {
+        const local = orders.find(o => o.id === pid);
+        if (local) { local.status = 'new'; fresh.push(local); }       // conservar visible
+      }
     });
   }
 
