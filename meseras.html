@@ -1281,9 +1281,13 @@ function initDrag() {
 }
 
 /* ── EMPACADO (solo órdenes para llevar) ── */
+// Órdenes recién empacadas (id → ts). Evita re-mostrarlas por carrera con el polling.
+const pendingDone = new Map();
+
 async function empacar(id, ev) {
   if (ev) ev.stopPropagation();
   const o = orders.find(x => x.id === id); if (!o) return;
+  pendingDone.set(id, Date.now());
   history.unshift({ ...o, completedAt: new Date().toISOString() });
   if (history.length > 150) history.pop();
   saveHistory();
@@ -1406,9 +1410,22 @@ async function loadOrders() {
     saveHistory();
   }
 
-  const newOnes = (data || []).filter(o => !knownIds.has(o.id));
+  // Anti-parpadeo: orden recién empacada que la BD aún devuelve como 'new' (update no
+  // propagado) se oculta hasta que la BD confirme el cambio.
+  let fresh = data || [];
+  if (pendingDone.size) {
+    const now = Date.now();
+    for (const [pid, ts] of pendingDone) if (now - ts > 8000) pendingDone.delete(pid);
+    fresh = fresh.filter(o => {
+      if (!pendingDone.has(o.id)) return true;
+      if (o.status !== 'new') { pendingDone.delete(o.id); return true; }
+      return false;
+    });
+  }
+
+  const newOnes = fresh.filter(o => !knownIds.has(o.id));
   if (newOnes.length && !firstLoad) beep();
-  orders = data || [];
+  orders = fresh;
   orders.forEach(o => knownIds.add(o.id));
   firstLoad = false;
   render();
