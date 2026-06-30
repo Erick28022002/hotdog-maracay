@@ -320,10 +320,12 @@ async function pollClover(loc) {
     for (const ord of els) {
       const lineItems = (ord.lineItems?.elements || []).filter(li => li.name);
 
-      // Orden borrada o vacía → quitarla del KDS
-      if (ord.state === 'deleted' || !lineItems.length) {
+      // Borrar del KDS SOLO si Clover la marcó borrada (state 'deleted').
+      // NO borrar por venir con lineItems vacíos: una lectura parcial/transitoria o una
+      // orden cerrada puede llegar vacía y NO debe perderse — cocina aún la necesita.
+      if (ord.state === 'deleted') {
         if (knownSquareIds.has(ord.id)) {
-          console.log(`[CLOVER][${loc.sede}] Orden borrada/vacía → eliminando del KDS: ${ord.id}`);
+          console.log(`[CLOVER][${loc.sede}] Orden BORRADA en Clover → eliminando del KDS: ${ord.id}`);
           supabaseDelete(ord.id);
           knownSquareIds.delete(ord.id);
           const idx = orders.findIndex(o => o.square_id === ord.id);
@@ -331,6 +333,8 @@ async function pollClover(loc) {
         }
         continue;
       }
+      // Sin ítems de cocina → ignorar: ni crear ni borrar.
+      if (!lineItems.length) continue;
 
       const items = lineItems.map(li => {
         // Modificaciones de Clover ("1 No Maiz", "2 No Vegetale", "Bacon Extra").
@@ -482,11 +486,13 @@ async function pollSquare(loc) {
     for (const ord of (result.orders || [])) {
       const lineItems = (ord.line_items || []).filter(li => li.name && li.item_type !== 'CUSTOM_AMOUNT');
 
-      // Orden cancelada, o vaciada (le anularon todos los artículos en Square)
-      // → quitarla también del KDS
-      if (ord.state === 'CANCELED' || !lineItems.length) {
+      // Borrar del KDS SOLO si Square la canceló explícitamente (state CANCELED).
+      // NO borrar por venir con line_items vacíos: una orden pagada/cerrada (COMPLETED) o
+      // una lectura parcial/transitoria de Square puede llegar vacía y NO debe perderse —
+      // cocina todavía la necesita. (Antes esto borraba órdenes reales al pagarlas.)
+      if (ord.state === 'CANCELED') {
         if (knownSquareIds.has(ord.id)) {
-          console.log(`[SQUARE] Orden cancelada/vaciada → eliminando del KDS: ${ord.id}`);
+          console.log(`[SQUARE] Orden CANCELADA en Square → eliminando del KDS: ${ord.id}`);
           supabaseDelete(ord.id);
           knownSquareIds.delete(ord.id);
           const idx = orders.findIndex(o => o.square_id === ord.id);
@@ -494,6 +500,8 @@ async function pollSquare(loc) {
         }
         continue;
       }
+      // Sin ítems de cocina (custom amount, vacía, etc.) → ignorar: ni crear ni borrar.
+      if (!lineItems.length) continue;
 
       // Items con variantes y modificadores
       const items = lineItems.map(li => {
