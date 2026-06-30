@@ -1312,7 +1312,7 @@ async function completar(id, ev) {
     el.style.opacity = '0'; el.style.transform = 'scale(.94)';
     el.style.transition = 'all .2s'; setTimeout(() => el.remove(), 200);
   }
-  render(); toast(nextStatus === 'packing' ? 'Preparado → a empacar 📦' : 'Pedido completado ✓');
+  render();
   await db.from('web_orders').update({ status: nextStatus }).eq('id', id);
 }
 
@@ -1354,7 +1354,6 @@ async function recuperar(id) {
   if (!orders.find(x => x.id === id)) orders.push(o);
   closeHist();
   render();
-  toast('Pedido devuelto a cocina');
   await db.from('web_orders').update({ status: 'new' }).eq('id', id);
 }
 
