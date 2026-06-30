@@ -1368,22 +1368,24 @@ function shiftAutoCloseAt() {
 async function autoCloseShift() {
   if (!activeSede) return;
   const closeAt = shiftAutoCloseAt();
-  const now = Date.now();
-  // Solo dentro de la VENTANA de cierre (desde closeAt hasta 3h después). Evita que en
-  // horas muertas (ej. la tarde antes de abrir) se archiven órdenes recién hechas: a esa
-  // hora shiftSince apunta al turno de ayer y su cierre ya pasó hace rato.
-  if (now < closeAt.getTime() || now >= closeAt.getTime() + 3 * 60 * 60 * 1000) return;
+  if (Date.now() < closeAt.getTime()) return; // aún no llega la hora de cierre del turno
+
+  // Sin límite superior: si el KDS estuvo cerrado durante el cierre, igual archiva al abrir.
+  // Discriminador clave: SOLO se archivan órdenes CREADAS ANTES del cierre (sobras del turno
+  // que ya terminó). Las órdenes nuevas (creadas después del cierre, ej. pruebas de la tarde
+  // o el turno de hoy) NO se tocan.
+  const open = orders.filter(o => o.status !== 'completed' && o.location === activeSede
+    && new Date(o.created_at).getTime() < closeAt.getTime());
+  if (open.length === 0) return;
 
   const key = 'hdm_autoclose_' + activeSede + '_' + closeAt.getTime();
-  if (localStorage.getItem(key)) return; // ya se ejecutó este turno
+  if (localStorage.getItem(key)) return; // ya se ejecutó este cierre
   localStorage.setItem(key, '1');
-
-  const open = orders.filter(o => o.status !== 'completed' && o.location === activeSede);
-  if (open.length === 0) return;
 
   try {
     await db.from('web_orders').update({ status: 'completed' })
-      .eq('location', activeSede).in('status', ['new', 'packing']); // incluye pendientes de empacar
+      .eq('location', activeSede).in('status', ['new', 'packing'])
+      .lt('created_at', closeAt.toISOString()); // solo sobras del turno cerrado
     toast('🔒 Cierre automático — ' + open.length + ' orden(es) archivadas');
   } catch(e) {
     localStorage.removeItem(key); // permitir reintento
