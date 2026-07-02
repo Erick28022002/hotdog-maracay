@@ -50,10 +50,10 @@
       position:fixed; top:0; left:0; right:0; z-index:100;
       box-shadow:0 1px 3px rgba(0,0,0,.07);
     }
-    .hdr-brand { font-size:15px; font-weight:800; color:var(--accent) }
+    .hdr-brand { font-size:20px; line-height:1; font-weight:800; color:var(--accent); white-space:nowrap }
     .fab-brand { margin-right:auto } /* empuja el resto de la barra a la derecha */
-    .conn-pill { display:flex; align-items:center; gap:7px; padding:4px 12px; background:#F5F5F5; border-radius:20px; font-size:11px; color:var(--muted) }
-    .conn-dot  { width:7px; height:7px; border-radius:50%; background:var(--green); animation:blink 2s infinite }
+    .conn-pill { display:inline-flex; align-items:center; gap:8px; height:calc(100% - 8px); padding:0 14px; background:#F5F5F5; border-radius:20px; font-size:15px; line-height:1; color:var(--muted); white-space:nowrap }
+    .conn-dot  { width:10px; height:10px; border-radius:50%; background:var(--green); animation:blink 2s infinite; flex:0 0 auto }
     .conn-dot.off { background:var(--urgent); animation:blink .7s infinite }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
@@ -251,38 +251,43 @@
     .tk-done-btn:hover  { background:#333 }
     .tk-done-btn:active { transform:scale(.97) }
 
-    /* ═══ FAB BAR (abajo) ═══ */
+    /* ═══ FAB BAR (abajo) — MISMA altura (52px), contenido mucho más grande ═══
+       El contenido ocupa ~85% de la altura vía height:calc(100% - 8px) y
+       line-height:1. NO se cambia height/posición/padding vertical de la barra. */
     .fab-bar {
-      position:fixed; bottom:0; left:0; right:0; height:52px;
+      position:fixed; bottom:0; left:0; right:0; height:52px; box-sizing:border-box;
       background:var(--card); border-top:1px solid var(--border);
-      display:flex; align-items:center; justify-content:flex-end;
-      padding:0 20px; gap:14px; z-index:100;
+      display:flex; align-items:center; justify-content:flex-end; flex-wrap:nowrap;
+      padding:0 clamp(8px,1.4vw,18px); gap:clamp(6px,1vw,12px); z-index:100;
       box-shadow:0 -1px 4px rgba(0,0,0,.06);
+      overflow:hidden; white-space:nowrap;
     }
-    .fab-clock { font-size:17px; font-weight:300; letter-spacing:2px; font-variant-numeric:tabular-nums; color:var(--muted) }
-    .fab-div   { width:1px; height:22px; background:var(--border) }
-    .fab-count { display:flex; align-items:center; gap:5px; font-size:13px; color:var(--muted) }
-    .fab-count .n { font-size:17px; font-weight:800; color:var(--text) }
+    .fab-bar > * { flex:0 0 auto }
+    .fab-clock { font-size:21px; line-height:1; font-weight:300; letter-spacing:1.5px; font-variant-numeric:tabular-nums; color:var(--muted) }
+    .fab-div   { width:1px; height:34px; background:var(--border) } /* ~65% de la altura interna */
+    .fab-count { display:inline-flex; align-items:center; gap:6px; font-size:15px; line-height:1; color:var(--muted) }
+    .fab-count .n { font-size:26px; line-height:1; font-weight:800; color:var(--text) }
     .fab-count.urg .n { color:var(--urgent) }
     .fab-hist  {
+      height:calc(100% - 8px); display:inline-flex; align-items:center; justify-content:center;
       background:none; border:1px solid var(--border); color:var(--muted);
-      padding:5px 14px; border-radius:20px; font-size:12px; cursor:pointer;
-      transition:all .2s;
+      padding:0 16px; border-radius:20px; font-size:16px; line-height:1; cursor:pointer;
+      white-space:nowrap; transition:all .2s;
     }
     .fab-hist:hover { border-color:var(--accent); color:var(--accent) }
 
     /* ═══ PANEL DE PRODUCCIÓN ═══ */
-    .prod-panel { display:flex; align-items:center; gap:5px }
+    .prod-panel { display:inline-flex; align-items:center; gap:6px; height:100% }
     .prod-pill {
-      display:flex; align-items:center; gap:4px;
-      padding:3px 8px; border-radius:6px;
+      height:calc(100% - 8px); display:inline-flex; align-items:center; justify-content:center; gap:5px;
+      padding:0 11px; border-radius:8px; line-height:1;
       background:#F5F5F5; border:1px solid var(--border);
       transition:opacity .25s;
       white-space:nowrap; cursor:default;
     }
     .prod-pill.prod-zero { opacity:.18 }
-    .prod-pill .plbl { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase }
-    .prod-pill .pval { font-size:14px; font-weight:900; line-height:1 }
+    .prod-pill .plbl { font-size:13px; line-height:1; font-weight:700; color:var(--muted); text-transform:uppercase }
+    .prod-pill .pval { font-size:21px; line-height:1; font-weight:900 }
     #pill-perros .pval              { color:var(--accent) }
     #pill-cm.prod-pill              { border-color:rgba(109,58,0,.35) }
     #pill-cm .pval                  { color:var(--brown) }
