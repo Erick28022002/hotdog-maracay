@@ -32,7 +32,11 @@ function squareUpdate(existingItems, squareItems, status) {
     const addedItems = [];
     newAgg.forEach((v, k) => {
       const diff = v.qty - ((oldAgg.get(k) || {}).qty || 0);
-      if (diff > 0) addedItems.push({ name: v.name, details: v.details, qty: diff });
+      if (diff > 0) {
+        const src = squareItems.find(it => (it.name||'').trim().toLowerCase() === v.name.trim().toLowerCase()
+                                        && normDetails(it.details) === normDetails(v.details) && (it.note_text||'').trim());
+        addedItems.push({ name: v.name, details: v.details, qty: diff, note_text: (src && src.note_text) || '' });
+      }
     });
     return { action: addedItems.length ? 'round' : 'none', addedItems };
   }
@@ -74,12 +78,23 @@ t('Prueba 4: agregar durante preparación (status new) → patch', () => {
 t('Prueba 5: agregar después de preparar (completed) → ronda nueva solo con lo añadido', () => {
   const r = squareUpdate([{name:'Promo Clasica',qty:1}], [{name:'Promo Clasica',qty:2}], 'completed');
   assert.strictEqual(r.action, 'round');
-  assert.deepStrictEqual(r.addedItems, [{name:'Promo Clasica',details:'',qty:1}]);
+  assert.deepStrictEqual(r.addedItems, [{name:'Promo Clasica',details:'',qty:1,note_text:''}]);
 });
 t('Empacado (packing) también cuenta como preparado → ronda nueva', () => {
   const r = squareUpdate([{name:'Promo',qty:1}], [{name:'Promo',qty:1},{name:'Frescolita',qty:1}], 'packing');
   assert.strictEqual(r.action, 'round');
   assert.deepStrictEqual(r.addedItems.map(i=>i.name), ['Frescolita']);
+});
+
+console.log('== Ronda nueva conserva la NOTA del ítem agregado ==');
+t('Mesa servida + nuevo ítem con nota → la ronda lleva la nota', () => {
+  const before = [{name:'Promo Clasica',qty:1}];
+  const after  = [{name:'Promo Clasica',qty:1}, {name:'Hot Dog Clásico', details:'', note_text:'sin sal, alérgico'}];
+  const r = squareUpdate(before, after, 'completed');
+  assert.strictEqual(r.action, 'round');
+  assert.strictEqual(r.addedItems.length, 1);
+  assert.strictEqual(r.addedItems[0].name, 'Hot Dog Clásico');
+  assert.strictEqual(r.addedItems[0].note_text, 'sin sal, alérgico'); // ← nota visible
 });
 
 console.log('== #6 Pruebas distinción por modificadores ==');

@@ -410,7 +410,12 @@ async function pollClover(loc) {
             const addedItems = [];
             newAgg.forEach((v, k) => {
               const diff = v.qty - ((oldAgg.get(k) || {}).qty || 0);
-              if (diff > 0) addedItems.push({ name: v.name, details: v.details, qty: diff });
+              if (diff > 0) {
+                // Preservar la NOTA del ítem agregado (mensaje para preparar bien la orden)
+                const src = items.find(it => (it.name || '').trim().toLowerCase() === v.name.trim().toLowerCase()
+                                          && normDetails(it.details) === normDetails(v.details) && (it.note_text || '').trim());
+                addedItems.push({ name: v.name, details: v.details, qty: diff, note_text: (src && src.note_text) || '' });
+              }
             });
             existing.items = items;
             if (addedItems.length > 0) {
@@ -544,7 +549,12 @@ async function pollSquare(loc) {
             const addedItems = [];
             newAgg.forEach((v, k) => {
               const diff = v.qty - ((oldAgg.get(k) || {}).qty || 0);
-              if (diff > 0) addedItems.push({ name: v.name, details: v.details, qty: diff });
+              if (diff > 0) {
+                // Preservar la NOTA del ítem agregado (mensaje para preparar bien la orden)
+                const src = items.find(it => (it.name || '').trim().toLowerCase() === v.name.trim().toLowerCase()
+                                          && normDetails(it.details) === normDetails(v.details) && (it.note_text || '').trim());
+                addedItems.push({ name: v.name, details: v.details, qty: diff, note_text: (src && src.note_text) || '' });
+              }
             });
             existing.items = items; // actualizar caché local
             if (addedItems.length > 0) {
