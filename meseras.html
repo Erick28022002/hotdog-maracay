@@ -765,6 +765,12 @@ function isToppingSin(text) {
 // Detección de bebidas — precisa para el menú (evita falsos positivos como "aguacate")
 const DRINK_RE = /\b(coca[\s-]*cola|coca|coke|pepsi|sprite|fanta|7\s*up|seven\s*up|frescolita|nestea|malta|uvita|chinotto|hit|glaceau|agua|refresco|gaseosa|soda|jugo|bebida|cerveza|gatorade|powerade|red\s*bull|monster|limonada|papel[oó]n|chicha|merengada|batido|malteada)\b/i;
 function isDrink(name) { return DRINK_RE.test(name || ''); }
+// ¿La orden tiene al menos un ítem de COCINA (no bebida)?
+function hasKitchenItems(o) {
+  let items = o.items || [];
+  if (typeof items === 'string') { try { items = JSON.parse(items); } catch (e) { items = []; } }
+  return items.some(it => !isDrink(it.name));
+}
 // Quita prefijo extra/con/más/+ de un modificador antes de evaluarlo
 function modCore(p) { return (p || '').replace(/^(extra|con|m[aá]s|\+)\s+/i, '').trim(); }
 function isDrinkMod(p) { return isDrink(modCore(p)); }
@@ -1004,17 +1010,14 @@ function calcularTotalesProduccion() {
       const name = it.name || '';
       const mods = (it.details || it.note || '').toLowerCase();
 
-      // Perros y CM base según tipo de producto (usa los mismos regex que PRODUCT_MAP)
-      if (PRODUCT_MAP[0].re.test(name)) {        // Promo Clásica: 2 perros
+      // Contar SOLO hot dogs: "promo" = 2, "hot dog"/"perro" = 1, cualquier otro
+      // producto (bebida, extra, acompañante) = 0.
+      if (/promo/i.test(name)) {                 // Promo (Clásica/Mechada): 2 hot dogs
         perros += 2 * qty;
-      } else if (PRODUCT_MAP[1].re.test(name)) { // Promo Mechada: 2 perros + 2 CM
-        perros += 2 * qty;
-        cm     += 2 * qty;
-      } else if (PRODUCT_MAP[2].re.test(name)) { // Perro Mechada: 1 perro + 1 CM
+        if (/carne|mech/i.test(name)) cm += 2 * qty;
+      } else if (/hot\s*dog|perro/i.test(name)) { // Hot Dog / Perro: 1 hot dog
         perros += 1 * qty;
-        cm     += 1 * qty;
-      } else {                                    // Hot Dog Clásico u otro: 1 perro
-        perros += 1 * qty;
+        if (/carne|mech/i.test(name)) cm += 1 * qty;
       }
 
       // Ingredientes especiales en modificadores
@@ -1086,7 +1089,10 @@ function render() {
   if (dragEl) return; // no redibujar mientras se arrastra (evita cortar el movimiento)
   const lane  = document.getElementById('lane');
   const empty = document.getElementById('emptyLane');
-  const vis   = orders.filter(o => o.status !== 'completed' && o.location === activeSede);
+  // Mostrar si tiene comida (con su bloque de bebidas) O si es para llevar (empacar).
+  // Una orden de SOLO bebida en sala NO se muestra (se cobra al final, sin cuadro vacío).
+  const vis   = orders.filter(o => o.status !== 'completed' && o.location === activeSede
+                              && (hasKitchenItems(o) || requiresPacking(o)));
   sortVis(vis);
 
   const pending = vis.length;
