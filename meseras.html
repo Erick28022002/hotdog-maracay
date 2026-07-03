@@ -762,6 +762,23 @@ function isToppingSin(text) {
   );
 }
 
+// Orden FIJO de sustituciones (siempre igual): cebolla → repollo → vegetales → papas →
+// maíz → ketchup → mayonesa → mostaza → salsa → queso. Desconocido va al final.
+function toppingRank(text) {
+  const lc = (text || '').toLowerCase();
+  if (lc.includes('cebolla')) return 0;
+  if (lc.includes('repollo')) return 1;
+  if (lc.includes('vegetal')) return 2;
+  if (lc.includes('papa'))    return 3;
+  if (lc.includes('maiz') || lc.includes('maíz') || lc.includes('elote')) return 4;
+  if (lc.includes('ketchup') || lc.includes('catsup')) return 5;
+  if (lc.includes('mayo'))    return 6;
+  if (lc.includes('mostaza')) return 7;
+  if (lc.includes('salsa'))   return 8;
+  if (lc.includes('queso'))   return 9;
+  return 50;
+}
+
 // Detección de bebidas — precisa para el menú (evita falsos positivos como "aguacate")
 const DRINK_RE = /\b(coca[\s-]*cola|coca|coke|pepsi|sprite|fanta|7\s*up|seven\s*up|frescolita|nestea|malta|uvita|chinotto|hit|glaceau|agua|refresco|gaseosa|soda|jugo|bebida|cerveza|gatorade|powerade|red\s*bull|monster|limonada|papel[oó]n|chicha|merengada|batido|malteada)\b/i;
 function isDrink(name) { return DRINK_RE.test(name || ''); }
@@ -933,7 +950,8 @@ function buildModsHtml(parts) {
   let html = '';
 
   // #5 Si quitaron más de lo que queda → mostrar lo que SÍ lleva. Si no, mostrar exclusiones.
-  const toppingSins = sins.filter(isToppingSin);
+  // Orden FIJO de sustituciones (no depende del orden que manda el POS).
+  const toppingSins = sins.filter(isToppingSin).sort((a, b) => toppingRank(a) - toppingRank(b));
   const otherSins   = sins.filter(s => !isToppingSin(s));
 
   if (toppingSins.length) {
