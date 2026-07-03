@@ -5,7 +5,7 @@ const cors    = require('cors');
 const https   = require('https');
 const path    = require('path');
 // Adapter específico de Clover para promos compuestas (2 hot dogs). Solo lo usa pollClover.
-const { parseCloverCompositeModifiers, cloverComponentsForPromo, detectComponentPrefix, capFirst, hasComponent2 } = require('./cloverModifiers');
+const { parseCloverCompositeModifiers, cloverComponentsForPromo, detectComponentPrefix, capFirst, hasComponent2, shouldSplitByHotDog, splitNoteByHotdog } = require('./cloverModifiers');
 
 const app  = express();
 const PORT = 3000;
@@ -408,14 +408,12 @@ async function pollClover(loc) {
         // Parser ESPECÍFICO de Clover sobre las modificaciones (clasifica por hot dog 1/2 o general).
         const parsed = parseCloverCompositeModifiers(rawMods.filter(t => !isPL(t)));
 
-        // Notas de línea (sin llevar): numeradas → su hot dog; LIBRES → se conservan como nota (📝).
-        const freeNotes = [];
-        for (const n of noteLines.filter(t => !isPL(t))) {
-          const p = detectComponentPrefix(n);
-          if (p.componentIndex === 1)      parsed.component1.notes.push(capFirst(p.instruction));
-          else if (p.componentIndex === 2) parsed.component2.notes.push(capFirst(p.instruction));
-          else                              freeNotes.push(n); // nota libre → no se pierde
-        }
+        // Nota de línea (sin llevar): puede traer #1/#2 en una sola línea → separar por hot dog.
+        const noteClean = noteLines.filter(t => !isPL(t)).join(' ');
+        const nh = splitNoteByHotdog(noteClean);
+        nh.hotDog1.forEach(x => parsed.component1.notes.push(x));
+        nh.hotDog2.forEach(x => parsed.component2.notes.push(x));
+        const freeNotes = nh.general; // notas libres (sin #) → se conservan como 📝
 
         // details PLANO (compat: contador de producción, detección para-llevar, agrupado) — sin prefijos.
         const flatMods = [
@@ -428,7 +426,7 @@ async function pollClover(loc) {
         // Promo de 2 hot dogs (por nombre). La vista por hot dog SOLO se separa si el cliente
         // marcó el Hot Dog 2; si solo hay "1 ..." el cambio aplica a AMBOS → vista plana.
         const isPromo2 = /promo/i.test(li.name || '');
-        const splitByHotDog = isPromo2 && hasComponent2(parsed);
+        const splitByHotDog = isPromo2 && shouldSplitByHotDog(parsed);
 
         // Notas libres SIEMPRE se muestran como 📝 (no se pierden, ni en promos ni en ítems simples).
         const item = { name: li.name, qty: 1, details: detalles, note_text: freeNotes.join(' · ') };
@@ -588,7 +586,18 @@ async function pollSquare(loc) {
         const mods     = (li.modifiers || []).map(m => m.name).filter(Boolean);
         const variante = li.variation_name && !/^(regular|normal|sin\s+variaci[oó]n)$/i.test(li.variation_name) ? li.variation_name : '';
         const detalles = [variante, ...mods].filter(Boolean).join(' · ');
-        return { name: li.name, qty: parseInt(li.quantity) || 1, details: detalles, note_text: (li.note || '').trim() };
+        // Nota con #1/#2 (aunque venga en una sola línea) → vista por hot dog.
+        const nh = splitNoteByHotdog(li.note || '');
+        const isPromo2 = /promo/i.test(li.name || '');
+        const item = { name: li.name, qty: parseInt(li.quantity) || 1, details: detalles, note_text: nh.general.join(' · ') };
+        if (isPromo2 && (nh.hotDog1.length || nh.hotDog2.length)) {
+          item.components = [
+            { name: 'Hot Dog 1', mods: [], notes: nh.hotDog1 },
+            { name: 'Hot Dog 2', mods: [], notes: nh.hotDog2 },
+          ];
+          item.general = mods; // modificadores planos de Square → bloque general
+        }
+        return item;
       });
 
       // Tipo de entrega según fulfillment de Square
