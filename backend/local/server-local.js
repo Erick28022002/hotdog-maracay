@@ -160,6 +160,19 @@ function supabaseDelete(squareId) {
   req.end();
 }
 
+// Borra UNA sola fila por payment_id exacto (una ronda concreta)
+function supabaseDeleteExact(paymentId) {
+  const path = '/rest/v1/web_orders?payment_id=eq.' + encodeURIComponent(paymentId);
+  const req  = https.request({
+    hostname: SUPABASE_URL, path, method: 'DELETE',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' }
+  }, res => {
+    if (res.statusCode >= 300) { let raw = ''; res.on('data', c => raw += c); res.on('end', () => console.log(`[SUPABASE] Delete exact error ${res.statusCode}:`, raw)); }
+  });
+  req.on('error', e => console.log('[SUPABASE] Delete exact error:', e.message));
+  req.end();
+}
+
 /* ══ ALMACENAMIENTO EN MEMORIA ══════════════════════════════*/
 let orders   = [];
 let counters = {};
@@ -191,6 +204,25 @@ function aggItems(items) {
 // Firma estable de una orden: independiente del orden de líneas y modificadores
 function itemsSig(items) {
   return [...aggItems(items).entries()].map(([k, v]) => k + 'x' + v.qty).sort().join('||');
+}
+
+// Aplica adiciones y cancelaciones sobre los ítems de una ronda abierta.
+// Suma lo añadido, resta lo cancelado (sin bajar de 0) y conserva note_text.
+function applyRoundDeltas(baseItems, added, removed) {
+  const keyOf = it => (it.name || '').trim().toLowerCase() + '|' + normDetails(it.details);
+  const list = (baseItems || []).map(it => ({
+    name: it.name, details: it.details || '', qty: parseInt(it.qty) || 1, note_text: it.note_text || ''
+  }));
+  (added || []).forEach(a => {
+    const ex = list.find(it => keyOf(it) === keyOf(a));
+    if (ex) ex.qty += a.qty;
+    else list.push({ name: a.name, details: a.details || '', qty: a.qty, note_text: a.note_text || '' });
+  });
+  (removed || []).forEach(r => {
+    const ex = list.find(it => keyOf(it) === keyOf(r));
+    if (ex) ex.qty -= r.qty;
+  });
+  return list.filter(it => it.qty > 0);
 }
 
 function nextOrderNum(sede) {
@@ -431,28 +463,37 @@ async function pollClover(loc) {
           // cocinero YA preparó lo anterior (la sacó del KDS) o si todavía está pendiente.
           const status = await supabaseGetStatus(ord.id);
           if (status === 'completed') {
-            // Ya se preparó esa ronda → lo nuevo es una ronda adicional (Mesa servida)
+            // Ya se preparó esa ronda → los cambios afectan la RONDA ADICIONAL (Mesa servida):
+            // lo añadido se suma y lo CANCELADO se resta (para no preparar de más).
             const oldAgg = aggItems(existing.items);
             const newAgg = aggItems(items);
-            const addedItems = [];
+            const addedItems = [], removedItems = [];
             newAgg.forEach((v, k) => {
               const diff = v.qty - ((oldAgg.get(k) || {}).qty || 0);
               if (diff > 0) {
-                // Preservar la NOTA del ítem agregado (mensaje para preparar bien la orden)
                 const src = items.find(it => (it.name || '').trim().toLowerCase() === v.name.trim().toLowerCase()
                                           && normDetails(it.details) === normDetails(v.details) && (it.note_text || '').trim());
                 addedItems.push({ name: v.name, details: v.details, qty: diff, note_text: (src && src.note_text) || '' });
               }
             });
+            oldAgg.forEach((v, k) => {
+              const diff = v.qty - ((newAgg.get(k) || {}).qty || 0);
+              if (diff > 0) removedItems.push({ name: v.name, details: v.details, qty: diff }); // cancelado
+            });
             existing.items = items;
-            if (addedItems.length > 0) {
+            if (addedItems.length || removedItems.length) {
               const customerName = cloverCustomer(ord.title, ord.note);
-              // ¿Hay una ronda adicional AÚN sin preparar? → agrupar en ella (un solo ticket)
               const open = await supabaseGetOpenAddRound(ord.id);
               if (open && Array.isArray(open.items)) {
-                supabasePatch(open.payment_id, { items: [...open.items, ...addedItems] });
-                console.log(`[CLOVER][${loc.sede}] ${customerName} — +${addedItems.length} ítem(s) agrupados en ronda abierta`);
-              } else {
+                const merged = applyRoundDeltas(open.items, addedItems, removedItems);
+                if (merged.length === 0) {
+                  supabaseDeleteExact(open.payment_id);
+                  console.log(`[CLOVER][${loc.sede}] ${customerName} — ronda abierta vaciada por cancelación → eliminada`);
+                } else {
+                  supabasePatch(open.payment_id, { items: merged });
+                  console.log(`[CLOVER][${loc.sede}] ${customerName} — ronda abierta actualizada (+${addedItems.length}/-${removedItems.length})`);
+                }
+              } else if (addedItems.length) {
                 console.log(`[CLOVER][${loc.sede}] ${customerName} — ${addedItems.length} ítem(s) adicionales (ronda nueva)`);
                 supabaseInsert({
                   customer_name: customerName, customer_phone: '',
@@ -577,34 +618,44 @@ async function pollSquare(loc) {
           const status = await supabaseGetStatus(ord.id);
           const prepared = (status === 'completed' || status === 'packing');
           if (prepared) {
-            // Ronda anterior YA preparada → SOLO lo añadido va a una RONDA NUEVA (Mesa servida).
+            // Ronda anterior YA preparada → los cambios afectan la RONDA ADICIONAL (Mesa servida):
+            // lo añadido se suma y lo CANCELADO se resta (para no preparar de más).
             const oldAgg = aggItems(existing.items);
             const newAgg = aggItems(items);
-            const addedItems = [];
+            const addedItems = [], removedItems = [];
             newAgg.forEach((v, k) => {
               const diff = v.qty - ((oldAgg.get(k) || {}).qty || 0);
               if (diff > 0) {
-                // Preservar la NOTA del ítem agregado (mensaje para preparar bien la orden)
                 const src = items.find(it => (it.name || '').trim().toLowerCase() === v.name.trim().toLowerCase()
                                           && normDetails(it.details) === normDetails(v.details) && (it.note_text || '').trim());
                 addedItems.push({ name: v.name, details: v.details, qty: diff, note_text: (src && src.note_text) || '' });
               }
             });
+            oldAgg.forEach((v, k) => {
+              const diff = v.qty - ((newAgg.get(k) || {}).qty || 0);
+              if (diff > 0) removedItems.push({ name: v.name, details: v.details, qty: diff }); // cancelado
+            });
             existing.items = items; // actualizar caché local
-            if (addedItems.length > 0) {
+            if (addedItems.length || removedItems.length) {
               const customerName = ord.ticket_name || 'Cliente POS';
-              // ¿Hay una ronda adicional AÚN sin preparar? → agrupar en ella (un solo ticket)
               const open = await supabaseGetOpenAddRound(ord.id);
               if (open && Array.isArray(open.items)) {
-                supabasePatch(open.payment_id, { items: [...open.items, ...addedItems] });
-                console.log(`[SQUARE][${loc.sede}] ${customerName} — +${addedItems.length} ítem(s) agrupados en ronda abierta`);
-              } else {
+                // Agrupar adiciones y aplicar cancelaciones sobre la ronda abierta.
+                const merged = applyRoundDeltas(open.items, addedItems, removedItems);
+                if (merged.length === 0) {
+                  supabaseDeleteExact(open.payment_id); // se canceló todo lo pendiente
+                  console.log(`[SQUARE][${loc.sede}] ${customerName} — ronda abierta vaciada por cancelación → eliminada`);
+                } else {
+                  supabasePatch(open.payment_id, { items: merged });
+                  console.log(`[SQUARE][${loc.sede}] ${customerName} — ronda abierta actualizada (+${addedItems.length}/-${removedItems.length})`);
+                }
+              } else if (addedItems.length) {
+                // No hay ronda abierta → crear nueva con lo añadido (las cancelaciones ya preparadas no se tocan)
                 console.log(`[SQUARE][${loc.sede}] ${customerName} — ${addedItems.length} ítem(s) adicionales (ronda nueva)`);
                 supabaseInsert({
                   customer_name: customerName, customer_phone: '',
                   items: addedItems, total: 0, order_type: orderType, channel,
                   location: loc.sede, notes: 'Mesa servida', status: 'new',
-                  // ID determinista según el contenido actual → el índice único evita duplicados
                   payment_id: ord.id + '_add_' + hashStr(itemsSig(items)),
                 });
               }
