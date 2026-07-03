@@ -190,12 +190,20 @@ function normDetails(d) {
   return (d || '').split('·').map(s => s.trim().toLowerCase()).filter(Boolean).sort().join(' · ');
 }
 
-// Agrupa items por (nombre + detalles normalizados) sumando cantidades
+// Agrupa items por (nombre + detalles + NOTA + componentes) sumando cantidades.
+// Incluir nota y componentes evita fusionar dos ítems iguales con instrucciones distintas
+// (ej. dos "Promo Clásica" con notas "Elías el 2" y "#1 pura papa").
 function aggItems(items) {
   const m = new Map();
   (items || []).forEach(it => {
-    const key = (it.name || '').trim().toLowerCase() + '|' + normDetails(it.details);
-    if (!m.has(key)) m.set(key, { name: (it.name || '').trim(), details: it.details || '', qty: 0 });
+    const compSig = (it.components && it.components.length) ? JSON.stringify(it.components) : '';
+    const genSig  = (it.general && it.general.length) ? JSON.stringify(it.general) : '';
+    const key = (it.name || '').trim().toLowerCase() + '|' + normDetails(it.details)
+              + '|' + (it.note_text || '').trim().toLowerCase() + '|' + compSig + '|' + genSig;
+    if (!m.has(key)) m.set(key, {
+      name: (it.name || '').trim(), details: it.details || '', note_text: it.note_text || '',
+      components: it.components || null, general: it.general || null, qty: 0,
+    });
     m.get(key).qty += (parseInt(it.qty) || 1);
   });
   return m;
@@ -207,16 +215,21 @@ function itemsSig(items) {
 }
 
 // Aplica adiciones y cancelaciones sobre los ítems de una ronda abierta.
-// Suma lo añadido, resta lo cancelado (sin bajar de 0) y conserva note_text.
+// Suma lo añadido, resta lo cancelado (sin bajar de 0) y conserva note_text/componentes.
+// La clave incluye nota y componentes → NO fusiona ítems iguales con instrucciones distintas.
 function applyRoundDeltas(baseItems, added, removed) {
-  const keyOf = it => (it.name || '').trim().toLowerCase() + '|' + normDetails(it.details);
-  const list = (baseItems || []).map(it => ({
-    name: it.name, details: it.details || '', qty: parseInt(it.qty) || 1, note_text: it.note_text || ''
-  }));
+  const keyOf = it => (it.name || '').trim().toLowerCase() + '|' + normDetails(it.details)
+    + '|' + (it.note_text || '').trim().toLowerCase()
+    + '|' + (it.components && it.components.length ? JSON.stringify(it.components) : '');
+  const clone = it => ({
+    name: it.name, details: it.details || '', qty: parseInt(it.qty) || 1, note_text: it.note_text || '',
+    ...(it.components ? { components: it.components, general: it.general || [] } : {}),
+  });
+  const list = (baseItems || []).map(clone);
   (added || []).forEach(a => {
     const ex = list.find(it => keyOf(it) === keyOf(a));
     if (ex) ex.qty += a.qty;
-    else list.push({ name: a.name, details: a.details || '', qty: a.qty, note_text: a.note_text || '' });
+    else list.push(clone(a));
   });
   (removed || []).forEach(r => {
     const ex = list.find(it => keyOf(it) === keyOf(r));
@@ -469,14 +482,14 @@ async function pollClover(loc) {
             newAgg.forEach((v, k) => {
               const diff = v.qty - ((oldAgg.get(k) || {}).qty || 0);
               if (diff > 0) {
-                const src = items.find(it => (it.name || '').trim().toLowerCase() === v.name.trim().toLowerCase()
-                                          && normDetails(it.details) === normDetails(v.details) && (it.note_text || '').trim());
-                addedItems.push({ name: v.name, details: v.details, qty: diff, note_text: (src && src.note_text) || '' });
+                const item = { name: v.name, details: v.details, qty: diff, note_text: v.note_text || '' };
+                if (v.components) { item.components = v.components; item.general = v.general || []; }
+                addedItems.push(item);
               }
             });
             oldAgg.forEach((v, k) => {
               const diff = v.qty - ((newAgg.get(k) || {}).qty || 0);
-              if (diff > 0) removedItems.push({ name: v.name, details: v.details, qty: diff }); // cancelado
+              if (diff > 0) removedItems.push({ name: v.name, details: v.details, qty: diff, note_text: v.note_text || '', components: v.components || null }); // cancelado
             });
             existing.items = items;
             if (addedItems.length || removedItems.length) {
@@ -635,14 +648,14 @@ async function pollSquare(loc) {
             newAgg.forEach((v, k) => {
               const diff = v.qty - ((oldAgg.get(k) || {}).qty || 0);
               if (diff > 0) {
-                const src = items.find(it => (it.name || '').trim().toLowerCase() === v.name.trim().toLowerCase()
-                                          && normDetails(it.details) === normDetails(v.details) && (it.note_text || '').trim());
-                addedItems.push({ name: v.name, details: v.details, qty: diff, note_text: (src && src.note_text) || '' });
+                const item = { name: v.name, details: v.details, qty: diff, note_text: v.note_text || '' };
+                if (v.components) { item.components = v.components; item.general = v.general || []; }
+                addedItems.push(item);
               }
             });
             oldAgg.forEach((v, k) => {
               const diff = v.qty - ((newAgg.get(k) || {}).qty || 0);
-              if (diff > 0) removedItems.push({ name: v.name, details: v.details, qty: diff }); // cancelado
+              if (diff > 0) removedItems.push({ name: v.name, details: v.details, qty: diff, note_text: v.note_text || '', components: v.components || null }); // cancelado
             });
             existing.items = items; // actualizar caché local
             if (addedItems.length || removedItems.length) {
