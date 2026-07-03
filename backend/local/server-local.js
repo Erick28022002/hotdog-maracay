@@ -110,6 +110,33 @@ function supabaseGetStatus(paymentId) {
   });
 }
 
+// Devuelve la ronda adicional (Mesa servida) de una orden que AÚN no se ha preparado
+// (status new), la más reciente → {payment_id, items} o null. Para agrupar pedidos
+// sucesivos de una mesa ya servida en un mismo ticket mientras no se marquen preparados.
+function supabaseGetOpenAddRound(orderId) {
+  return new Promise(resolve => {
+    let done = false;
+    const timer = setTimeout(() => { if (!done) { done = true; resolve(null); } }, 5000);
+    const path = '/rest/v1/web_orders?select=payment_id,items&status=eq.new'
+      + '&payment_id=like.' + encodeURIComponent(orderId + '_add_') + '*'
+      + '&order=created_at.desc&limit=1';
+    const req = https.request({
+      hostname: SUPABASE_URL, path, method: 'GET',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    }, res => {
+      let raw = '';
+      res.on('data', c => raw += c);
+      res.on('end', () => {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        try { const a = JSON.parse(raw); resolve(a && a[0] ? a[0] : null); } catch(e) { resolve(null); }
+      });
+    });
+    req.on('error', () => { if (!done) { done = true; clearTimeout(timer); resolve(null); } });
+    req.end();
+  });
+}
+
 function supabaseDelete(squareId) {
   // Borra la orden principal y sus adicionales (payment_id que empiezan igual)
   const path = '/rest/v1/web_orders?payment_id=like.' + encodeURIComponent(squareId) + '*';
@@ -420,13 +447,20 @@ async function pollClover(loc) {
             existing.items = items;
             if (addedItems.length > 0) {
               const customerName = cloverCustomer(ord.title, ord.note);
-              console.log(`[CLOVER][${loc.sede}] ${customerName} — ${addedItems.length} ítem(s) adicionales (ronda nueva)`);
-              supabaseInsert({
-                customer_name: customerName, customer_phone: '',
-                items: addedItems, total: 0, order_type: orderType, channel,
-                location: loc.sede, notes: 'Mesa servida', status: 'new',
-                payment_id: ord.id + '_add_' + hashStr(itemsSig(items)),
-              });
+              // ¿Hay una ronda adicional AÚN sin preparar? → agrupar en ella (un solo ticket)
+              const open = await supabaseGetOpenAddRound(ord.id);
+              if (open && Array.isArray(open.items)) {
+                supabasePatch(open.payment_id, { items: [...open.items, ...addedItems] });
+                console.log(`[CLOVER][${loc.sede}] ${customerName} — +${addedItems.length} ítem(s) agrupados en ronda abierta`);
+              } else {
+                console.log(`[CLOVER][${loc.sede}] ${customerName} — ${addedItems.length} ítem(s) adicionales (ronda nueva)`);
+                supabaseInsert({
+                  customer_name: customerName, customer_phone: '',
+                  items: addedItems, total: 0, order_type: orderType, channel,
+                  location: loc.sede, notes: 'Mesa servida', status: 'new',
+                  payment_id: ord.id + '_add_' + hashStr(itemsSig(items)),
+                });
+              }
             }
           } else {
             // Aún pendiente en el KDS → actualizar EL MISMO ticket (no duplicar)
@@ -559,14 +593,21 @@ async function pollSquare(loc) {
             existing.items = items; // actualizar caché local
             if (addedItems.length > 0) {
               const customerName = ord.ticket_name || 'Cliente POS';
-              console.log(`[SQUARE][${loc.sede}] ${customerName} — ${addedItems.length} ítem(s) adicionales (ronda nueva)`);
-              supabaseInsert({
-                customer_name: customerName, customer_phone: '',
-                items: addedItems, total: 0, order_type: orderType, channel,
-                location: loc.sede, notes: 'Mesa servida', status: 'new',
-                // ID determinista según el contenido actual → el índice único evita duplicados
-                payment_id: ord.id + '_add_' + hashStr(itemsSig(items)),
-              });
+              // ¿Hay una ronda adicional AÚN sin preparar? → agrupar en ella (un solo ticket)
+              const open = await supabaseGetOpenAddRound(ord.id);
+              if (open && Array.isArray(open.items)) {
+                supabasePatch(open.payment_id, { items: [...open.items, ...addedItems] });
+                console.log(`[SQUARE][${loc.sede}] ${customerName} — +${addedItems.length} ítem(s) agrupados en ronda abierta`);
+              } else {
+                console.log(`[SQUARE][${loc.sede}] ${customerName} — ${addedItems.length} ítem(s) adicionales (ronda nueva)`);
+                supabaseInsert({
+                  customer_name: customerName, customer_phone: '',
+                  items: addedItems, total: 0, order_type: orderType, channel,
+                  location: loc.sede, notes: 'Mesa servida', status: 'new',
+                  // ID determinista según el contenido actual → el índice único evita duplicados
+                  payment_id: ord.id + '_add_' + hashStr(itemsSig(items)),
+                });
+              }
             }
           } else {
             // Ronda original AÚN pendiente → actualizar EL MISMO ticket con la versión
