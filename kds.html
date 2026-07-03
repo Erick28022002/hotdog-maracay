@@ -1156,6 +1156,9 @@ function render() {
       // Quitar "llevar"/"para llevar" antes de parsear mods — así si queda vacío aparece CON TODO
       const cleanDetails  = stripDrinkMods(rawDetails.replace(/\s*·?\s*(para\s+)?llevar\s*·?\s*/gi, ' ').trim().replace(/^\s*·|·\s*$/g, '').trim());
       const pm            = productMatch(it.name || '');
+      const noteText      = (it.note_text || '').trim();
+      // nota real (no solo "llevar"): es una instrucción específica de cómo quieren el producto
+      const hasNote       = noteText && !/^(para\s+)?llevar$/i.test(noteText);
       let contentHtml;
       if (it.components && it.components.length) {
         // ── Clover compuesto: Hot Dog 1 / Hot Dog 2 (+ general) ──
@@ -1178,12 +1181,10 @@ function render() {
         contentHtml = html;
       } else {
         const modsHtml    = parseMods(cleanDetails, it.name || '');
-        contentHtml       = modsHtml || (pm ? '<div class="tk-mod keep">✔ CON TODO</div>' : '');
+        // Si hay una NOTA y NINGÚN modificador, la nota ES la instrucción → NO mostrar "CON TODO".
+        contentHtml       = modsHtml || ((pm && !hasNote) ? '<div class="tk-mod keep">✔ CON TODO</div>' : '');
       }
-      const noteText      = (it.note_text || '').trim();
-      // si la nota es solo "llevar"/"para llevar" no la repetimos (ya se muestra como PARA LLEVAR)
-      const noteIsJustLlevar = /^(para\s+)?llevar$/i.test(noteText);
-      const noteHtml      = (noteText && !noteIsJustLlevar) ? '<div class="tk-mod item-note">📝 ' + esc(noteText.toUpperCase()) + '</div>' : '';
+      const noteHtml      = hasNote ? '<div class="tk-mod item-note">📝 ' + esc(noteText.toUpperCase()) + '</div>' : '';
       const llevarHtml    = isItemTakeout ? '<div class="tk-mod" style="color:#555;font-weight:700;font-size:13px;margin-top:1px">PARA LLEVAR</div>' : '';
       const displayMods   = contentHtml + noteHtml + llevarHtml;
       const sep = idx < groupedItems.length - 1 ? '<div class="tk-item-sep"></div>' : '';

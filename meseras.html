@@ -1157,11 +1157,12 @@ function render() {
       const cleanDetails  = stripDrinkMods(rawDetails.replace(/\s*·?\s*(para\s+)?llevar\s*·?\s*/gi, ' ').trim().replace(/^\s*·|·\s*$/g, '').trim());
       const modsHtml      = parseMods(cleanDetails, it.name || '');
       const pm            = productMatch(it.name || '');
-      const contentHtml   = modsHtml || (pm ? '<div class="tk-mod keep">✔ CON TODO</div>' : '');
       const noteText      = (it.note_text || '').trim();
-      // si la nota es solo "llevar"/"para llevar" no la repetimos (ya se muestra como PARA LLEVAR)
-      const noteIsJustLlevar = /^(para\s+)?llevar$/i.test(noteText);
-      const noteHtml      = (noteText && !noteIsJustLlevar) ? '<div class="tk-mod item-note">📝 ' + esc(noteText.toUpperCase()) + '</div>' : '';
+      // nota real (no solo "llevar"): es una instrucción específica de cómo quieren el producto
+      const hasNote       = noteText && !/^(para\s+)?llevar$/i.test(noteText);
+      // Si hay una NOTA y NINGÚN modificador, la nota ES la instrucción → NO mostrar "CON TODO".
+      const contentHtml   = modsHtml || ((pm && !hasNote) ? '<div class="tk-mod keep">✔ CON TODO</div>' : '');
+      const noteHtml      = hasNote ? '<div class="tk-mod item-note">📝 ' + esc(noteText.toUpperCase()) + '</div>' : '';
       const llevarHtml    = isItemTakeout ? '<div class="tk-mod" style="color:#555;font-weight:700;font-size:13px;margin-top:1px">PARA LLEVAR</div>' : '';
       const displayMods   = contentHtml + noteHtml + llevarHtml;
       const drinkCls = isDrink(it.name) ? ' is-drink' : '';
