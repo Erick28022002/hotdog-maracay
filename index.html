@@ -182,13 +182,13 @@ main{display:block;margin:0;padding:0}
 a{color:inherit;text-decoration:none}
 
 /* ── NEON UTILITIES ── */
-.n-mango{color:var(--mango);text-shadow:0 0 20px rgba(250,168,60,.7),0 0 50px rgba(250,168,60,.35)}
-.n-blue{color:var(--blue);text-shadow:0 0 20px rgba(0,167,209,.8),0 0 50px rgba(0,167,209,.4)}
-.n-fucsia{color:var(--fucsia);text-shadow:0 0 20px rgba(203,92,149,.8),0 0 50px rgba(203,92,149,.4)}
-.n-terra{color:var(--terra);text-shadow:0 0 16px rgba(241,98,67,.7),0 0 40px rgba(241,98,67,.35)}
-.stroke-mango{color:transparent;-webkit-text-stroke:2px var(--mango);text-shadow:0 0 40px rgba(250,168,60,.5)}
-.stroke-blue{color:transparent;-webkit-text-stroke:2px var(--blue);text-shadow:0 0 40px rgba(0,167,209,.6)}
-.stroke-fucsia{color:transparent;-webkit-text-stroke:2px var(--fucsia);text-shadow:0 0 40px rgba(203,92,149,.6)}
+.n-mango{color:var(--mango);text-shadow:0 0 14px rgba(250,168,60,.42),0 0 30px rgba(250,168,60,.16)}
+.n-blue{color:var(--blue);text-shadow:0 0 14px rgba(0,167,209,.42),0 0 30px rgba(0,167,209,.18)}
+.n-fucsia{color:var(--fucsia);text-shadow:0 0 14px rgba(203,92,149,.42),0 0 30px rgba(203,92,149,.18)}
+.n-terra{color:var(--terra);text-shadow:0 0 10px rgba(241,98,67,.36),0 0 22px rgba(241,98,67,.15)}
+.stroke-mango{color:transparent;-webkit-text-stroke:2px var(--mango);text-shadow:0 0 22px rgba(250,168,60,.28)}
+.stroke-blue{color:transparent;-webkit-text-stroke:2px var(--blue);text-shadow:0 0 22px rgba(0,167,209,.30)}
+.stroke-fucsia{color:transparent;-webkit-text-stroke:2px var(--fucsia);text-shadow:0 0 22px rgba(203,92,149,.30)}
 
 /* ── NAV ── */
 nav{
@@ -202,7 +202,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 .nav-logo{
   font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;
   color:var(--mango);display:flex;align-items:center;gap:8px;
-  text-shadow:0 0 16px rgba(250,168,60,.5);
+  text-shadow:0 0 10px rgba(250,168,60,.3);
 }
 .nav-links{display:flex;gap:36px}
 .nav-links a{font-size:12px;font-weight:700;color:var(--mu);transition:color .2s;letter-spacing:.8px;text-transform:uppercase}
@@ -293,7 +293,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 .stat-num{
   font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--mango);
   line-height:1;letter-spacing:1px;
-  text-shadow:0 0 24px rgba(250,168,60,.5);
+  text-shadow:0 0 14px rgba(250,168,60,.28);
 }
 .stat-lbl{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:1.5px;margin-top:4px;text-transform:uppercase}
 .hero-mascot{
@@ -342,10 +342,11 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 
 /* ── HISTORIA ── */
 .historia-sec{background:var(--bg);padding:120px 60px;position:relative;overflow:hidden}
-.historia-sec::before{
-  content:'2014';font-family:'Bebas Neue',sans-serif;font-size:360px;
-  color:rgba(250,168,60,.03);position:absolute;right:-40px;top:50%;
+.historia-bg-year{
+  font-family:'Bebas Neue',sans-serif;font-size:360px;
+  color:rgba(250,168,60,.06);position:absolute;right:-40px;top:50%;
   transform:translateY(-50%);line-height:1;pointer-events:none;letter-spacing:-10px;
+  opacity:0;user-select:none;
 }
 .hist-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1280px;margin:0 auto}
 .hist-img-wrap{border-radius:24px;overflow:hidden;height:520px;position:relative}
@@ -414,7 +415,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 .promo-card:hover{border-color:rgba(250,168,60,.4)}
 .promo-left{padding:44px;display:flex;flex-direction:column;justify-content:center}
 .promo-eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--terra);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.promo-title{font-family:'Bebas Neue',sans-serif;font-size:54px;color:var(--mango);letter-spacing:1px;line-height:.95;margin-bottom:12px;text-shadow:0 0 30px rgba(250,168,60,.3)}
+.promo-title{font-family:'Bebas Neue',sans-serif;font-size:54px;color:var(--mango);letter-spacing:1px;line-height:.95;margin-bottom:12px;text-shadow:0 0 16px rgba(250,168,60,.18)}
 .promo-desc{font-size:14px;color:rgba(245,240,232,.6);line-height:1.65;margin-bottom:24px;font-weight:400}
 .promo-right{position:relative;overflow:hidden}
 .promo-right img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
@@ -447,7 +448,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 .mcard-footer{display:flex;align-items:center;justify-content:space-between}
 .mcard-price{
   font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--mango);
-  letter-spacing:1px;text-shadow:0 0 20px rgba(250,168,60,.4);
+  letter-spacing:1px;text-shadow:0 0 12px rgba(250,168,60,.2);
 }
 .add-btn{
   background:linear-gradient(135deg,var(--mango),var(--terra));color:#000;
@@ -480,6 +481,24 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 .app-info p{font-size:12px;color:var(--mu);font-weight:400}
 .app-arrow{margin-left:auto;color:var(--mango);font-size:26px;flex-shrink:0;transition:transform .2s}
 .app-card:hover .app-arrow{transform:translateX(6px)}
+.app-card{cursor:pointer}
+/* ── DELIVERY SEDE SELECTOR ── */
+.delivery-sede-card{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1.5px solid var(--b);border-radius:14px;padding:16px 20px;transition:border-color .2s,background .2s;color:var(--txt);text-decoration:none;gap:12px}
+.delivery-sede-card:hover:not(.disabled){border-color:var(--mango);background:rgba(250,168,60,.06)}
+.delivery-sede-card.disabled{opacity:.35;pointer-events:none}
+.dsc-ico{font-size:22px;flex-shrink:0}
+.dsc-info{flex:1;min-width:0}
+.dsc-name{font-weight:800;font-size:15px;margin-bottom:3px}
+.dsc-sub{font-size:12px;color:var(--mu)}
+.dsc-arrow{color:var(--mango);font-size:20px;flex-shrink:0;transition:transform .2s}
+.delivery-sede-card:hover:not(.disabled) .dsc-arrow{transform:translateX(4px)}
+#deliveryModal{align-items:center;padding:24px}
+#deliveryModal .modal{border-radius:24px;max-width:420px;width:100%;min-height:auto}
+#deliveryModal .modal::before{display:none}
+#sedeConfirmModal{align-items:center;padding:24px;z-index:350}
+#sedeConfirmModal .modal{border-radius:24px;max-width:360px;width:100%;min-height:auto}
+#sedeConfirmModal .modal::before{display:none}
+.form-sel option[value=""]{color:var(--mu)}
 
 /* ── LOCATIONS ── */
 .loc-sec{background:var(--s1);border-bottom:1px solid var(--b)}
@@ -497,7 +516,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 .loc-num{
   font-family:'Bebas Neue',sans-serif;font-size:110px;
   color:transparent;-webkit-text-stroke:2px var(--mango);
-  text-shadow:0 0 40px rgba(250,168,60,.6),0 0 80px rgba(250,168,60,.25);
+  text-shadow:0 0 22px rgba(250,168,60,.32),0 0 48px rgba(250,168,60,.14);
   line-height:1;margin-bottom:-14px;letter-spacing:-2px;
 }
 .loc-name{font-weight:900;font-size:34px;margin-bottom:12px;letter-spacing:.3px}
@@ -529,9 +548,9 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 }
 .rev-big-score{
   font-family:'Bebas Neue',sans-serif;font-size:140px;color:var(--mango);
-  line-height:1;text-shadow:0 0 40px rgba(250,168,60,.5);
+  line-height:1;text-shadow:0 0 22px rgba(250,168,60,.28);
 }
-.rev-stars-big{font-size:30px;color:var(--mango);letter-spacing:4px;display:block;margin-bottom:8px;text-shadow:0 0 16px rgba(250,168,60,.5)}
+.rev-stars-big{font-size:30px;color:var(--mango);letter-spacing:4px;display:block;margin-bottom:8px;text-shadow:0 0 10px rgba(250,168,60,.28)}
 .rev-meta h3{font-size:22px;font-weight:800;margin-bottom:8px}
 .rev-meta p{color:var(--mu);font-size:14px;font-weight:400}
 .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -548,7 +567,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 /* ── GALLERY ── */
 .gallery-sec{background:var(--s1);border-top:1px solid var(--b)}
 .gallery-grid{
-  margin-top:48px;display:grid;
+  margin-top:0;display:grid;
   grid-template-columns:2fr 1fr 1fr;grid-template-rows:280px 280px;gap:12px;
 }
 .g-item{border-radius:16px;overflow:hidden;background:var(--s2);position:relative;opacity:0;transform:scale(.97)}
@@ -574,7 +593,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 }
 .bn-item{
   display:flex;flex-direction:column;align-items:center;gap:4px;
-  color:rgba(255,255,255,.35);font-size:9px;font-weight:600;letter-spacing:.4px;
+  color:rgba(255,255,255,.72);font-size:9px;font-weight:600;letter-spacing:.4px;
   text-transform:uppercase;cursor:pointer;padding:4px 10px;
   transition:color .2s;border:none;background:none;min-width:44px;
 }
@@ -584,7 +603,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
   display:flex;align-items:center;justify-content:center;
   width:24px;height:24px;position:relative;
 }
-.bn-ico svg{width:22px;height:22px;stroke:rgba(255,255,255,.35);transition:stroke .2s}
+.bn-ico svg{width:22px;height:22px;stroke:rgba(255,255,255,.72);stroke-width:2.2;transition:stroke .2s}
 .bn-item:hover .bn-ico svg,.bn-item.active .bn-ico svg{stroke:var(--mango)}
 .bn-cart{position:relative}
 .bn-badge{
@@ -626,7 +645,7 @@ nav.scrolled{background:rgba(12,12,12,.98);border-top-color:rgba(250,168,60,.15)
 
 /* ── FOOTER ── */
 footer{background:var(--s1);border-top:1px solid var(--b);padding:80px 60px 40px}
-.foot-top-line{height:2px;background:linear-gradient(90deg,var(--mango),var(--terra),var(--fucsia),var(--blue));margin-bottom:80px;border-radius:2px}
+.foot-top-line{height:1px;background:var(--mango);margin-bottom:80px;box-shadow:0 0 12px rgba(250,168,60,.35)}
 .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;max-width:1280px;margin:0 auto 56px}
 .foot-logo{
   font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;
@@ -732,7 +751,7 @@ body{background:transparent}
   .rev-hero{grid-template-columns:1fr;gap:20px;padding:32px 24px}
   .gallery-grid{grid-template-columns:1fr 1fr}
   .foot-grid{grid-template-columns:1fr}
-  .historia-sec::before{font-size:160px}
+  .historia-bg-year{font-size:160px;right:-20px}
   .promo-card{grid-template-columns:1fr}
   .promo-right{height:220px}
   .promo-left{padding:28px 24px}
@@ -809,7 +828,7 @@ body{background:transparent}
 }
 @media(max-width:768px){
   .modal{min-height:88dvh}
-  #successModal .modal{min-height:auto}
+  #successModal .modal,#deliveryModal .modal{min-height:auto}
 }
 .modal-hdr{padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .modal-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px}
@@ -880,9 +899,7 @@ body{background:transparent}
 
 <!-- BOTTOM NAV (móvil) -->
 <nav class="bottom-nav" aria-label="Navegación principal móvil">
-  <button class="bn-item" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-    <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Inicio
-  </button>
+
   <button class="bn-item" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">
     <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="2" x2="8" y2="6"/><line x1="8" y1="10" x2="8" y2="22"/><path d="M6 2v4a2 2 0 0 0 4 0V2"/><line x1="16" y1="2" x2="16" y2="22"/></svg></span>Menú
   </button>
@@ -988,6 +1005,7 @@ body{background:transparent}
 
 <!-- HISTORIA Y ORIGEN -->
 <section class="historia-sec" id="historia">
+  <div class="historia-bg-year" aria-hidden="true">2014</div>
   <div class="hist-grid">
     <div style="position:relative">
       <div class="hist-img-wrap">
@@ -1124,26 +1142,26 @@ body{background:transparent}
     <h2 class="sec-title">PÍDELO DESDE<br><span class="n-blue">DONDE ESTÉS</span></h2>
     <p class="sec-sub">Disponibles en las principales plataformas de Miami.</p>
     <div class="delivery-grid">
-      <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer" class="app-card">
+      <div class="app-card" onclick="openDeliveryModal('ubereats')" role="button" tabindex="0">
         <div class="app-logo" style="background:#142328;padding:8px"><img src="fotos/logo-ubereats.webp" alt="Uber Eats" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
-        <div class="app-info"><h3>Uber Eats</h3><p>Pide y rastrea tu orden en tiempo real</p></div>
+        <div class="app-info"><h3>Uber Eats</h3><p>Elige tu sede y pide en tiempo real</p></div>
         <span class="app-arrow">→</span>
-      </a>
-      <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" rel="noopener noreferrer" class="app-card">
+      </div>
+      <div class="app-card" onclick="openDeliveryModal('doordash')" role="button" tabindex="0">
         <div class="app-logo" style="background:#fff;padding:8px"><img src="fotos/logo-doordash.webp" alt="DoorDash" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
-        <div class="app-info"><h3>DoorDash</h3><p>Delivery rápido a tu puerta</p></div>
+        <div class="app-info"><h3>DoorDash</h3><p>Delivery rápido · Elige tu sede</p></div>
         <span class="app-arrow">→</span>
-      </a>
-      <a href="https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152" target="_blank" rel="noopener noreferrer" class="app-card">
+      </div>
+      <div class="app-card" onclick="openDeliveryModal('grubhub')" role="button" tabindex="0">
         <div class="app-logo" style="background:#fff;padding:8px"><img src="fotos/logo-grubhub.webp" alt="GrubHub" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
-        <div class="app-info"><h3>GrubHub</h3><p>Ordena online con seguimiento</p></div>
+        <div class="app-info"><h3>GrubHub</h3><p>Ordena online · Elige tu sede</p></div>
         <span class="app-arrow">→</span>
-      </a>
-      <a href="https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer" class="app-card">
+      </div>
+      <div class="app-card" onclick="openDeliveryModal('postmates')" role="button" tabindex="0">
         <div class="app-logo" style="background:#000;padding:8px"><img src="fotos/logo-postmates.webp" alt="Postmates" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
-        <div class="app-info"><h3>Postmates</h3><p>Delivery express en Miami</p></div>
+        <div class="app-info"><h3>Postmates</h3><p>Delivery express · Elige tu sede</p></div>
         <span class="app-arrow">→</span>
-      </a>
+      </div>
     </div>
   </div>
 </section>
@@ -1157,26 +1175,23 @@ body{background:transparent}
     <div class="loc-list">
 
       <div class="loc-item loc-reveal">
-        <div class="loc-img-wrap">
-          <img src="fotos/sede-northmiami.webp" alt="Hot Dog Maracay North Miami Beach" class="loc-par" loading="lazy" width="600" height="400">
-        </div>
         <div>
           <div class="loc-num">01</div>
-          <div class="loc-name">North Miami Beach</div>
-          <div class="loc-addr">18315 West Dixie Highway<br>North Miami Beach, FL<br><span style="color:var(--blue)">📸 @hotdogmaracaynorthmiami</span></div>
+          <div class="loc-name">Downtown Miami</div>
+          <div class="loc-addr">Downtown Miami, FL<br>En el corazón de la ciudad<br><span style="color:var(--blue)">📸 @hotdogmaracaymiami</span></div>
           <div class="loc-btns">
-            <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank" rel="noopener noreferrer"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
-            <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Uber Eats</button></a>
-            <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" rel="noopener noreferrer"><button class="loc-btn">DoorDash</button></a>
-            <a href="https://www.instagram.com/hotdogmaracaynorthmiami" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Instagram</button></a>
+            <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank" rel="noopener noreferrer"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
+            <a href="https://www.ubereats.com/store/hot-dog-maracay-miamidowntown/xU2LTXX1VQioO0iuyW-Lvg" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Uber Eats</button></a>
+            <a href="https://www.doordash.com/store/hot-dog-maracay-miami-27691950/31795151/" target="_blank" rel="noopener noreferrer"><button class="loc-btn">DoorDash</button></a>
+            <a href="https://www.instagram.com/hotdogmaracaymiami" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Instagram</button></a>
           </div>
+        </div>
+        <div class="loc-img-wrap">
+          <img src="fotos/sede-downtown.webp" alt="Hot Dog Maracay Downtown Miami" class="loc-par" loading="lazy" width="600" height="400">
         </div>
       </div>
 
       <div class="loc-item rev loc-reveal">
-        <div class="loc-img-wrap">
-          <img src="fotos/sede-doral.webp" alt="Hot Dog Maracay Doral Miami" class="loc-par" loading="lazy" width="600" height="400">
-        </div>
         <div>
           <div class="loc-num">02</div>
           <div class="loc-name">Doral</div>
@@ -1188,22 +1203,25 @@ body{background:transparent}
             <a href="https://www.instagram.com/hotdogmaracaydoral" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Instagram</button></a>
           </div>
         </div>
+        <div class="loc-img-wrap">
+          <img src="fotos/sede-doral.webp" alt="Hot Dog Maracay Doral Miami" class="loc-par" loading="lazy" width="600" height="400">
+        </div>
       </div>
 
       <div class="loc-item loc-reveal">
-        <div class="loc-img-wrap">
-          <img src="fotos/sede-downtown.webp" alt="Hot Dog Maracay Downtown Miami" class="loc-par" loading="lazy" width="600" height="400">
-        </div>
         <div>
           <div class="loc-num">03</div>
-          <div class="loc-name">Downtown Miami</div>
-          <div class="loc-addr">Downtown Miami, FL<br>En el corazón de la ciudad<br><span style="color:var(--blue)">📸 @hotdogmaracaymiami</span></div>
+          <div class="loc-name">North Miami Beach</div>
+          <div class="loc-addr">18315 West Dixie Highway<br>North Miami Beach, FL<br><span style="color:var(--blue)">📸 @hotdogmaracaynorthmiami</span></div>
           <div class="loc-btns">
-            <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank" rel="noopener noreferrer"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
-            <a href="https://www.ubereats.com/store/hot-dog-maracay-miamidowntown/xU2LTXX1VQioO0iuyW-Lvg" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Uber Eats</button></a>
-            <a href="https://www.doordash.com/store/hot-dog-maracay-miami-27691950/31795151/" target="_blank" rel="noopener noreferrer"><button class="loc-btn">DoorDash</button></a>
-            <a href="https://www.instagram.com/hotdogmaracaymiami" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Instagram</button></a>
+            <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank" rel="noopener noreferrer"><button class="loc-btn primary">📍 Cómo Llegar</button></a>
+            <a href="https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Uber Eats</button></a>
+            <a href="https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/" target="_blank" rel="noopener noreferrer"><button class="loc-btn">DoorDash</button></a>
+            <a href="https://www.instagram.com/hotdogmaracaynorthmiami" target="_blank" rel="noopener noreferrer"><button class="loc-btn">Instagram</button></a>
           </div>
+        </div>
+        <div class="loc-img-wrap">
+          <img src="fotos/sede-northmiami.webp" alt="Hot Dog Maracay North Miami Beach" class="loc-par" loading="lazy" width="600" height="400">
         </div>
       </div>
 
@@ -1247,8 +1265,6 @@ body{background:transparent}
 <!-- GALLERY -->
 <section class="sec gallery-sec" id="gallery">
   <div class="container">
-    <span class="sec-tag">Galería</span>
-    <h2 class="sec-title">UN VISTAZO A<br><span class="n-mango">NUESTRA COCINA</span></h2>
     <div class="gallery-grid">
       <div class="g-item"><img src="fotos/ig-queso-bowl.webp" alt="Queso Amarillo Hotdog Maracay"><div class="g-overlay"></div></div>
       <div class="g-item"><img src="fotos/ig-promo-dos.webp" alt="Promo Dos Hot Dogs"><div class="g-overlay"></div></div>
@@ -1263,7 +1279,6 @@ body{background:transparent}
 <!-- REELS -->
 <section class="sec reels-sec" id="reels">
   <div class="container">
-    <span class="sec-tag">Instagram Reels</span>
     <h2 class="sec-title">NUESTRA<br><span class="n-fucsia">VIBRA EN VIDEO</span></h2>
     <div class="reels-grid">
       <div class="reel-item" onclick="toggleReel(this)">
@@ -1305,7 +1320,6 @@ body{background:transparent}
 <!-- SOCIAL -->
 <section class="sec social-sec" id="social">
   <div class="container">
-    <span class="sec-tag">Síguenos</span>
     <h2 class="sec-title" style="margin-bottom:16px">ÚNETE A LA<br><span class="n-blue">COMUNIDAD</span></h2>
     <p class="sec-sub" style="margin:0 auto;text-align:center">Promociones, fotos y la vibra venezolana todos los días en Instagram.</p>
     <div class="soc-grid">
@@ -1342,9 +1356,9 @@ body{background:transparent}
     </div>
     <div class="foot-col">
       <h4>Ubicaciones</h4>
-      <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank" rel="noopener noreferrer">North Miami Beach</a>
-      <a href="https://maps.app.goo.gl/kardweeJUDwJCdUV7" target="_blank" rel="noopener noreferrer">Doral</a>
       <a href="https://maps.app.goo.gl/j9nM2PnfRcf7auty7" target="_blank" rel="noopener noreferrer">Downtown Miami</a>
+      <a href="https://maps.app.goo.gl/kardweeJUDwJCdUV7" target="_blank" rel="noopener noreferrer">Doral</a>
+      <a href="https://maps.app.goo.gl/udhXrQAexfawSpyk9" target="_blank" rel="noopener noreferrer">North Miami Beach</a>
     </div>
   </div>
   <div class="foot-bottom">
@@ -1352,6 +1366,35 @@ body{background:transparent}
     <p>Hecho con ❤️ para la comunidad venezolana en Miami</p>
   </div>
 </footer>
+
+<!-- SEDE CONFIRM MODAL -->
+<div class="modal-wrap" id="sedeConfirmModal">
+  <div class="modal">
+    <div class="modal-body" style="padding-top:32px;text-align:center">
+      <div style="font-size:44px;margin-bottom:14px">📍</div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:10px">¿CONFIRMAR SEDE?</h3>
+      <p id="sedeConfirmText" style="font-size:14px;color:var(--mu);line-height:1.65;margin-bottom:28px"></p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="checkout-btn" onclick="acceptSede()">✓ Sí, ordenar aquí</button>
+        <button onclick="cancelSede()" style="background:none;border:1.5px solid var(--b2);color:var(--mu);font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;padding:13px;border-radius:12px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--mango)'" onmouseout="this.style.borderColor='var(--b2)'">Cambiar sede</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY SEDE MODAL -->
+<div class="modal-wrap" id="deliveryModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="deliveryModalTitle">ELIGE TU SEDE</h2>
+      <button class="modal-x" onclick="closeDeliveryModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--mu);margin-bottom:20px">¿Desde cuál sede deseas pedir?</p>
+      <div id="deliverySedeList" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+</div>
 
 <!-- CUSTOM MODAL -->
 <div class="modal-wrap" id="customModal">
@@ -1409,14 +1452,14 @@ body{background:transparent}
       <div class="form-grp"><label class="form-lbl">Tipo de Orden</label>
         <select class="form-sel" id="cType">
           <option value="pickup">📍 Pickup — Recoger en el local</option>
-          <option value="delivery">🛵 Delivery (via app)</option>
         </select>
       </div>
       <div class="form-grp"><label class="form-lbl">Ubicación</label>
-        <select class="form-sel" id="cLoc">
-          <option value="nmb">North Miami Beach — 18315 W Dixie Hwy</option>
-          <option value="doral">Doral</option>
+        <select class="form-sel" id="cLoc" onchange="confirmSede(this)" required>
+          <option value="" disabled selected>Selecciona tu sede</option>
           <option value="downtown">Downtown Miami</option>
+          <option value="doral">Doral</option>
+          <option value="nmb">North Miami Beach — 18315 W Dixie Hwy</option>
         </select>
       </div>
       <div class="form-grp"><label class="form-lbl">Notas (opcional)</label><input class="form-inp" id="cNotes" placeholder="Ej: sin cebolla, extra salsa..." maxlength="300"></div>
@@ -1471,7 +1514,9 @@ tl.to('#heroTag',    { opacity:1, y:0, duration:.6, ease:'power2.out' })
   .to('.hero-desc',  { opacity:1, y:0, duration:.7, ease:'power2.out' }, '-=.4')
   .to('.hero-btns',  { opacity:1, y:0, duration:.6, ease:'power2.out' }, '-=.4')
   .to('#heroStats',  { opacity:1, duration:.7 }, '-=.3')
-  .to('#heroMascot', { opacity:1, x:0, duration:1.3, ease:'power3.out' }, '-=1.5');
+  .to('#heroMascot', { opacity:1, x:0, duration:1.3, ease:'power3.out',
+    onComplete:()=>{ gsap.to('#heroMascot',{y:-12,duration:2,repeat:-1,yoyo:true,ease:'power1.inOut'}); }
+  }, '-=1.5');
 
 /* ── HERO PARALLAX (solo escritorio) ── */
 if (window.innerWidth > 768) {
@@ -1555,6 +1600,10 @@ gsap.from('.hist-grid > *',{
   opacity:0, y:60, duration:.9, stagger:.2, ease:'power2.out',
   scrollTrigger:{ trigger:'.hist-grid', start:'top 80%' }
 });
+gsap.to('.historia-bg-year',{
+  opacity:1, duration:1.6, ease:'power2.out',
+  scrollTrigger:{ trigger:'.historia-sec', start:'top 65%', once:true }
+});
 
 /* ── MENU TABS ── */
 function switchTab(cat, btn) {
@@ -1606,6 +1655,66 @@ gsap.to('.soc-btn',{
   opacity:1, y:0, duration:.6, stagger:.12, ease:'power2.out',
   scrollTrigger:{ trigger:'.soc-grid', start:'top 85%' }
 });
+
+/* ── DELIVERY SEDE SELECTOR ── */
+const DELIVERY_DATA = {
+  ubereats: {
+    name: 'Uber Eats',
+    sedes: [
+      { ico:'🌆', name:'Downtown Miami',   sub:'En el corazón de la ciudad',        url:'https://www.ubereats.com/store/hot-dog-maracay-miamidowntown/xU2LTXX1VQioO0iuyW-Lvg' },
+      { ico:'🌴', name:'Doral',            sub:'La capital venezolana de Miami',     url:'https://www.ubereats.com/store/hot-dog-maracay-miami/CEtjUmJEUWWz1Rqa3tteIQ' },
+      { ico:'📍', name:'North Miami Beach', sub:'18315 West Dixie Highway',           url:'https://www.ubereats.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow' }
+    ]
+  },
+  doordash: {
+    name: 'DoorDash',
+    sedes: [
+      { ico:'🌆', name:'Downtown Miami',   sub:'En el corazón de la ciudad',        url:'https://www.doordash.com/store/hot-dog-maracay-miami-27691950/31795151/' },
+      { ico:'🌴', name:'Doral',            sub:'La capital venezolana de Miami',     url:'https://www.doordash.com/store/26219712' },
+      { ico:'📍', name:'North Miami Beach', sub:'18315 West Dixie Highway',           url:'https://www.doordash.com/store/hot-dog-maracay-north-miami-beach-north-miami-beach-37436883/84611775/' }
+    ]
+  },
+  grubhub: {
+    name: 'GrubHub',
+    sedes: [
+      { ico:'🌆', name:'Downtown Miami',   sub:'Próximamente',                      url:null },
+      { ico:'🌴', name:'Doral',            sub:'Próximamente',                      url:null },
+      { ico:'📍', name:'North Miami Beach', sub:'18315 West Dixie Highway',           url:'https://www.grubhub.com/restaurant/hot-dog-maracay-north-miami-beach-18315-w-dixie-hwy-north-miami-beach/10778152' }
+    ]
+  },
+  postmates: {
+    name: 'Postmates',
+    sedes: [
+      { ico:'🌆', name:'Downtown Miami',   sub:'Próximamente',                      url:null },
+      { ico:'🌴', name:'Doral',            sub:'Próximamente',                      url:null },
+      { ico:'📍', name:'North Miami Beach', sub:'18315 West Dixie Highway',           url:'https://postmates.com/store/hot-dog-maracay-north-miami-18315-west-dixie-highway/oiHtSzWqQ1utCXqChre-ow' }
+    ]
+  }
+};
+
+function openDeliveryModal(appId) {
+  const app = DELIVERY_DATA[appId];
+  if (!app) return;
+  document.getElementById('deliveryModalTitle').textContent = app.name.toUpperCase();
+  document.getElementById('deliverySedeList').innerHTML = app.sedes.map(s => {
+    if (s.url) {
+      return `<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="delivery-sede-card" onclick="closeDeliveryModal()">
+        <span class="dsc-ico">${s.ico}</span>
+        <div class="dsc-info"><div class="dsc-name">${escHtml(s.name)}</div><div class="dsc-sub">${escHtml(s.sub)}</div></div>
+        <span class="dsc-arrow">→</span>
+      </a>`;
+    }
+    return `<div class="delivery-sede-card disabled">
+      <span class="dsc-ico">${s.ico}</span>
+      <div class="dsc-info"><div class="dsc-name">${escHtml(s.name)}</div><div class="dsc-sub">${escHtml(s.sub)}</div></div>
+      <span class="dsc-arrow" style="color:var(--mu);font-size:14px">Pronto</span>
+    </div>`;
+  }).join('');
+  document.getElementById('deliveryModal').classList.add('open');
+}
+function closeDeliveryModal() {
+  document.getElementById('deliveryModal').classList.remove('open');
+}
 
 /* ── CART ── */
 const TAX = 0.07;
@@ -1759,6 +1868,30 @@ function renderCart(){
 
 function toggleCart(){ const d=document.getElementById('cartDrawer'),o=document.getElementById('cartOverlay'); d.classList.toggle('open'); o.classList.toggle('open'); d.classList.contains('open')?lockScroll():unlockScroll(); }
 
+/* ── SEDE CONFIRM ── */
+const SEDE_LABELS = { downtown:'Downtown Miami', doral:'Doral', nmb:'North Miami Beach' };
+let _pendingSede = '';
+function confirmSede(sel) {
+  const val = sel.value;
+  if (!val) return;
+  _pendingSede = val;
+  sel.value = '';
+  document.getElementById('sedeConfirmText').innerHTML =
+    `¿Estás seguro que deseas ordenar en?<br>
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--txt);letter-spacing:2px;display:block;margin-top:8px;line-height:1">${escHtml(SEDE_LABELS[val])}</span>`;
+  document.getElementById('sedeConfirmModal').classList.add('open');
+}
+function acceptSede() {
+  document.getElementById('cLoc').value = _pendingSede;
+  document.getElementById('sedeConfirmModal').classList.remove('open');
+  _pendingSede = '';
+}
+function cancelSede() {
+  document.getElementById('cLoc').value = '';
+  document.getElementById('sedeConfirmModal').classList.remove('open');
+  _pendingSede = '';
+}
+
 /* ── CHECKOUT ── */
 function openCheckout(){
   if(!cart.length)return;
@@ -1821,6 +1954,7 @@ async function sendOrder(){
   if(!name||!phone){ showToast('⚠️ Ingresa tu nombre y teléfono','info'); return; }
   if(phone.length<7||phone.length>CHECKOUT_LIMITS.phone){ showToast('⚠️ El teléfono no es válido','info'); return; }
   if(emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){ showToast('⚠️ El correo electrónico no es válido','info'); return; }
+  if(!location){ showToast('⚠️ Debes seleccionar una sede antes de continuar','info'); return; }
   if(!['pickup','delivery'].includes(orderType)||!['nmb','doral','downtown'].includes(location)){ showToast('⚠️ Revisa el tipo de orden y la ubicación','info'); return; }
   if(cart.length>CHECKOUT_LIMITS.maxItems||cart.some(i=>i.qty<1||i.qty>CHECKOUT_LIMITS.maxQty)){ showToast('⚠️ Tu pedido es demasiado grande. Llámanos para ayudarte.','info'); return; }
   if(!_sqCard){ showToast('⚠️ Sistema de pago no listo','info'); return; }
