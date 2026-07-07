@@ -70,6 +70,12 @@ async function claimCheckoutAttempt(repository, record) {
   }
 }
 
+// El KDS real (maracayos.duckdns.org/kds/kds.html) filtra web_orders.location
+// por NOMBRE COMPLETO exacto ('North Miami', 'Doral', 'Downtown Miami'), no
+// por el codigo corto del checkout. sede sí guarda el codigo corto (nmb/doral/
+// downtown), consistente con pos_integration_config.sede_id.
+const SEDE_DISPLAY_NAMES = { nmb: 'North Miami', doral: 'Doral', downtown: 'Downtown Miami' };
+
 function webOrderFromAttempt(attempt) {
   return {
     customer_name: attempt.customer?.name || '',
@@ -80,8 +86,8 @@ function webOrderFromAttempt(attempt) {
     payment_id: attempt.payment_id,
     receipt_url: attempt.receipt_url || '',
     order_type: attempt.order_type,
-    location: attempt.location,
-    sede: attempt.location,   // location es el sede_id para pedidos web (nmb/doral/downtown)
+    location: SEDE_DISPLAY_NAMES[attempt.location] || attempt.location,
+    sede: attempt.location,
     notes: attempt.notes || '',
     status: 'paid',
     checkout_attempt_id: attempt.checkout_attempt_id,
