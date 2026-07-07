@@ -1,0 +1,17 @@
+{
+  "name": "hotdog-maracay-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
+    "cors": "^2.8.5",
+    "express": "^4.18.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "square": "^40.0.0"
+  }
+}

@@ -1870,12 +1870,24 @@ function toggleCart(){ const d=document.getElementById('cartDrawer'),o=document.
 
 /* ── SEDE CONFIRM ── */
 const SEDE_LABELS = { downtown:'Downtown Miami', doral:'Doral', nmb:'North Miami Beach' };
+/* Cada sede procesa el pago con su propia cuenta Square (application_id +
+   location_id propios). Una sede sin datos aquí queda deshabilitada para
+   pedidos online — nunca se cobra en la cuenta de otra sede. */
+const BRANCH_CONFIG = {
+  nmb:      { enabled:true,  applicationId:'sq0idp-cV4mfJ-nYO7H-2eTPAvLMQ', locationId:'L3WZRABX6ZBX4' },
+  doral:    { enabled:false, applicationId:null, locationId:null },
+  downtown: { enabled:false, applicationId:null, locationId:null }
+};
 let _pendingSede = '';
 function confirmSede(sel) {
   const val = sel.value;
   if (!val) return;
-  _pendingSede = val;
   sel.value = '';
+  if (!BRANCH_CONFIG[val]?.enabled) {
+    showToast('⚠️ Los pedidos online para esta sede todavía no están disponibles. Selecciona otra ubicación.','info');
+    return;
+  }
+  _pendingSede = val;
   document.getElementById('sedeConfirmText').innerHTML =
     `¿Estás seguro que deseas ordenar en?<br>
     <span style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--txt);letter-spacing:2px;display:block;margin-top:8px;line-height:1">${escHtml(SEDE_LABELS[val])}</span>`;
@@ -1884,6 +1896,7 @@ function confirmSede(sel) {
 function acceptSede() {
   document.getElementById('cLoc').value = _pendingSede;
   document.getElementById('sedeConfirmModal').classList.remove('open');
+  initSquareForBranch(_pendingSede);
   _pendingSede = '';
 }
 function cancelSede() {
@@ -1904,7 +1917,16 @@ function openCheckout(){
   toggleCart();
   document.getElementById('checkoutModal').classList.add('open');
   lockScroll();
-  initSquare();
+  const currentLoc=document.getElementById('cLoc').value;
+  if(currentLoc && _sqBranch===currentLoc && _sqCard){
+    document.getElementById('sq-loading').style.display='none';
+    document.getElementById('sq-card-container').style.display='block';
+    document.getElementById('sq-pay-btn').disabled=false;
+  }else{
+    document.getElementById('sq-card-container').style.display='none';
+    document.getElementById('sq-loading').style.display='block';
+    document.getElementById('sq-loading').textContent='📍 Selecciona tu sede para continuar con el pago';
+  }
 }
 function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); unlockScroll(); }
 function closeSuccess(){ document.getElementById('successModal').classList.remove('open'); unlockScroll(); cart=[]; renderCart(); }
@@ -1912,7 +1934,7 @@ function closeSuccess(){ document.getElementById('successModal').classList.remov
 /* ── SQUARE ── */
 const BACKEND_URL='https://hotdog-backend.vercel.app';
 const CHECKOUT_LIMITS={name:80,phone:25,email:120,notes:300,details:500,maxItems:25,maxQty:20};
-let _sqPayments=null, _sqCard=null;
+let _sqPayments=null, _sqCard=null, _sqBranch=null;
 let _checkoutAttemptId=null;
 
 function createCheckoutAttemptId(){
@@ -1922,10 +1944,24 @@ function createCheckoutAttemptId(){
   const hex=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
   return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
 }
-async function initSquare(){
-  if(_sqCard){ document.getElementById('sq-loading').style.display='none'; document.getElementById('sq-card-container').style.display='block'; document.getElementById('sq-pay-btn').disabled=false; return; }
+/* Reinicializa el SDK de Square con el application_id + location_id de la
+   sede confirmada — cada sede cobra en SU PROPIA cuenta Square. */
+async function initSquareForBranch(branchCode){
+  const branch=BRANCH_CONFIG[branchCode];
+  if(!branch?.enabled)return;
+  if(_sqBranch===branchCode && _sqCard){
+    document.getElementById('sq-loading').style.display='none';
+    document.getElementById('sq-card-container').style.display='block';
+    document.getElementById('sq-pay-btn').disabled=false;
+    return;
+  }
+  document.getElementById('sq-pay-btn').disabled=true;
+  document.getElementById('sq-card-container').style.display='none';
+  document.getElementById('sq-loading').style.display='block';
+  document.getElementById('sq-loading').textContent='⏳ Cargando sistema de pago...';
   try{
-    _sqPayments=Square.payments('sq0idp-CAxJsVjUl55Ulb7Nwekcjw','L2WHB70494FZB');
+    if(_sqCard){ await _sqCard.destroy(); _sqCard=null; _sqBranch=null; }
+    _sqPayments=Square.payments(branch.applicationId,branch.locationId);
     _sqCard=await _sqPayments.card({style:{
       '.input-container':{borderColor:'#ddd',borderRadius:'10px'},
       '.input-container.is-focus':{borderColor:'#FAA83C'},
@@ -1936,6 +1972,7 @@ async function initSquare(){
       '.message-icon':{color:'#E8272A'}
     }});
     await _sqCard.attach('#sq-card-container');
+    _sqBranch=branchCode;
     document.getElementById('sq-loading').style.display='none';
     document.getElementById('sq-card-container').style.display='block';
     document.getElementById('sq-pay-btn').disabled=false;
@@ -1957,7 +1994,7 @@ async function sendOrder(){
   if(!location){ showToast('⚠️ Debes seleccionar una sede antes de continuar','info'); return; }
   if(!['pickup','delivery'].includes(orderType)||!['nmb','doral','downtown'].includes(location)){ showToast('⚠️ Revisa el tipo de orden y la ubicación','info'); return; }
   if(cart.length>CHECKOUT_LIMITS.maxItems||cart.some(i=>i.qty<1||i.qty>CHECKOUT_LIMITS.maxQty)){ showToast('⚠️ Tu pedido es demasiado grande. Llámanos para ayudarte.','info'); return; }
-  if(!_sqCard){ showToast('⚠️ Sistema de pago no listo','info'); return; }
+  if(!_sqCard||_sqBranch!==location){ showToast('⚠️ Sistema de pago no listo para esta sede. Vuelve a seleccionarla.','info'); return; }
   const{total}=totals();
   const payBtn=document.getElementById('sq-pay-btn');
   payBtn.disabled=true; payBtn.textContent='⏳ Procesando...';
