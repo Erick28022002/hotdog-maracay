@@ -1463,6 +1463,10 @@ body{background:transparent}
         </select>
       </div>
       <div class="form-grp"><label class="form-lbl">Notas (opcional)</label><input class="form-inp" id="cNotes" placeholder="Ej: sin cebolla, extra salsa..." maxlength="300"></div>
+      <div id="apple-pay-wrap" style="display:none;margin-bottom:14px">
+        <button type="button" id="apple-pay-button" onclick="payWithApplePay()" style="width:100%;height:44px;border-radius:10px;-webkit-appearance:-apple-pay-button;-apple-pay-button-type:plain;-apple-pay-button-style:black;border:none;cursor:pointer"></button>
+        <div style="text-align:center;color:var(--mu);font-size:12px;margin-top:12px">o paga con tarjeta</div>
+      </div>
       <div class="form-grp">
         <label class="form-lbl">Datos de Tarjeta</label>
         <div id="sq-loading" style="text-align:center;padding:18px;color:var(--mu);font-size:13px">⏳ Cargando sistema de pago...</div>
@@ -1922,10 +1926,12 @@ function openCheckout(){
     document.getElementById('sq-loading').style.display='none';
     document.getElementById('sq-card-container').style.display='block';
     document.getElementById('sq-pay-btn').disabled=false;
+    initApplePay(total);
   }else{
     document.getElementById('sq-card-container').style.display='none';
     document.getElementById('sq-loading').style.display='block';
     document.getElementById('sq-loading').textContent='📍 Selecciona tu sede para continuar con el pago';
+    document.getElementById('apple-pay-wrap').style.display='none';
   }
 }
 function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); unlockScroll(); }
@@ -1934,7 +1940,7 @@ function closeSuccess(){ document.getElementById('successModal').classList.remov
 /* ── SQUARE ── */
 const BACKEND_URL='https://hotdog-backend.vercel.app';
 const CHECKOUT_LIMITS={name:80,phone:25,email:120,notes:300,details:500,maxItems:25,maxQty:20};
-let _sqPayments=null, _sqCard=null, _sqBranch=null;
+let _sqPayments=null, _sqCard=null, _sqBranch=null, _applePay=null;
 let _checkoutAttemptId=null;
 
 function createCheckoutAttemptId(){
@@ -1976,53 +1982,100 @@ async function initSquareForBranch(branchCode){
     document.getElementById('sq-loading').style.display='none';
     document.getElementById('sq-card-container').style.display='block';
     document.getElementById('sq-pay-btn').disabled=false;
+    initApplePay(totals().total);
   }catch(e){
     document.getElementById('sq-loading').textContent='⚠️ No se pudo cargar el sistema de pago. Intenta de nuevo.';
     console.error('Square init error:',e);
   }
 }
-async function sendOrder(){
+/* Apple Pay — usa el mismo _sqPayments de la sede confirmada. Se oculta
+   solo si el dispositivo/navegador no lo soporta o la sede aún no lo tiene
+   habilitado en su cuenta Square (degrada sin romper el pago con tarjeta). */
+async function initApplePay(total){
+  const wrap=document.getElementById('apple-pay-wrap');
+  if(!_sqPayments || !window.ApplePaySession || !ApplePaySession.canMakePayments()){
+    wrap.style.display='none'; _applePay=null; return;
+  }
+  try{
+    const paymentRequest=_sqPayments.paymentRequest({
+      countryCode:'US', currencyCode:'USD',
+      total:{amount:total.toFixed(2),label:'Hot Dog Maracay'}
+    });
+    _applePay=await _sqPayments.applePay(paymentRequest);
+    wrap.style.display='block';
+    document.getElementById('apple-pay-button').disabled=false;
+  }catch(e){
+    wrap.style.display='none'; _applePay=null;
+    console.error('Apple Pay no disponible:',e);
+  }
+}
+function validateCheckoutForm(){
   const name=cleanText(document.getElementById('cName').value,CHECKOUT_LIMITS.name);
   const phone=cleanPhone(document.getElementById('cPhone').value);
   const emailVal=cleanText(document.getElementById('cEmail').value,CHECKOUT_LIMITS.email).toLowerCase();
   const notes=cleanText(document.getElementById('cNotes').value,CHECKOUT_LIMITS.notes);
   const orderType=document.getElementById('cType').value;
   const location=document.getElementById('cLoc').value;
-  if(!name||!phone){ showToast('⚠️ Ingresa tu nombre y teléfono','info'); return; }
-  if(phone.length<7||phone.length>CHECKOUT_LIMITS.phone){ showToast('⚠️ El teléfono no es válido','info'); return; }
-  if(emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){ showToast('⚠️ El correo electrónico no es válido','info'); return; }
-  if(!location){ showToast('⚠️ Debes seleccionar una sede antes de continuar','info'); return; }
-  if(!['pickup','delivery'].includes(orderType)||!['nmb','doral','downtown'].includes(location)){ showToast('⚠️ Revisa el tipo de orden y la ubicación','info'); return; }
-  if(cart.length>CHECKOUT_LIMITS.maxItems||cart.some(i=>i.qty<1||i.qty>CHECKOUT_LIMITS.maxQty)){ showToast('⚠️ Tu pedido es demasiado grande. Llámanos para ayudarte.','info'); return; }
-  if(!_sqCard||_sqBranch!==location){ showToast('⚠️ Sistema de pago no listo para esta sede. Vuelve a seleccionarla.','info'); return; }
-  const{total}=totals();
-  const payBtn=document.getElementById('sq-pay-btn');
-  payBtn.disabled=true; payBtn.textContent='⏳ Procesando...';
+  if(!name||!phone){ showToast('⚠️ Ingresa tu nombre y teléfono','info'); return null; }
+  if(phone.length<7||phone.length>CHECKOUT_LIMITS.phone){ showToast('⚠️ El teléfono no es válido','info'); return null; }
+  if(emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){ showToast('⚠️ El correo electrónico no es válido','info'); return null; }
+  if(!location){ showToast('⚠️ Debes seleccionar una sede antes de continuar','info'); return null; }
+  if(!['pickup','delivery'].includes(orderType)||!['nmb','doral','downtown'].includes(location)){ showToast('⚠️ Revisa el tipo de orden y la ubicación','info'); return null; }
+  if(cart.length>CHECKOUT_LIMITS.maxItems||cart.some(i=>i.qty<1||i.qty>CHECKOUT_LIMITS.maxQty)){ showToast('⚠️ Tu pedido es demasiado grande. Llámanos para ayudarte.','info'); return null; }
+  return {name,phone,emailVal,notes,orderType,location};
+}
+async function submitPayment(sourceId,form,resetBtn){
+  const orderPayload={
+    sourceId,
+    checkoutAttemptId:_checkoutAttemptId,
+    items:cart.map(i=>({
+      productId:String(i.productId||'').slice(0,80),
+      qty:Number(i.qty)||1,
+      selections:i.selections
+    })),
+    customer:{name:form.name,phone:form.phone,email:form.emailVal},
+    orderType:form.orderType,
+    location:form.location,
+    notes:form.notes
+  };
   try{
-    const result=await _sqCard.tokenize();
-    if(result.status!=='OK'){ showToast('⚠️ '+(result.errors?.[0]?.message||'Verifica los datos de tu tarjeta'),'info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; return; }
-    const orderPayload={
-      sourceId:result.token,
-      checkoutAttemptId:_checkoutAttemptId,
-      items:cart.map(i=>({
-        productId:String(i.productId||'').slice(0,80),
-        qty:Number(i.qty)||1,
-        selections:i.selections
-      })),
-      customer:{name,phone,email:emailVal},
-      orderType,
-      location,
-      notes
-    };
     const resp=await fetch(BACKEND_URL+'/api/pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(orderPayload)});
     const data=await resp.json().catch(()=>({}));
     if(resp.ok&&data.success){
       const rl=document.getElementById('sq-receipt-link');
       if(isSafeHttpsUrl(data.receiptUrl)){rl.href=data.receiptUrl;rl.style.display='inline';}else{rl.removeAttribute('href');rl.style.display='none';}
       closeCheckout(); document.getElementById('successModal').classList.add('open');
+      return;
     }
-    else{ showToast('⚠️ No se pudo procesar el pago. Verifica tus datos o intenta de nuevo.','info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
-  }catch(e){ showToast('⚠️ Error de conexión con el servidor','info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
+    showToast('⚠️ No se pudo procesar el pago. Verifica tus datos o intenta de nuevo.','info'); resetBtn();
+  }catch(e){ showToast('⚠️ Error de conexión con el servidor','info'); resetBtn(); }
+}
+async function sendOrder(){
+  const form=validateCheckoutForm();
+  if(!form)return;
+  if(!_sqCard||_sqBranch!==form.location){ showToast('⚠️ Sistema de pago no listo para esta sede. Vuelve a seleccionarla.','info'); return; }
+  const{total}=totals();
+  const payBtn=document.getElementById('sq-pay-btn');
+  payBtn.disabled=true; payBtn.textContent='⏳ Procesando...';
+  const resetBtn=()=>{ payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; };
+  try{
+    const result=await _sqCard.tokenize();
+    if(result.status!=='OK'){ showToast('⚠️ '+(result.errors?.[0]?.message||'Verifica los datos de tu tarjeta'),'info'); resetBtn(); return; }
+    await submitPayment(result.token,form,resetBtn);
+  }catch(e){ showToast('⚠️ Error al procesar la tarjeta','info'); resetBtn(); }
+}
+async function payWithApplePay(){
+  const form=validateCheckoutForm();
+  if(!form)return;
+  if(!_applePay||_sqBranch!==form.location){ showToast('⚠️ Apple Pay no está listo para esta sede. Vuelve a seleccionarla.','info'); return; }
+  const btn=document.getElementById('apple-pay-button');
+  btn.disabled=true;
+  const resetBtn=()=>{ btn.disabled=false; };
+  try{
+    const result=await _applePay.tokenize();
+    if(result.status!=='OK'){ showToast('⚠️ '+(result.errors?.[0]?.message||'No se pudo completar el pago con Apple Pay'),'info'); resetBtn(); return; }
+    await submitPayment(result.token,form,resetBtn);
+  }catch(e){ showToast('⚠️ Error al procesar Apple Pay','info'); resetBtn(); }
 }
 
 /* ── TOAST ── */
