@@ -22,20 +22,18 @@
     * { margin:0; padding:0; box-sizing:border-box }
     body { background:var(--bg); color:var(--text); font-family:var(--font); height:100vh; overflow:hidden }
 
-    /* ═══ PIN / SEDE (dark) ═══ */
+    /* ═══ LOGIN / SEDE (dark) ═══ */
     .screen { position:fixed; inset:0; background:#111; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999 }
     .screen.hidden { display:none }
     .scr-logo  { font-size:52px; margin-bottom:8px }
     .scr-brand { font-size:20px; font-weight:800; color:#FAA83C; letter-spacing:.5px; margin-bottom:4px }
     .scr-sub   { font-size:12px; color:#555; margin-bottom:36px; text-transform:uppercase; letter-spacing:1.5px }
     .pin-label { font-size:11px; color:#555; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:14px }
-    .pin-dots  { display:flex; gap:14px; margin-bottom:30px }
-    .pin-dot   { width:14px; height:14px; border-radius:50%; border:2px solid #333; background:transparent; transition:all .2s }
-    .pin-dot.on { background:#FAA83C; border-color:#FAA83C }
-    .pin-pad   { display:grid; grid-template-columns:repeat(3,72px); gap:10px }
-    .pin-btn   { width:72px; height:72px; border-radius:50%; border:1px solid #333; background:#1C1C1C; color:#F0F0F0; font-size:22px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .12s }
-    .pin-btn:active { background:#FAA83C; color:#000; transform:scale(.92) }
-    .pin-btn.sp { font-size:15px; color:#555 }
+    .login-form { display:flex; flex-direction:column; gap:12px; width:100%; max-width:280px }
+    .login-inp  { padding:14px 16px; border-radius:10px; border:1px solid #333; background:#1C1C1C; color:#F0F0F0; font-size:15px; font-family:var(--font) }
+    .login-inp::placeholder { color:#555 }
+    .login-btn  { padding:14px 16px; border-radius:10px; border:none; background:#FAA83C; color:#000; font-size:15px; font-weight:800; cursor:pointer }
+    .login-btn:active { transform:scale(.97) }
     .pin-err   { color:#E8272A; font-size:12px; margin-top:16px; min-height:18px; text-align:center }
     .sede-list { display:flex; flex-direction:column; gap:10px; width:100%; max-width:320px }
     .sede-btn  { padding:16px 20px; border-radius:10px; border:1px solid #2A2A2A; background:#1C1C1C; color:#F0F0F0; font-size:15px; font-weight:600; cursor:pointer; text-align:left; transition:all .15s; display:flex; align-items:center; justify-content:space-between }
@@ -319,29 +317,15 @@
 </head>
 <body>
 
-<!-- PIN -->
+<!-- LOGIN -->
 <div id="pinScreen" class="screen">
   <div class="scr-logo">🌭</div>
   <div class="scr-brand">Hot Dog Maracay</div>
   <div class="scr-sub">Sistema de Cocina · KDS</div>
-  <div class="pin-label">Código de acceso</div>
-  <div class="pin-dots">
-    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
-  </div>
-  <div class="pin-pad">
-    <button class="pin-btn" onclick="pk('1')">1</button>
-    <button class="pin-btn" onclick="pk('2')">2</button>
-    <button class="pin-btn" onclick="pk('3')">3</button>
-    <button class="pin-btn" onclick="pk('4')">4</button>
-    <button class="pin-btn" onclick="pk('5')">5</button>
-    <button class="pin-btn" onclick="pk('6')">6</button>
-    <button class="pin-btn" onclick="pk('7')">7</button>
-    <button class="pin-btn" onclick="pk('8')">8</button>
-    <button class="pin-btn" onclick="pk('9')">9</button>
-    <button class="pin-btn sp" onclick="pk('c')">✕</button>
-    <button class="pin-btn" onclick="pk('0')">0</button>
-    <button class="pin-btn sp" onclick="pk('b')">⌫</button>
+  <div class="login-form">
+    <input type="email" id="loginEmail" class="login-inp" placeholder="Correo" autocomplete="username">
+    <input type="password" id="loginPass" class="login-inp" placeholder="Contraseña" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
   </div>
   <div class="pin-err" id="pinErr"></div>
 </div>
@@ -357,7 +341,7 @@
     <button class="sede-btn" onclick="selectSede('Downtown Miami')">Downtown Miami <span style="color:#555">›</span></button>
     <button class="sede-btn" onclick="selectSede('Próxima sede')">Próxima sede <span style="color:#555">›</span></button>
   </div>
-  <span class="logout-lnk" onclick="logout()">← Cambiar PIN</span>
+  <span class="logout-lnk" onclick="logout()">← Cerrar sesión</span>
 </div>
 
 <!-- KDS -->
@@ -404,6 +388,7 @@
     </div>
     <div class="fab-div"></div>
     <button class="fab-hist" onclick="openHist()">↑ Historial</button>
+    <button class="fab-hist" onclick="logout()">⎋ Salir</button>
     <div class="fab-div"></div>
     <div class="conn-pill">
       <div class="conn-dot" id="connDot"></div>
@@ -431,12 +416,11 @@
 const SUPABASE_URL = 'https://ckzvjudhpbhzisrrhozk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_5cEosCpGfTIM-culYQ1ofA_xggsaIBc';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { persistSession: false, autoRefreshToken: false },
+  auth: { persistSession: true, autoRefreshToken: true },
 });
 
-const PIN      = '2802';
-const AUTH_KEY = 'hdm_kds_v2';
 const SEDE_KEY = 'hdm_kds_sede';
+const SEDE_DISPLAY_NAMES = { nmb:'North Miami', doral:'Doral', downtown:'Downtown Miami', orlando:'Próxima sede' };
 const HIST_KEY = 'hdm_hist_v1';
 
 const HIST_MAX_MS = 60 * 60 * 1000; // el historial solo conserva la última hora
@@ -467,42 +451,42 @@ let realtimeCh = null, reconnectTimer = null;
 let lastOkAt = Date.now(); // timestamp del último loadOrders() exitoso
 
 /* ── BOOT ── */
-(function boot() {
-  // PIN desactivado temporalmente para pruebas
-  document.getElementById('pinScreen').classList.add('hidden');
-  document.getElementById('sedeScreen').classList.remove('hidden');
+(async function boot() {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) await afterLogin(session);
 })();
 
-/* ── PIN ── */
-let pinEntry = '';
-function pk(k) {
-  const err = document.getElementById('pinErr');
-  err.textContent = '';
-  if (k === 'c') pinEntry = '';
-  else if (k === 'b') pinEntry = pinEntry.slice(0, -1);
-  else if (pinEntry.length < 4) pinEntry += k;
-  for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.toggle('on', i < pinEntry.length);
-  if (pinEntry.length === 4) {
-    if (pinEntry === PIN) {
-      sessionStorage.setItem(AUTH_KEY, PIN);
-      document.getElementById('pinScreen').classList.add('hidden');
-      document.getElementById('sedeScreen').classList.remove('hidden');
-    } else {
-      err.textContent = 'Código incorrecto';
-      setTimeout(() => {
-        pinEntry = '';
-        for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.remove('on');
-        err.textContent = '';
-      }, 900);
-    }
+/* ── LOGIN ── */
+async function afterLogin(session) {
+  const { data: profile, error } = await db.from('profiles')
+    .select('role,sede,account_status').eq('id', session.user.id).single();
+  if (error || !profile || profile.account_status !== 'active') {
+    await db.auth.signOut();
+    document.getElementById('pinErr').textContent = 'Cuenta no autorizada o pendiente de aprobación';
+    return;
+  }
+  document.getElementById('pinScreen').classList.add('hidden');
+  const sedeNombre = profile.sede ? SEDE_DISPLAY_NAMES[profile.sede] : null;
+  if (sedeNombre) {
+    selectSede(sedeNombre);
+  } else {
+    const savedSede = sessionStorage.getItem(SEDE_KEY);
+    if (savedSede) selectSede(savedSede);
+    else document.getElementById('sedeScreen').classList.remove('hidden');
   }
 }
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('pinErr');
+  errEl.textContent = '';
+  if (!email || !pass) { errEl.textContent = 'Ingresa correo y contraseña'; return; }
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error || !data.session) { errEl.textContent = 'Correo o contraseña incorrectos'; return; }
+  await afterLogin(data.session);
+}
 document.addEventListener('keydown', e => {
-  if (!document.getElementById('pinScreen').classList.contains('hidden')) {
-    if (e.key >= '0' && e.key <= '9') pk(e.key);
-    if (e.key === 'Backspace') pk('b');
-    if (e.key === 'Escape') pk('c');
-  }
+  if (!document.getElementById('pinScreen').classList.contains('hidden') && e.key === 'Enter') doLogin();
 });
 
 /* ── SEDE ── */
@@ -512,25 +496,29 @@ function selectSede(nombre) {
   document.getElementById('sedeScreen').classList.add('hidden');
   unlockKDS();
 }
-function logout() {
-  sessionStorage.clear(); pinEntry = '';
-  for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.remove('on');
+async function logout() {
+  await db.auth.signOut();
+  sessionStorage.removeItem(SEDE_KEY);
+  activeSede = null;
+  document.getElementById('kds').style.display = 'none';
   document.getElementById('sedeScreen').classList.add('hidden');
   document.getElementById('pinScreen').classList.remove('hidden');
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('pinErr').textContent = '';
 }
 
+/* ── KDS ── */
 // Nombre visible de cada sede (activeSede se conserva igual para el aislamiento)
 function sedeLabel(s) {
   const map = { 'North Miami': 'North Miami Beach' };
   return map[s] || s || 'Hot Dog Maracay';
 }
-
-/* ── KDS ── */
 function unlockKDS() {
   document.title = 'Cocina · ' + activeSede;
+  document.getElementById('kds').style.display = 'block';
   const brand = document.getElementById('brandSede');
   if (brand) brand.textContent = '🌭 ' + sedeLabel(activeSede);
-  document.getElementById('kds').style.display = 'block';
 
   // Checklist interactivo: tap en ítem lo tacha
   document.getElementById('lane').addEventListener('click', e => {
