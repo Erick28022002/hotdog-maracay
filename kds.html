@@ -377,7 +377,7 @@
   </div>
 
   <div class="fab-bar">
-    <span class="hdr-brand fab-brand">🌭 Hot Dog Maracay</span>
+    <span class="hdr-brand fab-brand" id="brandSede">🌭 Hot Dog Maracay</span>
     <span class="fab-clock" id="clk">00:00:00</span>
     <div class="fab-div"></div>
     <div class="fab-count">
@@ -519,9 +519,17 @@ function logout() {
   document.getElementById('pinScreen').classList.remove('hidden');
 }
 
+// Nombre visible de cada sede (activeSede se conserva igual para el aislamiento)
+function sedeLabel(s) {
+  const map = { 'North Miami': 'North Miami Beach' };
+  return map[s] || s || 'Hot Dog Maracay';
+}
+
 /* ── KDS ── */
 function unlockKDS() {
   document.title = 'Cocina · ' + activeSede;
+  const brand = document.getElementById('brandSede');
+  if (brand) brand.textContent = '🌭 ' + sedeLabel(activeSede);
   document.getElementById('kds').style.display = 'block';
 
   // Checklist interactivo: tap en ítem lo tacha
