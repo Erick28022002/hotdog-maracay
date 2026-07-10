@@ -510,7 +510,7 @@ app.post('/webhook/square', async (req, res) => {
         payment_id: 'sq-order-' + orderId,
         receipt_url: '',
         order_type: 'pickup',
-        location: locationName,
+        location: locationDisplayName(sedeId),
         sede: sedeId,
         notes: '',
         status: 'pending'

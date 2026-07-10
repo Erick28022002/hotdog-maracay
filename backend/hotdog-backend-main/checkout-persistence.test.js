@@ -8,7 +8,9 @@ const { getSquareOrder, verifySquareWebhookSignature } = require('./square-compa
 const {
   claimCheckoutAttempt,
   persistApprovedCheckout,
-  reconcileApprovedCheckout
+  reconcileApprovedCheckout,
+  webOrderFromAttempt,
+  locationDisplayName
 } = require('./checkout-persistence');
 const app = require('./server');
 
@@ -135,6 +137,14 @@ test('fallo de Supabase despues del pago queda verificable y se reconcilia sin o
   const repeated = await reconcileApprovedCheckout(repository, id);
   assert.equal(repeated.persisted, true);
   assert.equal(repository.orders.size, 1);
+});
+
+test('guarda location con el nombre exacto que filtra el KDS real', () => {
+  const order = webOrderFromAttempt(approvedAttempt('55555555-5555-4555-8555-555555555555'));
+  assert.equal(order.location, 'North Miami');
+  assert.equal(order.sede, 'nmb');
+  assert.equal(locationDisplayName('doral'), 'Doral');
+  assert.equal(locationDisplayName('downtown'), 'Downtown Miami');
 });
 
 test('respuestas de pago no exponen ids internos de Square', async () => {
