@@ -902,6 +902,7 @@ body{background:transparent}
 .custom-check.selected .ck-box{background:var(--mango);border-color:var(--mango);color:#000}
 .custom-check.salsa-disabled{opacity:.3;pointer-events:none}
 .custom-check span.ck-lbl{font-size:13px;font-weight:600}
+.custom-check .sauce-price{color:var(--red);font-style:normal;font-size:11px;margin-left:6px}
 .drinks-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .drink-opt{display:flex;align-items:center;gap:10px;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:10px 14px;cursor:pointer;transition:all .15s;user-select:none}
 .drink-opt input{display:none}
@@ -1794,6 +1795,7 @@ const DRINKS   = [
   {name:'Frescolita',price:3.50},{name:'Malta',price:3.50},{name:'Uvita',price:3.50},{name:'Agua',price:0}
 ];
 let _custom = null;
+let _salsaPickOrder = 0;
 
 function toppingBlockHTML(n, label) {
   const isOpen = n === 1 ? ' open' : '';
@@ -1844,8 +1846,9 @@ function openCustom(id, name, price, emoji, img, hasDrink, numHD) {
          <span class="dk-lbl">${d.name} ${d.price>0?`<em style="color:var(--red);font-style:normal;font-size:11px">+$${d.price.toFixed(2)}</em>`:`<em style="color:var(--gr);font-style:normal;font-size:11px">gratis</em>`}</span>
        </label>`).join('');
   } else { ds.style.display = 'none'; }
+  _salsaPickOrder = 0;
   document.getElementById('customChecks').innerHTML = SALSAS.map(s=>
-    `<label class="custom-check" onclick="toggleSalsa(this,event)"><input type="checkbox" value="${s}"><div class="ck-box">✓</div><span class="ck-lbl">${s}</span></label>`).join('');
+    `<label class="custom-check" onclick="toggleSalsa(this,event)"><input type="checkbox" value="${s}"><div class="ck-box">✓</div><span class="ck-lbl">${s}<em class="sauce-price"></em></span></label>`).join('');
   document.getElementById('salsaError').style.display = 'none';
   document.getElementById('customConfirmBtn').disabled = true;
   document.getElementById('customNote').value = '';
@@ -1859,11 +1862,26 @@ function toggleSalsa(lbl,ev){
   ev.preventDefault();
   const isSel = lbl.classList.contains('selected');
   if(!isSel){
+    lbl.dataset.pickOrder = String(++_salsaPickOrder);
     lbl.classList.add('selected'); lbl.querySelector('input').checked=true;
-  } else { lbl.classList.remove('selected'); lbl.querySelector('input').checked=false; }
+  } else {
+    delete lbl.dataset.pickOrder;
+    lbl.classList.remove('selected'); lbl.querySelector('input').checked=false;
+  }
   const count=document.querySelectorAll('#customChecks .custom-check.selected').length;
+  updateSalsaPrices();
   document.getElementById('customConfirmBtn').disabled=count===0;
   if(count>0)document.getElementById('salsaError').style.display='none';
+}
+function updateSalsaPrices(){
+  const included = _custom && _custom.numHD >= 2 ? 2 : 1;
+  const selected = [...document.querySelectorAll('#customChecks .custom-check.selected')]
+    .sort((a,b)=>(parseInt(a.dataset.pickOrder||'0',10)-parseInt(b.dataset.pickOrder||'0',10)));
+  document.querySelectorAll('#customChecks .sauce-price').forEach(el=>el.textContent='');
+  selected.forEach((lbl,idx)=>{
+    const priceEl = lbl.querySelector('.sauce-price');
+    if(priceEl)priceEl.textContent = idx >= included ? `+$${SALSA_EXTRA_PRICE.toFixed(2)}` : '';
+  });
 }
 function selectDrink(lbl,ev){ ev.preventDefault(); document.querySelectorAll('.drink-opt').forEach(l=>l.classList.remove('selected')); lbl.classList.add('selected'); lbl.querySelector('input').checked=true; }
 
