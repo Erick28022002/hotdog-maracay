@@ -28,7 +28,9 @@ alter table public.web_orders
   add column if not exists checkout_attempt_id uuid,
   add column if not exists square_order_id text,
   add column if not exists payment_status text,
-  add column if not exists persistence_error text;
+  add column if not exists persistence_error text,
+  add column if not exists updated_at timestamptz not null default now(),
+  add column if not exists version integer not null default 0;
 
 -- A full UNIQUE constraint is required for Postgres ON CONFLICT inference.
 -- This deliberately fails and rolls back if historical duplicates exist.
@@ -65,6 +67,9 @@ end $$;
 create index if not exists web_checkout_attempts_reconcile_idx
   on public.web_checkout_attempts (persistence_status, updated_at)
   where payment_status = 'approved' and persistence_status <> 'persisted';
+
+create index if not exists web_orders_kds_idx
+  on public.web_orders (location, status, created_at desc);
 
 commit;
 
