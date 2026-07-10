@@ -5,15 +5,16 @@
 En el proyecto del backend, abrir Settings > Environment Variables y configurar
 para Production, Preview y Development:
 
-- `SQUARE_ACCESS_TOKEN`
-- `SQUARE_LOCATION_ID`
-- `SQUARE_ENV=production`
+- `SQUARE_NMB_ACCESS_TOKEN`
+- `SQUARE_NMB_LOCATION_ID`
+- `SQUARE_DORAL_ACCESS_TOKEN`
+- `SQUARE_DORAL_LOCATION_ID`
+- `SQUARE_DOWNTOWN_ACCESS_TOKEN`
+- `SQUARE_DOWNTOWN_LOCATION_ID`
 - `SQUARE_WEBHOOK_KEY`
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `RESEND_API_KEY`
 - `ORDER_CONFIRMATION_FROM`
-- `ORDER_NOTIFICATION_EMAIL`
 - `SMTP_HOST`
 - `SMTP_PORT`
 - `SMTP_USER`
@@ -21,6 +22,20 @@ para Production, Preview y Development:
 - `ORDER_FROM_NMB`
 - `ORDER_FROM_DORAL`
 - `ORDER_FROM_DOWNTOWN`
+- `ORDER_NOTIFICATION_EMAIL_ENABLED=false`
+- `ORDER_NOTIFICATION_EMAIL`
+
+Variables opcionales:
+
+- `SQUARE_ACCESS_TOKEN`
+- `SQUARE_LOCATION_ID`
+- `SQUARE_ENV=production`
+- `RESEND_API_KEY`
+
+`SQUARE_ACCESS_TOKEN` y `SQUARE_LOCATION_ID` solo quedan como respaldo para
+webhooks POS antiguos que no incluyan `location_id`. Los pedidos web reales
+deben usar las variables por sede. Una sede sin token o location ID propio queda
+deshabilitada para pedidos online; nunca cae en la cuenta de otra sede.
 
 La clave `SUPABASE_SERVICE_ROLE_KEY` se obtiene en Supabase > Project Settings >
 API Keys. Nunca debe copiarse al frontend, subirse a GitHub ni enviarse por chat.
@@ -34,8 +49,13 @@ Para Microsoft 365 / Outlook, configurar:
 - `ORDER_CONFIRMATION_FROM=Hot Dog Maracay Miami <Miami@hotdogmaracay.com>`
 
 Si cada sede tiene su propio buzon, usar `ORDER_FROM_NMB`, `ORDER_FROM_DORAL`
-y `ORDER_FROM_DOWNTOWN`. `ORDER_NOTIFICATION_EMAIL` es el correo interno del
-restaurante que recibira copia de cada orden pagada.
+y `ORDER_FROM_DOWNTOWN`.
+
+El correo interno del restaurante queda apagado por defecto para no llenar la
+bandeja. Para recibir copia de cada orden pagada, configurar:
+
+- `ORDER_NOTIFICATION_EMAIL_ENABLED=true`
+- `ORDER_NOTIFICATION_EMAIL=Miami@hotdogmaracay.com`
 
 `RESEND_API_KEY` queda como alternativa opcional. Si hay SMTP configurado, el
 backend usa SMTP primero.
@@ -47,8 +67,12 @@ backend usa SMTP primero.
 3. Confirmar que `/health` responde correctamente.
 4. Desplegar el `index.html` actualizado inmediatamente despues.
 5. Realizar un pedido real de importe pequeno y confirmar pago, recibo y KDS.
-6. Aplicar `supabase-lockdown.sql` desde Supabase SQL Editor.
-7. Confirmar que el KDS inicia sesion y puede leer y actualizar pedidos.
+6. Confirmar que el KDS real usa `status` y `sort_pos` como unicos updates
+   directos sobre `web_orders`.
+7. Aplicar `migration_checkout_persistence.sql` desde Supabase SQL Editor.
+8. Aplicar `supabase-lockdown.sql` desde Supabase SQL Editor.
+9. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+   pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
 un contrato de pedido nuevo y deben publicarse juntos.
