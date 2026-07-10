@@ -196,3 +196,39 @@ test('rechaza delivery en checkout web mientras solo existe pickup', async () =>
     await new Promise(resolve => server.close(resolve));
   }
 });
+
+test('responde JSON limpio cuando el cuerpo excede el limite', async () => {
+  const server = app.listen(0);
+  try {
+    const baseUrl = `http://127.0.0.1:${server.address().port}`;
+    const response = await fetch(`${baseUrl}/api/pay`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sourceId: 'x'.repeat(40000) })
+    });
+    const body = await response.json();
+    assert.equal(response.status, 413);
+    assert.equal(body.success, false);
+    assert.match(body.error, /grande/);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
+});
+
+test('responde JSON limpio cuando el cuerpo no es JSON valido', async () => {
+  const server = app.listen(0);
+  try {
+    const baseUrl = `http://127.0.0.1:${server.address().port}`;
+    const response = await fetch(`${baseUrl}/api/pay`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{"sourceId":'
+    });
+    const body = await response.json();
+    assert.equal(response.status, 400);
+    assert.equal(body.success, false);
+    assert.match(body.error, /JSON/);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
+});

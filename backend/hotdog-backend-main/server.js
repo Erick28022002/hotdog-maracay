@@ -51,6 +51,16 @@ app.use(express.json({
   }
 }));
 
+app.use((err, req, res, next) => {
+  if (err?.type === 'entity.too.large') {
+    return res.status(413).json({ success: false, error: 'Solicitud demasiado grande' });
+  }
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ success: false, error: 'JSON invalido' });
+  }
+  next(err);
+});
+
 const paymentLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 15,
