@@ -2010,7 +2010,8 @@ function openCheckout(){
   document.getElementById('orderSummary').innerHTML=`<h4>Resumen del Pedido</h4>${cart.map(i=>`<div class="os-row"><span>${i.emoji} ${escHtml(i.name)} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}<div class="os-row"><span>Tax 7%</span><span>$${tax.toFixed(2)}</span></div><div class="os-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
   setPayButtonAmount(total);
   document.getElementById('sq-pay-btn').disabled=true;
-  toggleCart();
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('cartOverlay').classList.remove('open');
   document.getElementById('checkoutModal').classList.add('open');
   lockScroll();
   const currentLoc=document.getElementById('cLoc').value;
@@ -2202,7 +2203,8 @@ async function submitPayment(sourceId,form,resetBtn){
     if(resp.ok&&data.success){
       const rl=document.getElementById('sq-receipt-link');
       if(isSafeHttpsUrl(data.receiptUrl)){rl.href=data.receiptUrl;rl.style.display='inline';}else{rl.removeAttribute('href');rl.style.display='none';}
-      closeCheckout(); document.getElementById('successModal').classList.add('open');
+      document.getElementById('checkoutModal').classList.remove('open');
+      document.getElementById('successModal').classList.add('open');
       return;
     }
     showToast('⚠️ No se pudo procesar el pago. Verifica tus datos o intenta de nuevo.','info'); resetBtn();
@@ -2251,17 +2253,30 @@ function isSafeHttpsUrl(url){
 
 /* ── SCROLL LOCK (iOS safe) ── */
 let _scrollY=0;
+let _scrollLocked=false;
 function lockScroll(){
-  _scrollY=window.scrollY;
+  if(_scrollLocked)return;
+  _scrollY=window.pageYOffset || document.documentElement.scrollTop || 0;
+  _scrollLocked=true;
+  document.documentElement.style.scrollBehavior='auto';
+  document.documentElement.style.overflow='hidden';
   document.body.style.position='fixed';
   document.body.style.top=`-${_scrollY}px`;
   document.body.style.width='100%';
+  document.body.style.left='0';
+  document.body.style.right='0';
 }
 function unlockScroll(){
+  if(!_scrollLocked)return;
   document.body.style.position='';
   document.body.style.top='';
   document.body.style.width='';
+  document.body.style.left='';
+  document.body.style.right='';
+  document.documentElement.style.overflow='';
   window.scrollTo(0,_scrollY);
+  document.documentElement.style.scrollBehavior='';
+  _scrollLocked=false;
 }
 </script>
 </body>
