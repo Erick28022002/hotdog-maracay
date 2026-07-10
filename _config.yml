@@ -3,6 +3,7 @@ include:
 
 exclude:
   - backend
+  - fotos/*.jpg
   - AUDITORIA_*.md
   - .deploy-hotdog-maracay
   - node_modules
