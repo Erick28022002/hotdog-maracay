@@ -8,6 +8,7 @@ revoke all privileges on table public.profiles from anon;
 revoke delete, truncate, references, trigger on table public.profiles from authenticated;
 
 drop policy if exists own_profile on public.profiles;
+drop policy if exists authenticated_read on public.profiles;
 drop policy if exists profiles_self_insert_limited on public.profiles;
 
 create policy profiles_self_insert_limited
