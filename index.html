@@ -873,6 +873,7 @@ body{background:transparent}
 #sq-pay-btn{width:100%;background:linear-gradient(135deg,var(--mango),var(--terra));color:#000;font-family:var(--font-body);font-weight:900;font-size:15px;padding:15px;border:none;border-radius:14px;cursor:pointer;margin-top:16px;transition:filter .15s}
 #sq-pay-btn:hover:not(:disabled){filter:brightness(1.08)}
 #sq-pay-btn:disabled{opacity:.45;cursor:not-allowed}
+.pay-status{min-height:18px;margin:10px 0 0;color:var(--mango);font-size:12px;font-weight:800;text-align:center}
 
 /* ── CUSTOM MODAL ── */
 .custom-item-preview{display:flex;align-items:center;gap:14px;padding:14px;background:var(--s2);border-radius:14px;margin-bottom:20px}
@@ -1524,6 +1525,7 @@ body{background:transparent}
         <div id="sq-card-container" style="display:none"></div>
       </div>
       <button id="sq-pay-btn" onclick="sendOrder()" disabled>💳 Pagar</button>
+      <p class="pay-status" id="payStatus" aria-live="polite"></p>
       <p class="pay-note">🔒 Pago seguro con Square 🔒</p>
     </div>
   </div>
@@ -2080,8 +2082,9 @@ function openCheckout(){
     selectPaymentMethod('card');
   }
 }
-function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); unlockScroll(); }
+function closeCheckout(){ setPayStatus(''); document.getElementById('checkoutModal').classList.remove('open'); unlockScroll(); }
 function closeSuccess(){ document.getElementById('successModal').classList.remove('open'); unlockScroll(); cart=[]; renderCart(); }
+function setPayStatus(message=''){ const el=document.getElementById('payStatus'); if(el)el.textContent=message; }
 function showPaymentResult({pending=false,receiptUrl=''}={}){
   document.getElementById('successIcon').textContent=pending?'⏳':'✅';
   document.getElementById('successTitle').textContent=pending?'PAGO RECIBIDO':'¡PAGO EXITOSO!';
@@ -2091,6 +2094,7 @@ function showPaymentResult({pending=false,receiptUrl=''}={}){
   const rl=document.getElementById('sq-receipt-link');
   if(isSafeHttpsUrl(receiptUrl)){rl.href=receiptUrl;rl.style.display='inline';}else{rl.removeAttribute('href');rl.style.display='none';}
   document.getElementById('checkoutModal').classList.remove('open');
+  setPayStatus('');
   document.getElementById('successModal').classList.add('open');
 }
 
@@ -2277,6 +2281,7 @@ async function submitPayment(sourceId,form,resetBtn){
     notes:form.notes
   };
   try{
+    setPayStatus('Confirmando tu pago. No cierres ni recargues esta pantalla.');
     const resp=await fetch(BACKEND_URL+'/api/pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(orderPayload)});
     const data=await resp.json().catch(()=>({}));
     if(resp.ok&&data.success){
@@ -2287,8 +2292,9 @@ async function submitPayment(sourceId,form,resetBtn){
       showPaymentResult({pending:true});
       return;
     }
+    setPayStatus('');
     showToast('⚠️ No se pudo procesar el pago. Verifica tus datos o intenta de nuevo.','info'); resetBtn();
-  }catch(e){ showToast('⚠️ Error de conexión con el servidor','info'); resetBtn(); }
+  }catch(e){ setPayStatus(''); showToast('⚠️ Error de conexión con el servidor','info'); resetBtn(); }
 }
 async function sendOrder(){
   const form=validateCheckoutForm();
@@ -2299,10 +2305,11 @@ async function sendOrder(){
   payBtn.disabled=true; payBtn.textContent='⏳ Procesando...';
   const resetBtn=()=>{ payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; };
   try{
+    setPayStatus('Preparando pago seguro...');
     const result=await _sqCard.tokenize();
-    if(result.status!=='OK'){ showToast('⚠️ '+(result.errors?.[0]?.message||'Verifica los datos de tu tarjeta'),'info'); resetBtn(); return; }
+    if(result.status!=='OK'){ setPayStatus(''); showToast('⚠️ '+(result.errors?.[0]?.message||'Verifica los datos de tu tarjeta'),'info'); resetBtn(); return; }
     await submitPayment(result.token,form,resetBtn);
-  }catch(e){ showToast('⚠️ Error al procesar la tarjeta','info'); resetBtn(); }
+  }catch(e){ setPayStatus(''); showToast('⚠️ Error al procesar la tarjeta','info'); resetBtn(); }
 }
 async function payWithApplePay(){
   const form=validateCheckoutForm();
@@ -2312,10 +2319,11 @@ async function payWithApplePay(){
   btn.disabled=true;
   const resetBtn=()=>{ btn.disabled=false; };
   try{
+    setPayStatus('Esperando confirmación de Apple Pay...');
     const result=await _applePay.tokenize();
-    if(result.status!=='OK'){ showToast('⚠️ '+(result.errors?.[0]?.message||'No se pudo completar el pago con Apple Pay'),'info'); resetBtn(); return; }
+    if(result.status!=='OK'){ setPayStatus(''); showToast('⚠️ '+(result.errors?.[0]?.message||'No se pudo completar el pago con Apple Pay'),'info'); resetBtn(); return; }
     await submitPayment(result.token,form,resetBtn);
-  }catch(e){ showToast('⚠️ Error al procesar Apple Pay','info'); resetBtn(); }
+  }catch(e){ setPayStatus(''); showToast('⚠️ Error al procesar Apple Pay','info'); resetBtn(); }
 }
 
 /* ── TOAST ── */

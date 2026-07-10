@@ -151,6 +151,20 @@ async function estimateReadyTime(repository, attempt) {
   };
 }
 
+function sendOrderEmailsInBackground(attempt) {
+  setTimeout(async () => {
+    try {
+      const estimate = await estimateReadyTime(checkoutRepository, attempt);
+      const emailResult = await sendOrderEmails({ ...attempt, ...estimate });
+      if (emailResult.skipped) {
+        console.warn('ORDER_EMAIL_SKIPPED', emailResult.reason);
+      }
+    } catch (emailError) {
+      console.error('ORDER_EMAIL_ERROR', emailError?.message || emailError);
+    }
+  }, 0);
+}
+
 app.post('/api/pay', paymentLimiter, async (req, res) => {
   let approvedPaymentContext = null;
   let claimedAttemptId = null;
@@ -346,16 +360,7 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
       });
     }
 
-    try {
-      const estimate = await estimateReadyTime(checkoutRepository, approvedAttempt);
-      const emailResult = await sendOrderEmails({ ...approvedAttempt, ...estimate });
-      if (emailResult.skipped) {
-        console.warn('ORDER_EMAIL_SKIPPED', emailResult.reason);
-      }
-    } catch (emailError) {
-      console.error('ORDER_EMAIL_ERROR', emailError?.message || emailError);
-    }
-
+    sendOrderEmailsInBackground(approvedAttempt);
     res.json({ success: true, receiptUrl, total: Number(orderTotal) / 100 });
   } catch (err) {
     const errMsg = err?.errors?.[0]?.detail || err?.message || JSON.stringify(err);
