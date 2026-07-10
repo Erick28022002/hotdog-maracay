@@ -364,6 +364,10 @@ function fromForAttempt(attempt) {
     || '';
 }
 
+function internalOrderEmailEnabled() {
+  return String(process.env.ORDER_NOTIFICATION_EMAIL_ENABLED || '').toLowerCase() === 'true';
+}
+
 async function sendSmtpEmail({ transport, from, to, subject, text, html }) {
   if (!to) return { skipped: true, reason: 'missing_recipient' };
   const result = await transport.sendMail({ from, to, subject, text, html });
@@ -389,7 +393,7 @@ async function sendOrderEmails(attempt) {
     results.push(await sendEmail({ from, to: customerEmail, ...email }));
   }
 
-  const restaurantEmail = process.env.ORDER_NOTIFICATION_EMAIL || '';
+  const restaurantEmail = internalOrderEmailEnabled() ? process.env.ORDER_NOTIFICATION_EMAIL || '' : '';
   if (restaurantEmail) {
     const email = buildRestaurantEmail(attempt);
     results.push(await sendEmail({ from, to: restaurantEmail, ...email }));
