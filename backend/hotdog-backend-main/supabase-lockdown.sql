@@ -7,10 +7,30 @@ drop policy if exists "Permitir insertar" on public.web_orders;
 drop policy if exists "Permitir actualizar" on public.web_orders;
 drop policy if exists web_orders_staff_read on public.web_orders;
 drop policy if exists web_orders_staff_update on public.web_orders;
+drop policy if exists web_orders_staff_update_limited on public.web_orders;
 
 revoke all privileges on table public.web_orders from anon;
 revoke insert, update, delete, truncate, references, trigger on table public.web_orders from authenticated;
 grant select on table public.web_orders to authenticated;
+
+-- Compatibility with the live KDS hosted at maracayos.duckdns.org/kds.
+-- That app currently updates only status and sort_pos directly from the
+-- browser. Keep the grant column-scoped so staff cannot update customer,
+-- payment, item, or receipt fields from the client.
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'web_orders'
+      and column_name = 'sort_pos'
+  ) then
+    execute 'grant update (status, sort_pos) on table public.web_orders to authenticated';
+  else
+    execute 'grant update (status) on table public.web_orders to authenticated';
+  end if;
+end $$;
 
 create policy web_orders_staff_read
 on public.web_orders
@@ -18,8 +38,15 @@ for select
 to authenticated
 using (public.auth_is_admin() or location = public.get_my_sede());
 
--- Staff/KDS must not receive direct UPDATE over the whole row. Use this RPC
--- to change only status, with an optimistic expected-status check.
+create policy web_orders_staff_update_limited
+on public.web_orders
+for update
+to authenticated
+using (public.auth_is_admin() or location = public.get_my_sede())
+with check (public.auth_is_admin() or location = public.get_my_sede());
+
+-- Future KDS versions can use this RPC for safer status transitions with an
+-- optimistic expected-status check.
 create or replace function public.transition_web_order_status(
   p_order_id text,
   p_expected text,
