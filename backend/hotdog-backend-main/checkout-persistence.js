@@ -90,17 +90,15 @@ function locationDisplayName(location) {
   return SEDE_DISPLAY_NAMES[location] || location;
 }
 
-// El titulo del ticket en el KDS debe identificar el ORIGEN del pedido (igual
-// que "Mesa 4" identifica una mesa), no el nombre del cliente. El nombre/
-// telefono reales se conservan en customer_phone y en web_checkout_attempts
-// para soporte, pero el ticket muestra esto.
-const PICKUP_TICKET_TITLE = 'PAGINA WEB PICK-UP';
-
 function webOrderFromAttempt(attempt) {
   return {
-    customer_name: attempt.order_type === 'pickup' ? PICKUP_TICKET_TITLE : (attempt.customer?.name || ''),
+    customer_name: attempt.customer?.name || '',
     customer_phone: attempt.customer?.phone || '',
     customer_email: attempt.customer?.email || '',
+    // Identifica el pedido como venido de la pagina web para que el KDS
+    // muestre "Pickup Web" en vez de "Para llevar" generico, sin tocar el
+    // nombre del cliente (que se queda en el titulo del ticket).
+    channel: 'web',
     items: attempt.items || [],
     total: Number(attempt.total || 0),
     payment_id: attempt.payment_id,
