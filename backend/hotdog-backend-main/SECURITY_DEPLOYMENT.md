@@ -11,9 +11,17 @@ para Production, Preview y Development:
 - `SQUARE_WEBHOOK_KEY`
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `RESEND_API_KEY`
+- `ORDER_CONFIRMATION_FROM`
+- `ORDER_NOTIFICATION_EMAIL`
 
 La clave `SUPABASE_SERVICE_ROLE_KEY` se obtiene en Supabase > Project Settings >
 API Keys. Nunca debe copiarse al frontend, subirse a GitHub ni enviarse por chat.
+
+`RESEND_API_KEY` activa los correos de confirmacion. `ORDER_CONFIRMATION_FROM`
+debe ser un remitente verificado en Resend, por ejemplo
+`Hot Dog Maracay <orders@hotdogmaracay.com>`. `ORDER_NOTIFICATION_EMAIL` es el
+correo interno del restaurante que recibira copia de cada orden pagada.
 
 ## 2. Despliegue coordinado
 

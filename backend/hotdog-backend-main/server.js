@@ -12,6 +12,7 @@ const {
   persistApprovedCheckout,
   reconcileApprovedCheckout
 } = require('./checkout-persistence');
+const { sendOrderEmails } = require('./email-confirmation');
 
 const ALLOWED_ORIGINS = [
   'https://erick28022002.github.io',
@@ -270,6 +271,7 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
       amountMoney: { amount: orderTotal, currency: 'USD' },
       locationId: branch.locationId,
       orderId,
+      buyerEmailAddress: customerEmail || undefined,
       note: `${customerName} | ${orderType} | ${location} | ${safeNotes}`
     });
 
@@ -309,6 +311,15 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
         paymentId,
         message: 'Tu pago fue aprobado y esta siendo verificado. No vuelvas a pagar.'
       });
+    }
+
+    try {
+      const emailResult = await sendOrderEmails(approvedAttempt);
+      if (emailResult.skipped) {
+        console.warn('ORDER_EMAIL_SKIPPED', emailResult.reason);
+      }
+    } catch (emailError) {
+      console.error('ORDER_EMAIL_ERROR', emailError?.message || emailError);
     }
 
     res.json({ success: true, paymentId, receiptUrl, total: Number(orderTotal) / 100 });
