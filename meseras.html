@@ -276,6 +276,17 @@
     }
     .fab-hist:hover { border-color:var(--accent); color:var(--accent) }
 
+    /* ═══ CONFIRMAR SALIR ═══ */
+    .confirm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000; align-items:center; justify-content:center }
+    .confirm-overlay.show { display:flex }
+    .confirm-box   { background:#1C1C1C; border:1px solid #333; border-radius:14px; padding:24px; width:280px; text-align:center }
+    .confirm-title { font-size:17px; font-weight:800; color:#F0F0F0; margin-bottom:6px }
+    .confirm-sub   { font-size:13px; color:#888; margin-bottom:20px }
+    .confirm-btns  { display:flex; gap:10px }
+    .confirm-btn   { flex:1; padding:12px; border-radius:10px; border:none; font-size:14px; font-weight:700; cursor:pointer }
+    .confirm-cancel { background:#2A2A2A; color:#F0F0F0 }
+    .confirm-ok    { background:var(--urgent); color:#fff }
+
     /* ═══ PANEL DE PRODUCCIÓN ═══ */
     .prod-panel { display:flex; align-items:center; gap:5px }
     .prod-pill {
@@ -397,9 +408,21 @@
     </div>
     <div class="fab-div"></div>
     <button class="fab-hist" onclick="openHist()">↑ Historial</button>
-    <button class="fab-hist" onclick="logout()">⎋ Salir</button>
+    <button class="fab-hist" onclick="confirmLogout()">⎋ Salir</button>
   </div>
 
+</div>
+
+<!-- CONFIRMAR SALIR -->
+<div class="confirm-overlay" id="logoutConfirm">
+  <div class="confirm-box">
+    <div class="confirm-title">¿Cerrar sesión?</div>
+    <div class="confirm-sub">Vas a salir de esta sede.</div>
+    <div class="confirm-btns">
+      <button class="confirm-btn confirm-cancel" onclick="cancelLogout()">Cancelar</button>
+      <button class="confirm-btn confirm-ok" onclick="confirmLogoutYes()">Sí, salir</button>
+    </div>
+  </div>
 </div>
 
 <!-- HISTORIAL -->
@@ -510,6 +533,12 @@ async function logout() {
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPass').value = '';
   document.getElementById('pinErr').textContent = '';
+}
+function confirmLogout() { document.getElementById('logoutConfirm').classList.add('show'); }
+function cancelLogout()  { document.getElementById('logoutConfirm').classList.remove('show'); }
+async function confirmLogoutYes() {
+  document.getElementById('logoutConfirm').classList.remove('show');
+  await logout();
 }
 
 /* ── KDS ── */
