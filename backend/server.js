@@ -363,6 +363,11 @@ function safeJSON(str, fallback) {
 }
 
 /* ══ ARRANCAR SERVIDOR ══════════════════════════════════════*/
+if (process.env.LEGACY_BACKEND_ENABLE !== 'true') {
+  console.error('Backend legado desactivado. Usa backend/hotdog-backend-main/server.js para produccion.');
+  process.exit(1);
+}
+
 app.listen(PORT, () => {
   console.log(`\n🌭 Hot Dog Maracay Backend · Puerto ${PORT}`);
   console.log(`   Square: ${SQUARE_ENV} | Token: ${SQUARE_TOKEN ? '✓ configurado' : '✗ FALTA'}`);

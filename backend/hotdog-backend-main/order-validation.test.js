@@ -28,6 +28,26 @@ test('calcula precios, extras e impuesto desde el catalogo del servidor', () => 
   assert.equal(order.totalCents, 2140);
 });
 
+test('cobra salsas extra despues de las incluidas por tipo de producto', () => {
+  const combo = promoSelections();
+  combo.sauces = ['Ajo', 'Pina', 'Queso', 'BBQ'];
+  const comboOrder = buildTrustedOrder([{ productId: 'promo-clasica', qty: 1, selections: combo }]);
+  assert.equal(comboOrder.items[0].unitCents, 2100);
+
+  const individualOrder = buildTrustedOrder([{
+    productId: 'hd-clasico',
+    qty: 1,
+    selections: {
+      removedToppings: [[]],
+      extras: [[]],
+      sauces: ['Ajo', 'Pina', 'Queso'],
+      drink: undefined,
+      note: ''
+    }
+  }]);
+  assert.equal(individualOrder.items[0].unitCents, 785);
+});
+
 test('ignora nombres y precios inventados por el cliente', () => {
   const order = buildTrustedOrder([{
     productId: 'beb-agua',

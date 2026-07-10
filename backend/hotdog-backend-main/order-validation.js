@@ -8,6 +8,7 @@ const MAX_TOTAL_QUANTITY = 50;
 const TOPPINGS = new Set(['Repollo', 'Cebolla', 'Papitas', 'Maiz', 'Ketchup', 'Mayonesa', 'Mostaza', 'Queso amarillo']);
 const EXTRAS = new Map([['Queso de Mano', 200], ['Tocineta', 200]]);
 const SAUCES = new Set(['Ajo', 'Chica Sexi', 'Maiz', 'Queso', 'Tocineta', 'Pina', 'Picante', 'BBQ', 'Queso de Ano']);
+const EXTRA_SAUCE_CENTS = 50;
 const DRINKS = new Map([
   ['Coca Cola', 0], ['Coca Cola Zero', 0], ['Diet Coke', 0], ['Sprite', 0],
   ['Nestea Limon', 0], ['Nestea Durazno', 0], ['Frescolita', 350],
@@ -88,8 +89,10 @@ function buildSelections(product, rawSelections) {
     perHotDogMods.push(buildHotDogMods(removed, extras));
   }
 
-  const sauces = uniqueAllowed(selections.sauces, SAUCES, 'Salsas', 2);
+  const sauces = uniqueAllowed(selections.sauces, SAUCES, 'Salsas', SAUCES.size);
   if (sauces.length < 1) throw new Error('Debes elegir al menos una salsa');
+  const includedSauces = product.hotDogs >= 2 ? 2 : 1;
+  extraCents += Math.max(0, sauces.length - includedSauces) * EXTRA_SAUCE_CENTS;
   const general = [...sauces];
 
   const drink = normalizeOption(selections.drink);

@@ -14,3 +14,10 @@ assets/
 *.tmp
 *.log
 Thumbs.db
+
+# Secretos locales / variables de entorno
+.env
+.env.*
+!.env.example
+!backend/.env.example
+!backend/hotdog-backend-main/.env.example
