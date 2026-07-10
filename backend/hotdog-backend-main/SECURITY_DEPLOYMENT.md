@@ -73,7 +73,9 @@ backend usa SMTP primero.
 8. Aplicar `supabase-lockdown.sql` desde Supabase SQL Editor.
 9. Aplicar `supabase-authenticated-functions-hardening.sql` desde Supabase SQL
    Editor para limitar RPC autenticadas por sede.
-10. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+10. Aplicar `supabase-profiles-hardening.sql` desde Supabase SQL Editor para
+   impedir cambios de rol/sede por self-service.
+11. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
@@ -86,3 +88,6 @@ un contrato de pedido nuevo y deben publicarse juntos.
 - Activar MFA en Vercel, Square, Supabase, GitHub y el proveedor del dominio.
 - Revisar las tablas publicas sin RLS antes de habilitar RLS en bloque, porque el
   proyecto contiene otras aplicaciones que pueden depender de ellas.
+- Antes de desplegar nuevamente el backend, reponer `SQUARE_WEBHOOK_KEY` en
+  Vercel Production desde Square Dashboard. El despliegue activo conserva la
+  clave, pero la variable ya no aparece en la lista actual de Production.
