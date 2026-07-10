@@ -154,11 +154,23 @@ function renderItemsText(items) {
   }).join('\n');
 }
 
+function renderDetailLineHtml(line) {
+  const hdMatch = String(line).match(/^(\[HD\d+\]\s+)(Sin|Extra|Nota):(.*)$/i);
+  if (hdMatch) {
+    return `<strong style="color:${BRAND.red};font-weight:900">${escapeHtml(hdMatch[1])}${escapeHtml(hdMatch[2])}:</strong>${escapeHtml(hdMatch[3])}`;
+  }
+  const labelMatch = String(line).match(/^(Salsa acompanante|Bebida|Nota|Sin|Extra):(.*)$/i);
+  if (labelMatch) {
+    return `<strong style="color:${BRAND.red};font-weight:900">${escapeHtml(labelMatch[1])}:</strong>${escapeHtml(labelMatch[2])}`;
+  }
+  return escapeHtml(line);
+}
+
 function renderItemsHtml(items) {
   return (items || []).map(item => {
     const qty = item.qty || item.quantity || 1;
     const details = formatItemDetailLines(item)
-      .map(line => `<div style="color:${BRAND.muted};font-size:13px;margin-top:7px;line-height:1.45">${escapeHtml(line)}</div>`)
+      .map(line => `<div style="color:${BRAND.muted};font-size:13px;margin-top:7px;line-height:1.45">${renderDetailLineHtml(line)}</div>`)
       .join('');
     return `
       <tr>
