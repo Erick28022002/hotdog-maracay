@@ -1555,7 +1555,6 @@ body{background:transparent}
 
 <div class="toast-wrap" id="toastWrap"></div>
 
-<script src="https://web.squarecdn.com/v1/square.js" async></script>
 <script>
 /* Fija el alto del viewport en móvil una sola vez — evita el salto por la barra del URL */
 (function(){
@@ -2074,6 +2073,21 @@ const CHECKOUT_LIMITS={name:80,phone:25,email:120,notes:300,details:500,maxItems
 let _sqPayments=null, _sqCard=null, _sqBranch=null, _applePay=null;
 let _checkoutAttemptId=null;
 let _paymentMethod='card';
+let _squareSdkPromise=null;
+
+function loadSquareSdk(){
+  if(window.Square)return Promise.resolve();
+  if(_squareSdkPromise)return _squareSdkPromise;
+  _squareSdkPromise=new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='https://web.squarecdn.com/v1/square.js';
+    script.async=true;
+    script.onload=()=>window.Square?resolve():reject(new Error('Square SDK no disponible'));
+    script.onerror=()=>reject(new Error('No se pudo cargar Square'));
+    document.head.appendChild(script);
+  });
+  return _squareSdkPromise;
+}
 
 function createCheckoutAttemptId(){
   if(crypto.randomUUID)return crypto.randomUUID();
@@ -2133,7 +2147,8 @@ async function initSquareForBranch(branchCode){
   selectPaymentMethod('card');
   try{
     if(_sqCard){ await _sqCard.destroy(); _sqCard=null; _sqBranch=null; _applePay=null; }
-    _sqPayments=Square.payments(branch.applicationId,branch.locationId);
+    await loadSquareSdk();
+    _sqPayments=window.Square.payments(branch.applicationId,branch.locationId);
     _sqCard=await _sqPayments.card({style:{
       '.input-container':{borderColor:'#ddd',borderRadius:'10px'},
       '.input-container.is-focus':{borderColor:'#FAA83C'},
