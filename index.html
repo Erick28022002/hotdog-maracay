@@ -1000,10 +1000,10 @@ body{background:transparent}
       <a href="#locations" class="btn-outline">📍 Ubicaciones</a>
     </div>
     <div class="hero-stats" id="heroStats">
-      <div class="stat"><div class="stat-num" id="s1">0</div><div class="stat-lbl">Calificación ★</div></div>
-      <div class="stat"><div class="stat-num" id="s2">0</div><div class="stat-lbl">Reseñas</div></div>
-      <div class="stat"><div class="stat-num" id="s3">0</div><div class="stat-lbl">Ubicaciones</div></div>
-      <div class="stat"><div class="stat-num" id="s4">0</div><div class="stat-lbl">+ Salsas</div></div>
+      <div class="stat"><div class="stat-num" id="s1">4.9</div><div class="stat-lbl">Calificación ★</div></div>
+      <div class="stat"><div class="stat-num" id="s2">564</div><div class="stat-lbl">Reseñas</div></div>
+      <div class="stat"><div class="stat-num" id="s3">3</div><div class="stat-lbl">Ubicaciones</div></div>
+      <div class="stat"><div class="stat-num" id="s4">12</div><div class="stat-lbl">+ Salsas</div></div>
     </div>
   </div>
 </section>
@@ -1658,17 +1658,28 @@ function countUp(el, target, decimals) {
     else el.textContent=decimals?target.toFixed(1):target;
   })(start);
 }
+function startHeroStatsCount(){
+  const stats = document.getElementById('heroStats');
+  if(!stats || stats.dataset.counted)return;
+  stats.dataset.counted='true';
+  countUp(document.getElementById('s1'),4.9,true);
+  countUp(document.getElementById('s2'),564);
+  countUp(document.getElementById('s3'),3);
+  countUp(document.getElementById('s4'),12);
+}
+if('IntersectionObserver' in window){
+  const statsObserver = new IntersectionObserver(entries=>{
+    if(entries.some(e=>e.isIntersecting)){
+      startHeroStatsCount();
+      statsObserver.disconnect();
+    }
+  },{threshold:.25});
+  const statsEl = document.getElementById('heroStats');
+  if(statsEl)statsObserver.observe(statsEl);
+}else{
+  startHeroStatsCount();
+}
 function initScrollAnimations(){
-ScrollTrigger.create({
-  trigger:'#heroStats', start:'top 90%', once:true,
-  onEnter:()=>{
-    countUp(document.getElementById('s1'),4.9,true);
-    countUp(document.getElementById('s2'),564);
-    countUp(document.getElementById('s3'),3);
-    countUp(document.getElementById('s4'),12);
-  }
-});
-
 /* ── FEATURES ── */
 if (document.querySelector('.features-sec')) {
   gsap.to('.feat-card',{
