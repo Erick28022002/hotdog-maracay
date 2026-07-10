@@ -926,13 +926,13 @@ body{background:transparent}
 <!-- BOTTOM NAV (móvil) -->
 <nav class="bottom-nav" aria-label="Navegación principal móvil">
 
-  <button class="bn-item" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">
+  <button class="bn-item" onclick="scrollMobileTarget('menu','menuMobileFocus')">
     <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="2" x2="8" y2="6"/><line x1="8" y1="10" x2="8" y2="22"/><path d="M6 2v4a2 2 0 0 0 4 0V2"/><line x1="16" y1="2" x2="16" y2="22"/></svg></span>Menú
   </button>
-  <button class="bn-item" onclick="document.getElementById('delivery').scrollIntoView({behavior:'smooth'})">
+  <button class="bn-item" onclick="scrollMobileTarget('delivery','deliveryMobileFocus')">
     <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>Delivery
   </button>
-  <button class="bn-item" onclick="document.getElementById('locations').scrollIntoView({behavior:'smooth'})">
+  <button class="bn-item" onclick="scrollMobileTarget('locations','locationsMobileFocus')">
     <span class="bn-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>Lugares
   </button>
   <button class="bn-item bn-cart" onclick="toggleCart()">
@@ -946,9 +946,9 @@ body{background:transparent}
 <!-- MOBILE NAV DRAWER -->
 <div class="mobile-nav" id="mobileNav">
   <button class="mn-close" onclick="closeMobileNav()">✕</button>
-  <a href="#menu" onclick="closeMobileNav()">Menú</a>
-  <a href="#delivery" onclick="closeMobileNav()">Delivery</a>
-  <a href="#locations" onclick="closeMobileNav()">Ubicaciones</a>
+  <a href="#menu" onclick="closeMobileNav(); setTimeout(()=>scrollMobileTarget('menu','menuMobileFocus'),0); return false;">Menú</a>
+  <a href="#delivery" onclick="closeMobileNav(); setTimeout(()=>scrollMobileTarget('delivery','deliveryMobileFocus'),0); return false;">Delivery</a>
+  <a href="#locations" onclick="closeMobileNav(); setTimeout(()=>scrollMobileTarget('locations','locationsMobileFocus'),0); return false;">Ubicaciones</a>
   <a href="#historia" onclick="closeMobileNav()">Historia</a>
   <a href="#reviews" onclick="closeMobileNav()">Reseñas</a>
   <a href="#reels" onclick="closeMobileNav()">Reels</a>
@@ -1077,7 +1077,7 @@ body{background:transparent}
     </div>
 
     <!-- Promo Destacada -->
-    <div class="promo-card">
+    <div class="promo-card" id="menuMobileFocus">
       <div class="promo-left">
         <div class="promo-eyebrow">🌭 LA MÁS PEDIDA</div>
         <div class="promo-title">PROMO<br>CLÁSICA</div>
@@ -1167,7 +1167,7 @@ body{background:transparent}
     <span class="sec-tag">Delivery</span>
     <h2 class="sec-title">PÍDELO DESDE<br><span class="n-blue">DONDE ESTÉS</span></h2>
     <p class="sec-sub">Disponibles en las principales plataformas de Miami.</p>
-    <div class="delivery-grid">
+    <div class="delivery-grid" id="deliveryMobileFocus">
       <div class="app-card" onclick="openDeliveryModal('ubereats')" role="button" tabindex="0">
         <div class="app-logo" style="background:#142328;padding:8px"><img src="fotos/logo-ubereats.webp" alt="Uber Eats" style="width:100%;height:100%;object-fit:contain" loading="lazy"></div>
         <div class="app-info"><h3>Uber Eats</h3><p>Elige tu sede y pide en tiempo real</p></div>
@@ -1198,7 +1198,7 @@ body{background:transparent}
     <span class="sec-tag">Ubicaciones</span>
     <h2 class="sec-title">ESTAMOS EN<br><span class="n-mango">TODO MIAMI</span></h2>
     <p class="sec-sub">3 ubicaciones para servirte. Estacionamiento amplio y ambiente familiar en todas.</p>
-    <div class="loc-list">
+    <div class="loc-list" id="locationsMobileFocus">
 
       <div class="loc-item loc-reveal">
         <div>
@@ -1588,6 +1588,15 @@ function closeMobileNav() {
   document.getElementById('mobileNav').classList.remove('open');
   document.getElementById('ham').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+function scrollMobileTarget(sectionId, mobileTargetId) {
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const target = document.getElementById(isMobile ? mobileTargetId : sectionId) || document.getElementById(sectionId);
+  if (!target) return;
+  const topComfort = isMobile ? 16 : 0;
+  const y = target.getBoundingClientRect().top + window.pageYOffset - topComfort;
+  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
 }
 
 function toggleReel(el) {
