@@ -13,6 +13,10 @@ revoke all privileges on table public.web_orders from anon;
 revoke insert, update, delete, truncate, references, trigger on table public.web_orders from authenticated;
 grant select on table public.web_orders to authenticated;
 
+alter table public.web_orders
+  add column if not exists updated_at timestamptz not null default now(),
+  add column if not exists version integer not null default 0;
+
 -- Compatibility with the live KDS hosted at maracayos.duckdns.org/kds.
 -- That app currently updates only status and sort_pos directly from the
 -- browser. Keep the grant column-scoped so staff cannot update customer,
