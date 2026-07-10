@@ -33,7 +33,7 @@ as $$
 declare
   v_order public.web_orders;
   v_allowed_statuses constant text[] := array[
-    'paid', 'pending', 'preparing', 'ready',
+    'new', 'paid', 'pending', 'preparing', 'ready',
     'completed', 'complete', 'done',
     'cancelled', 'canceled'
   ];
