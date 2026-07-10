@@ -73,11 +73,13 @@ backend usa SMTP primero.
 8. Aplicar `supabase-lockdown.sql` desde Supabase SQL Editor.
 9. Aplicar `supabase-authenticated-functions-hardening.sql` desde Supabase SQL
    Editor para limitar RPC autenticadas por sede.
-10. Aplicar `supabase-profiles-hardening.sql` desde Supabase SQL Editor para
+10. Aplicar `supabase-profile-identity-hardening.sql` desde Supabase SQL Editor
+   para que solo cuentas activas/aprobadas otorguen acceso admin o por sede.
+11. Aplicar `supabase-profiles-hardening.sql` desde Supabase SQL Editor para
    impedir cambios de rol/sede por self-service.
-11. Aplicar `supabase-anon-hardening.sql` desde Supabase SQL Editor para quitar
+12. Aplicar `supabase-anon-hardening.sql` desde Supabase SQL Editor para quitar
    permisos anonimos directos sobre tablas y vistas internas.
-12. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+13. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
