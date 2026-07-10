@@ -112,6 +112,7 @@
     /* Ticket: cliente */
     .tk-head { padding:14px 16px 10px; border-bottom:1px solid var(--sep) }
     .tk-name { font-size:22px; font-weight:900; color:var(--text); letter-spacing:-.3px; margin-bottom:7px; line-height:1.1; word-break:break-word }
+    .tk-phone { font-size:13px; font-weight:700; color:var(--muted); margin:-4px 0 7px }
     .tk-badges { display:flex; align-items:center; gap:6px; flex-wrap:wrap }
     .tk-badge { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; padding:3px 9px; border-radius:4px }
     .tk-badge.pickup   { background:#FFF3E0; color:#BF360C }
@@ -1224,9 +1225,10 @@ function render() {
     el.innerHTML =
       '<div class="tk-head">' +
         '<div class="tk-name">' + esc(custName) + '</div>' +
+        (o.customer_phone ? '<div class="tk-phone">' + esc(o.customer_phone) + '</div>' : '') +
         ((channelBadge(o) || isTakeout) ? '<div class="tk-badges-row">' +
           channelBadge(o) +
-          (isTakeout ? '<span class="chan chan-takeout">🏠 Para llevar</span>' : '') +
+          (isTakeout ? '<span class="chan chan-takeout">🏠 ' + (o.channel === 'web' ? 'Pickup Web' : 'Para llevar') + '</span>' : '') +
         '</div>' : '') +
       '</div>' +
       '<div class="tk-items">' + itemsHtml + '</div>' +
