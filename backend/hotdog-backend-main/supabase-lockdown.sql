@@ -56,8 +56,9 @@ with check (
   )
 );
 
--- Future KDS versions can use this RPC for safer status transitions with an
--- optimistic expected-status check.
+-- Future server-side KDS versions can use this RPC for safer status
+-- transitions with an optimistic expected-status check. It is not exposed to
+-- browser roles; the current KDS uses the column-limited status/sort_pos grant.
 create or replace function public.transition_web_order_status(
   p_order_id text,
   p_expected text,
@@ -103,6 +104,8 @@ end;
 $$;
 
 revoke all on function public.transition_web_order_status(text, text, text) from public;
-grant execute on function public.transition_web_order_status(text, text, text) to authenticated;
+revoke all on function public.transition_web_order_status(text, text, text) from anon;
+revoke all on function public.transition_web_order_status(text, text, text) from authenticated;
+grant execute on function public.transition_web_order_status(text, text, text) to service_role;
 
 commit;

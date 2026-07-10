@@ -1652,14 +1652,17 @@ const reelObserver = new IntersectionObserver(entries => {
 document.querySelectorAll('.reel-item').forEach(r => reelObserver.observe(r));
 
 function countUp(el, target, decimals) {
+  if(!el)return;
   const dur=1800, start=performance.now();
+  const finalValue=decimals?target.toFixed(1):String(target);
   (function step(now){
     const p=Math.min((now-start)/dur,1);
     const e=1-Math.pow(1-p,3);
     el.textContent=decimals?(target*e).toFixed(1):Math.round(target*e);
     if(p<1)requestAnimationFrame(step);
-    else el.textContent=decimals?target.toFixed(1):target;
+    else el.textContent=finalValue;
   })(start);
+  setTimeout(()=>{ el.textContent=finalValue; }, dur + 350);
 }
 function startHeroStatsCount(){
   const stats = document.getElementById('heroStats');
