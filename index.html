@@ -1533,9 +1533,9 @@ body{background:transparent}
 <div class="modal-wrap" id="successModal">
   <div class="modal">
     <div class="success-body">
-      <div class="success-ico">✅</div>
-      <h2>¡PAGO EXITOSO!</h2>
-      <p>Tu pedido fue recibido y tu pago procesado.<br>Si dejaste correo, recibirás la confirmación de tu orden.</p>
+      <div class="success-ico" id="successIcon">✅</div>
+      <h2 id="successTitle">¡PAGO EXITOSO!</h2>
+      <p id="successMessage">Tu pedido fue recibido y tu pago procesado.<br>Si dejaste correo, recibirás la confirmación de tu orden.</p>
       <a id="sq-receipt-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none;color:var(--mango);font-size:14px;font-weight:700;margin-top:16px;text-decoration:underline">🧾 Ver Recibo</a>
       <button class="btn-primary" style="margin-top:28px;justify-content:center;width:100%" onclick="closeSuccess()">Volver al Menú</button>
     </div>
@@ -2082,6 +2082,17 @@ function openCheckout(){
 }
 function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); unlockScroll(); }
 function closeSuccess(){ document.getElementById('successModal').classList.remove('open'); unlockScroll(); cart=[]; renderCart(); }
+function showPaymentResult({pending=false,receiptUrl=''}={}){
+  document.getElementById('successIcon').textContent=pending?'⏳':'✅';
+  document.getElementById('successTitle').textContent=pending?'PAGO RECIBIDO':'¡PAGO EXITOSO!';
+  document.getElementById('successMessage').innerHTML=pending
+    ? 'Tu pago fue recibido y está en verificación.<br>No vuelvas a pagar. Si dejaste correo, recibirás la confirmación cuando quede registrado.'
+    : 'Tu pedido fue recibido y tu pago procesado.<br>Si dejaste correo, recibirás la confirmación de tu orden.';
+  const rl=document.getElementById('sq-receipt-link');
+  if(isSafeHttpsUrl(receiptUrl)){rl.href=receiptUrl;rl.style.display='inline';}else{rl.removeAttribute('href');rl.style.display='none';}
+  document.getElementById('checkoutModal').classList.remove('open');
+  document.getElementById('successModal').classList.add('open');
+}
 
 function attachSwipeClose(targetId, closeFn) {
   const target = document.getElementById(targetId);
@@ -2269,10 +2280,11 @@ async function submitPayment(sourceId,form,resetBtn){
     const resp=await fetch(BACKEND_URL+'/api/pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(orderPayload)});
     const data=await resp.json().catch(()=>({}));
     if(resp.ok&&data.success){
-      const rl=document.getElementById('sq-receipt-link');
-      if(isSafeHttpsUrl(data.receiptUrl)){rl.href=data.receiptUrl;rl.style.display='inline';}else{rl.removeAttribute('href');rl.style.display='none';}
-      document.getElementById('checkoutModal').classList.remove('open');
-      document.getElementById('successModal').classList.add('open');
+      showPaymentResult({receiptUrl:data.receiptUrl});
+      return;
+    }
+    if(resp.ok&&(data.paymentApproved||data.paymentStatus==='verification_pending'||data.paymentStatus==='processing')){
+      showPaymentResult({pending:true});
       return;
     }
     showToast('⚠️ No se pudo procesar el pago. Verifica tus datos o intenta de nuevo.','info'); resetBtn();
