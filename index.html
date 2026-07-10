@@ -1808,7 +1808,7 @@ function toppingBlockHTML(n, label) {
         <div class="custom-checks" id="customChecks${n}">
           ${TOPPINGS.map(t=>`<label class="custom-check" onclick="toggleTopping(this,event)"><input type="checkbox" value="${t}" checked><div class="ck-box">✓</div><span class="ck-lbl">${t}</span></label>`).join('')}
         </div>
-        <p style="font-size:11px;font-weight:700;color:var(--mango);letter-spacing:.5px;margin:10px 0 6px">EXTRAS (+$2.00 c/u):</p>
+        <p style="font-size:11px;font-weight:700;color:var(--mango);letter-spacing:.5px;margin:10px 0 6px">EXTRAS (${n > 1 ? 'HOT DOG 2' : 'HOT DOG 1'}):</p>
         <div class="custom-checks" id="customExtras${n}">
           ${EXTRAS.map(e=>`<label class="custom-check" onclick="toggleExtra(this,event)"><input type="checkbox" value="${e.name}" data-price="${e.price}"><div class="ck-box">✓</div><span class="ck-lbl">${e.name} <em style="color:var(--mango);font-style:normal;font-size:11px">+$${e.price.toFixed(2)}</em></span></label>`).join('')}
         </div>
