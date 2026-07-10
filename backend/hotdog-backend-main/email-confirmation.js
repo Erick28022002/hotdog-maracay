@@ -177,7 +177,7 @@ function statusLabel(attempt) {
 function statusBadge(label) {
   const normalized = normalizeText(label).toLowerCase();
   const colors = {
-    confirmado: { color: BRAND.text, border: BRAND.gold },
+    confirmado: { color: '#1B8F2F', border: '#D8F2D8', bg: '#EAF8EA' },
     preparando: { color: BRAND.text, border: BRAND.gold },
     'en cocina': { color: BRAND.text, border: BRAND.gold },
     listo: { color: BRAND.text, border: BRAND.text },
@@ -186,7 +186,7 @@ function statusBadge(label) {
     cancelado: { color: BRAND.red, border: BRAND.red }
   };
   const style = colors[normalized] || colors.confirmado;
-  return `<span style="display:inline-block;border:1px solid ${style.border};border-radius:999px;background:#FFFFFF;color:${style.color};padding:5px 10px;font-size:12px;font-weight:700;line-height:1">${escapeHtml(label)}</span>`;
+  return `<span style="display:inline-block;border:1px solid ${style.border};border-radius:999px;background:${style.bg || '#FFFFFF'};color:${style.color};padding:7px 12px;font-size:14px;font-weight:800;line-height:1">${escapeHtml(label)}</span>`;
 }
 
 function formatComponentLine(component, index) {
@@ -255,21 +255,21 @@ function renderItemsHtml(items) {
   }).join('');
 }
 
-function card(title, body) {
+function card(title, body, tone = 'default') {
+  const titleColor = tone === 'red' ? BRAND.red : BRAND.text;
   return `
-    <section style="background:${BRAND.card};border-radius:20px;padding:32px;margin:0 0 24px;box-shadow:0 10px 30px rgba(17,17,17,.06)">
-      ${title ? `<h2 style="margin:0 0 18px;color:${BRAND.text};font-size:20px;line-height:1.2;font-weight:700">${escapeHtml(title)}</h2>` : ''}
+    <section class="receipt-card" style="background:${BRAND.card};border-radius:20px;padding:32px;margin:0 0 24px;box-shadow:0 10px 30px rgba(17,17,17,.08);border:1px solid ${BRAND.divider}">
+      ${title ? `<h2 style="margin:0 0 18px;color:${titleColor};font-size:20px;line-height:1.2;font-weight:900;text-transform:uppercase;letter-spacing:.3px">${escapeHtml(title)}</h2>` : ''}
       ${body}
     </section>`;
 }
 
 function receiptHeader() {
   return `
-    <header style="background:${BRAND.header};border-radius:20px;padding:32px;margin:0 0 24px;color:#fff;box-shadow:0 10px 30px rgba(17,17,17,.08)">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:24px">
-        <img src="${BRAND.logoUrl}" alt="${BRAND.name}" style="display:block;width:124px;max-width:32%;height:auto;border-radius:16px;background:${BRAND.header}">
-        <div style="flex:1;text-align:center;color:#fff;font-size:40px;line-height:1.05;font-weight:700;letter-spacing:0;text-transform:uppercase">COMPROBANTE DE PAGO</div>
-        <div style="width:124px;max-width:32%"></div>
+    <header class="receipt-header" style="background:${BRAND.header};padding:42px 48px;margin:0 0 32px;color:#fff;box-shadow:0 10px 30px rgba(17,17,17,.12)">
+      <div class="receipt-header-inner" style="display:flex;align-items:center;justify-content:space-between;gap:32px">
+        <img class="receipt-logo" src="${BRAND.logoUrl}" alt="${BRAND.name}" style="display:block;width:190px;max-width:30%;height:auto;border:0;border-radius:0;background:${BRAND.header};object-fit:contain">
+        <div class="receipt-title" style="flex:1;text-align:center;color:#fff;font-size:42px;line-height:1.05;font-weight:900;letter-spacing:0;text-transform:uppercase;white-space:normal">COMPROBANTE DE PAGO</div>
       </div>
     </header>`;
 }
@@ -283,10 +283,31 @@ function receiptFooter() {
 
 function receiptShell({ body }) {
   return `
-    <div style="margin:0;padding:32px;background:${BRAND.background};font-family:Inter,Arial,sans-serif;color:${BRAND.text};line-height:1.5">
-      <div style="max-width:900px;margin:0 auto">
+    <div class="receipt-outer" style="margin:0;padding:0;background:${BRAND.background};font-family:Inter,Arial,sans-serif;color:${BRAND.text};line-height:1.5">
+      <style>
+        @media only screen and (max-width: 640px) {
+          .receipt-outer { padding:0 !important; }
+          .receipt-wrap { width:100% !important; max-width:100% !important; }
+          .receipt-main { padding:18px 14px 24px !important; }
+          .receipt-header { padding:26px 18px !important; margin-bottom:18px !important; }
+          .receipt-header-inner { display:block !important; text-align:center !important; }
+          .receipt-logo { width:168px !important; max-width:82% !important; margin:0 auto 18px !important; }
+          .receipt-title { font-size:28px !important; text-align:center !important; }
+          .receipt-card { padding:22px !important; margin-bottom:16px !important; border-radius:16px !important; }
+          .receipt-grid { display:block !important; }
+          .receipt-half { width:100% !important; display:block !important; padding:0 !important; margin:0 0 16px !important; }
+          .receipt-row { align-items:flex-start !important; }
+          .receipt-row-label { min-width:0 !important; width:auto !important; font-size:13px !important; }
+          .receipt-row-value { text-align:right !important; font-size:14px !important; }
+          .receipt-social-button { width:30% !important; min-width:82px !important; }
+          .receipt-social-label { font-size:11px !important; }
+        }
+      </style>
+      <div class="receipt-wrap" style="max-width:900px;margin:0 auto;background:${BRAND.background}">
         ${receiptHeader()}
-        ${body}
+        <main class="receipt-main" style="padding:0 32px 32px">
+          ${body}
+        </main>
         ${receiptFooter()}
       </div>
     </div>`;
@@ -294,11 +315,11 @@ function receiptShell({ body }) {
 
 function receiptRow({ icon, label, value, html }) {
   return `
-    <div style="display:flex;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid ${BRAND.divider}">
-      <div style="width:28px;text-align:center;color:${BRAND.text};font-size:17px;line-height:1">${icon}</div>
-      <div style="flex:1;min-width:0">
-        <div style="color:${BRAND.muted};font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;line-height:1.3">${escapeHtml(label)}</div>
-        <div style="color:${BRAND.text};font-size:16px;font-weight:700;line-height:1.4;margin-top:3px;word-break:break-word">${html || escapeHtml(value || '-')}</div>
+    <div class="receipt-row" style="display:flex;align-items:center;gap:16px;padding:15px 0;border-bottom:1px solid ${BRAND.divider}">
+      <div style="width:28px;text-align:center;color:${BRAND.text};font-size:18px;line-height:1">${icon}</div>
+      <div class="receipt-row-label" style="color:${BRAND.text};font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.2px;line-height:1.3;min-width:190px">${escapeHtml(label)}</div>
+      <div class="receipt-row-value" style="flex:1;min-width:0;text-align:right;color:${BRAND.text};font-size:18px;font-weight:500;line-height:1.4;word-break:break-word">
+        ${html || escapeHtml(value || '-')}
       </div>
     </div>`;
 }
@@ -318,7 +339,7 @@ function customerCard(attempt) {
 }
 
 function orderCard(attempt) {
-  return card('Detalle del Pedido', renderItemsHtml(attempt.items));
+  return card('Detalle del Pedido', renderItemsHtml(attempt.items), 'red');
 }
 
 function paymentValues(attempt) {
@@ -355,19 +376,19 @@ function paymentSummary(attempt) {
     summaryRow('Delivery', payment.deliveryFee),
     summaryRow('Propina', payment.tip),
     summaryRow('TOTAL', payment.total, true)
-  ].join(''));
+  ].join(''), 'red');
 }
 
 function notesCard(attempt) {
   const note = normalizeText(attempt.notes || '');
-  return note ? card('Notas', `<div style="color:${BRAND.text};font-size:16px;line-height:1.6">${escapeHtml(note)}</div>`) : '';
+  return note ? card('Notas Generales', `<div style="color:${BRAND.text};font-size:16px;line-height:1.6">${escapeHtml(note)}</div>`, 'red') : '';
 }
 
 function socialButton({ label, url, icon }) {
   return `
-    <a href="${escapeHtml(url)}" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:120px;color:${BRAND.text};text-decoration:none">
+    <a class="receipt-social-button" href="${escapeHtml(url)}" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:120px;color:${BRAND.text};text-decoration:none">
       <span style="display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:999px;border:1px solid ${BRAND.divider};color:${BRAND.text};font-size:22px;font-weight:700;transition:all 200ms">${icon}</span>
-      <span style="color:${BRAND.text};font-size:14px;font-weight:700">${escapeHtml(label)}</span>
+      <span class="receipt-social-label" style="color:${BRAND.text};font-size:14px;font-weight:800;text-transform:uppercase">${escapeHtml(label)}</span>
     </a>`;
 }
 
@@ -390,8 +411,10 @@ function buildReceiptHtml(attempt, includeNotes = true) {
     body: [
       customerMessage(),
       customerCard(attempt),
-      orderCard(attempt),
-      paymentSummary(attempt),
+      `<div class="receipt-grid" style="display:flex;gap:24px;align-items:stretch;margin:0 0 24px">
+        <div class="receipt-half" style="width:50%;display:block">${orderCard(attempt)}</div>
+        <div class="receipt-half" style="width:50%;display:block">${paymentSummary(attempt)}</div>
+      </div>`,
       includeNotes ? notesCard(attempt) : '',
       socialLinks(attempt)
     ].filter(Boolean).join('')
