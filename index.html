@@ -1756,12 +1756,22 @@ gsap.to('.soc-btn',{
 });
 }
 
+const SCRIPT_INTEGRITY = {
+  'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js': 'sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt',
+  'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js': 'sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d'
+};
+
 function loadScriptOnce(src){
   return new Promise((resolve,reject)=>{
     if(document.querySelector(`script[src="${src}"]`)){ resolve(); return; }
     const script=document.createElement('script');
     script.src=src;
     script.async=true;
+    if(SCRIPT_INTEGRITY[src]){
+      script.integrity=SCRIPT_INTEGRITY[src];
+      script.crossOrigin='anonymous';
+      script.referrerPolicy='no-referrer';
+    }
     script.onload=resolve;
     script.onerror=reject;
     document.head.appendChild(script);
