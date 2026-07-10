@@ -79,7 +79,9 @@ backend usa SMTP primero.
    impedir cambios de rol/sede por self-service.
 12. Aplicar `supabase-anon-hardening.sql` desde Supabase SQL Editor para quitar
    permisos anonimos directos sobre tablas y vistas internas.
-13. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+13. Aplicar `supabase-admin-rpc-hardening.sql` desde Supabase SQL Editor para
+   limitar RPC administrativas a `service_role`.
+14. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
