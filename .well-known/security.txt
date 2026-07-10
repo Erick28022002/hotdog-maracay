@@ -1,0 +1,4 @@
+Contact: mailto:miami@hotdogmaracay.com
+Expires: 2027-07-10T23:59:00Z
+Preferred-Languages: es, en
+Canonical: https://hotdogmaracay.com/.well-known/security.txt
