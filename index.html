@@ -828,6 +828,7 @@ body{background:transparent}
 }
 @media(max-width:768px){
   .modal{min-height:88dvh}
+  #customModal .modal,#checkoutModal .modal{min-height:calc(100dvh - 8px);max-height:calc(100dvh - 8px)}
   #successModal .modal,#deliveryModal .modal{min-height:auto}
 }
 .modal-hdr{padding:24px 24px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;position:sticky;top:0;z-index:10;background:var(--s1);border-radius:24px 24px 0 0;border-bottom:1px solid rgba(255,255,255,.06)}
