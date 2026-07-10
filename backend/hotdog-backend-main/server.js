@@ -16,7 +16,6 @@ const {
 const { sendOrderEmails } = require('./email-confirmation');
 
 const ALLOWED_ORIGINS = [
-  'https://erick28022002.github.io',
   'https://hotdogmaracay.com',
   'https://www.hotdogmaracay.com'
 ];
