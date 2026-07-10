@@ -71,7 +71,9 @@ backend usa SMTP primero.
    directos sobre `web_orders`.
 7. Aplicar `migration_checkout_persistence.sql` desde Supabase SQL Editor.
 8. Aplicar `supabase-lockdown.sql` desde Supabase SQL Editor.
-9. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+9. Aplicar `supabase-authenticated-functions-hardening.sql` desde Supabase SQL
+   Editor para limitar RPC autenticadas por sede.
+10. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
