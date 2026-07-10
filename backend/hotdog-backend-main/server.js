@@ -114,8 +114,7 @@ const checkoutRepository = supabase ? createSupabaseCheckoutRepository(supabase)
 
 app.get('/health', (req, res) => res.json({
   ok: true,
-  version: 5,
-  branches: Object.fromEntries(Object.entries(BRANCH_CONFIG).map(([id, b]) => [id, b.enabled ? 'ok' : 'sin_configurar']))
+  version: 6
 }));
 
 // Nota legible para el recibo/ticket de Square. El KDS ya no lee esto (usa
