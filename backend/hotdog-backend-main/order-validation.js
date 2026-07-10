@@ -59,6 +59,18 @@ function uniqueAllowed(values, allowed, label, maxLength) {
   return result;
 }
 
+// El KDS (kds.html/meseras.html) espera los modificadores como frases sueltas
+// separadas por ' · ', cada una empezando con "sin"/"no" (removido, se pinta
+// rojo), "extra"/"con"/"mas" (agregado, se pinta verde) o sin prefijo (neutro:
+// salsas/bebida). Nada de etiquetas ("Sin:", "Bebida:") ni separador '|' —
+// eso es exactamente lo que kds.html NO reconoce (ver parseMods/buildModsHtml).
+function buildHotDogMods(removed, extras) {
+  const mods = [];
+  removed.forEach(name => mods.push(`sin ${name}`));
+  extras.forEach(name => mods.push(`extra ${name}`));
+  return mods;
+}
+
 function buildSelections(product, rawSelections) {
   const selections = rawSelections && typeof rawSelections === 'object' ? rawSelections : {};
   const removedByHotDog = Array.isArray(selections.removedToppings) ? selections.removedToppings : [];
@@ -68,33 +80,29 @@ function buildSelections(product, rawSelections) {
   }
 
   let extraCents = 0;
-  const details = [];
+  const perHotDogMods = [];
   for (let index = 0; index < product.hotDogs; index += 1) {
     const removed = uniqueAllowed(removedByHotDog[index], TOPPINGS, 'Toppings', TOPPINGS.size);
     const extras = uniqueAllowed(extrasByHotDog[index], new Set(EXTRAS.keys()), 'Extras', EXTRAS.size);
     extraCents += extras.reduce((sum, name) => sum + EXTRAS.get(name), 0);
-    const parts = [];
-    if (removed.length) parts.push(`Sin: ${removed.join(', ')}`);
-    if (extras.length) parts.push(`Extra: ${extras.join(', ')}`);
-    if (parts.length) details.push(`[HD${index + 1}] ${parts.join(' | ')}`);
+    perHotDogMods.push(buildHotDogMods(removed, extras));
   }
 
   const sauces = uniqueAllowed(selections.sauces, SAUCES, 'Salsas', 2);
   if (sauces.length < 1) throw new Error('Debes elegir al menos una salsa');
-  details.push(`Salsas: ${sauces.join(', ')}`);
+  const general = [...sauces];
 
   const drink = normalizeOption(selections.drink);
   if (product.drink) {
     if (!DRINKS.has(drink)) throw new Error('Bebida invalida');
     extraCents += DRINKS.get(drink);
-    details.push(`Bebida: ${drink}`);
+    general.push(drink);
   } else if (drink) {
     throw new Error('Este producto no incluye bebida');
   }
 
   const note = cleanText(selections.note, 200);
-  if (note) details.push(`Nota: ${note}`);
-  return { extraCents, details: details.join(' | ') };
+  return { extraCents, perHotDogMods, general, note };
 }
 
 function buildTrustedOrder(rawItems) {
@@ -114,10 +122,26 @@ function buildTrustedOrder(rawItems) {
 
     let unitCents = product.cents;
     let details = '';
+    let components = null;
+    let general = null;
+    let noteText = '';
     if (product.custom) {
       const selections = buildSelections(product, rawItem.selections);
       unitCents += selections.extraCents;
-      details = selections.details;
+      noteText = selections.note;
+      if (product.hotDogs > 1) {
+        // Combo de 2 hot dogs: cada uno con sus propios mods, salsas/bebida
+        // compartidas en "general" — misma forma que usa kds.html para las
+        // ordenes reales del POS con nota partida por hot dog.
+        components = selections.perHotDogMods.map((mods, index) => ({
+          name: `Hot Dog ${index + 1}`,
+          mods,
+          notes: []
+        }));
+        general = selections.general;
+      } else {
+        details = [...selections.perHotDogMods[0], ...selections.general].join(' · ');
+      }
     } else if (rawItem.selections != null) {
       throw new Error('Opciones no permitidas');
     }
@@ -127,7 +151,10 @@ function buildTrustedOrder(rawItems) {
       name: product.name,
       quantity,
       unitCents,
-      details
+      details,
+      components,
+      general,
+      noteText
     };
   });
 

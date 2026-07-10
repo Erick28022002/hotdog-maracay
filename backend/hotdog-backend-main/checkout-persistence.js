@@ -55,6 +55,16 @@ function createSupabaseCheckoutRepository(supabase) {
         .maybeSingle();
       if (error) throw error;
       return data;
+    },
+
+    async countActiveOrders(location) {
+      const { count, error } = await supabase
+        .from('web_orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('location', location)
+        .not('status', 'in', '("ready","completed","complete","done","cancelled","canceled")');
+      if (error) throw error;
+      return count || 0;
     }
   };
 }
@@ -76,9 +86,19 @@ async function claimCheckoutAttempt(repository, record) {
 // downtown), consistente con pos_integration_config.sede_id.
 const SEDE_DISPLAY_NAMES = { nmb: 'North Miami', doral: 'Doral', downtown: 'Downtown Miami' };
 
+function locationDisplayName(location) {
+  return SEDE_DISPLAY_NAMES[location] || location;
+}
+
+// El titulo del ticket en el KDS debe identificar el ORIGEN del pedido (igual
+// que "Mesa 4" identifica una mesa), no el nombre del cliente. El nombre/
+// telefono reales se conservan en customer_phone y en web_checkout_attempts
+// para soporte, pero el ticket muestra esto.
+const PICKUP_TICKET_TITLE = 'PAGINA WEB PICK-UP';
+
 function webOrderFromAttempt(attempt) {
   return {
-    customer_name: attempt.customer?.name || '',
+    customer_name: attempt.order_type === 'pickup' ? PICKUP_TICKET_TITLE : (attempt.customer?.name || ''),
     customer_phone: attempt.customer?.phone || '',
     customer_email: attempt.customer?.email || '',
     items: attempt.items || [],
@@ -86,7 +106,7 @@ function webOrderFromAttempt(attempt) {
     payment_id: attempt.payment_id,
     receipt_url: attempt.receipt_url || '',
     order_type: attempt.order_type,
-    location: SEDE_DISPLAY_NAMES[attempt.location] || attempt.location,
+    location: locationDisplayName(attempt.location),
     sede: attempt.location,
     notes: attempt.notes || '',
     status: 'paid',
@@ -152,5 +172,6 @@ module.exports = {
   claimCheckoutAttempt,
   persistApprovedCheckout,
   reconcileApprovedCheckout,
-  webOrderFromAttempt
+  webOrderFromAttempt,
+  locationDisplayName
 };

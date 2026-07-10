@@ -10,7 +10,8 @@ const {
   createSupabaseCheckoutRepository,
   claimCheckoutAttempt,
   persistApprovedCheckout,
-  reconcileApprovedCheckout
+  reconcileApprovedCheckout,
+  locationDisplayName
 } = require('./checkout-persistence');
 const { sendOrderEmails } = require('./email-confirmation');
 
@@ -117,6 +118,40 @@ app.get('/health', (req, res) => res.json({
   branches: Object.fromEntries(Object.entries(BRANCH_CONFIG).map(([id, b]) => [id, b.enabled ? 'ok' : 'sin_configurar']))
 }));
 
+// Nota legible para el recibo/ticket de Square. El KDS ya no lee esto (usa
+// item.details/components/general directamente desde web_orders), esto es
+// solo para que el recibo impreso por Square muestre algo entendible.
+function squareLineItemNote(item) {
+  const parts = [];
+  if (item.components && item.components.length) {
+    item.components.forEach(c => {
+      if (c.mods && c.mods.length) parts.push(`${c.name}: ${c.mods.join(', ')}`);
+    });
+    if (item.general && item.general.length) parts.push(`General: ${item.general.join(', ')}`);
+  } else if (item.details) {
+    parts.push(item.details.split(' · ').join(', '));
+  }
+  if (item.noteText) parts.push(`Nota: ${item.noteText}`);
+  return parts.join(' | ');
+}
+
+async function estimateReadyTime(repository, attempt) {
+  const displayLocation = locationDisplayName(attempt.location);
+  const activeOrders = repository?.countActiveOrders
+    ? await repository.countActiveOrders(displayLocation)
+    : 0;
+  const ordersAhead = Math.max(0, Number(activeOrders || 0) - 1);
+  const itemCount = (attempt.items || []).reduce((sum, item) => sum + Number(item.qty || item.quantity || 1), 0);
+  const min = Math.min(55, 12 + ordersAhead * 4 + Math.max(0, itemCount - 1) * 2);
+  const max = Math.min(60, min + 8);
+  return {
+    ordersAhead,
+    estimated_ready_min: min,
+    estimated_ready_max: max,
+    estimated_ready_text: `${min}-${max} min`
+  };
+}
+
 app.post('/api/pay', paymentLimiter, async (req, res) => {
   let approvedPaymentContext = null;
   let claimedAttemptId = null;
@@ -172,7 +207,10 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
       name: item.name,
       price: item.unitCents / 100,
       qty: item.quantity,
-      details: item.details
+      details: item.details,
+      components: item.components,
+      general: item.general,
+      note_text: item.noteText
     }));
     const attemptRecord = {
       checkout_attempt_id: checkoutAttemptId,
@@ -232,7 +270,7 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
         lineItems: trustedOrder.items.map(item => ({
           name: item.name,
           quantity: String(item.quantity),
-          note: item.details || undefined,
+          note: squareLineItemNote(item) || undefined,
           basePriceMoney: {
             amount: BigInt(item.unitCents),
             currency: 'USD'
@@ -314,7 +352,8 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
     }
 
     try {
-      const emailResult = await sendOrderEmails(approvedAttempt);
+      const estimate = await estimateReadyTime(checkoutRepository, approvedAttempt);
+      const emailResult = await sendOrderEmails({ ...approvedAttempt, ...estimate });
       if (emailResult.skipped) {
         console.warn('ORDER_EMAIL_SKIPPED', emailResult.reason);
       }

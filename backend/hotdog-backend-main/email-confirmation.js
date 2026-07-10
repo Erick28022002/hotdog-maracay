@@ -99,6 +99,7 @@ function metaGrid(rows) {
 
 function buildCustomerEmail(attempt) {
   const receiptLine = attempt.receipt_url ? `\nRecibo Square: ${attempt.receipt_url}` : '';
+  const estimateLine = attempt.estimated_ready_text ? `\nTiempo estimado: ${attempt.estimated_ready_text}` : '';
   const text = `Gracias por tu pedido en Hot Dog Maracay.
 
 Pedido pagado correctamente.
@@ -106,7 +107,7 @@ Pedido pagado correctamente.
 Cliente: ${attempt.customer?.name || ''}
 Telefono: ${attempt.customer?.phone || ''}
 Sede: ${attempt.location || ''}
-Tipo de orden: ${attempt.order_type || 'pickup'}
+Tipo de orden: ${attempt.order_type || 'pickup'}${estimateLine}
 
 ${renderItemsText(attempt.items)}
 
@@ -120,7 +121,7 @@ Estamos preparando tu orden.`;
 
   const html = receiptShell({
     eyebrow: 'Recibo de pedido',
-    title: 'Pedido confirmado',
+    title: 'Orden pagada',
     body: `
       <p style="margin:0 0 12px;font-size:16px">Gracias por tu pedido en <strong>${BRAND.name}</strong>. Tu pago fue procesado correctamente.</p>
       ${metaGrid([
@@ -128,6 +129,7 @@ Estamos preparando tu orden.`;
         { label: 'Telefono', value: attempt.customer?.phone || '' },
         { label: 'Sede', value: attempt.location || '' },
         { label: 'Tipo', value: attempt.order_type || 'pickup' },
+        { label: 'Tiempo estimado', value: attempt.estimated_ready_text || '15-25 min' },
         { label: 'Pago', value: attempt.payment_id || 'Aprobado' }
       ])}
       <table style="width:100%;border-collapse:collapse;margin:18px 0;background:#fff;border-radius:12px;overflow:hidden">
@@ -138,20 +140,21 @@ Estamos preparando tu orden.`;
         </tr>
       </table>
       ${receiptButton}
-      <p style="color:${BRAND.muted};font-size:13px;margin:18px 0 0">Estamos preparando tu orden.</p>`
+      <p style="color:${BRAND.muted};font-size:13px;margin:18px 0 0">El tiempo estimado puede variar segun la cantidad de ordenes activas en cocina.</p>`
   });
 
-  return { subject: 'Tu pedido en Hot Dog Maracay esta confirmado', text, html };
+  return { subject: 'Orden pagada - Hot Dog Maracay', text, html };
 }
 
 function buildRestaurantEmail(attempt) {
-  const text = `Nueva orden pagada desde la web.
+  const text = `Comprobante de pago desde la web.
 
 Cliente: ${attempt.customer?.name || ''}
 Telefono: ${attempt.customer?.phone || ''}
 Email: ${attempt.customer?.email || ''}
 Sede: ${attempt.location || ''}
 Tipo: ${attempt.order_type || 'pickup'}
+Tiempo estimado: ${attempt.estimated_ready_text || '15-25 min'}
 
 ${renderItemsText(attempt.items)}
 
@@ -162,7 +165,7 @@ Recibo: ${attempt.receipt_url || ''}`;
 
   const html = receiptShell({
     eyebrow: 'Orden web pagada',
-    title: 'Nueva orden pagada',
+    title: 'Comprobante de pago',
     body: `
       ${metaGrid([
         { label: 'Cliente', value: attempt.customer?.name || '' },
@@ -170,6 +173,7 @@ Recibo: ${attempt.receipt_url || ''}`;
         { label: 'Email', value: attempt.customer?.email || '' },
         { label: 'Sede', value: attempt.location || '' },
         { label: 'Tipo', value: attempt.order_type || 'pickup' },
+        { label: 'Tiempo estimado', value: attempt.estimated_ready_text || '15-25 min' },
         { label: 'Pago Square', value: attempt.payment_id || '' }
       ])}
       <table style="width:100%;border-collapse:collapse;margin:18px 0;background:#fff;border-radius:12px;overflow:hidden">${renderItemsHtml(attempt.items)}</table>
@@ -177,7 +181,7 @@ Recibo: ${attempt.receipt_url || ''}`;
       <p style="font-size:22px;margin:16px 0;color:${BRAND.red}"><strong>Total: ${money(attempt.total)}</strong></p>`
   });
 
-  return { subject: 'Nueva orden pagada - Hot Dog Maracay', text, html };
+  return { subject: 'Comprobante de pago - Hot Dog Maracay', text, html };
 }
 
 async function sendResendEmail({ apiKey, from, to, subject, text, html }) {

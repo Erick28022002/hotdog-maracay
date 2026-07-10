@@ -43,7 +43,13 @@ function fakeRepository() {
       orders.set(record.checkout_attempt_id, order);
       return order;
     },
-    async getWebOrder(id) { return orders.get(id) || null; }
+    async getWebOrder(id) { return orders.get(id) || null; },
+    async countActiveOrders(location) {
+      return [...orders.values()].filter(order =>
+        order.location === location &&
+        !['ready', 'completed', 'complete', 'done', 'cancelled', 'canceled'].includes(order.status)
+      ).length;
+    }
   };
 }
 
