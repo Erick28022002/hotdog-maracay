@@ -876,7 +876,6 @@ body{background:transparent}
 .payment-panel.active{display:block}
 #apple-pay-button{width:100%;height:44px;border-radius:10px;-webkit-appearance:-apple-pay-button;-apple-pay-button-type:plain;-apple-pay-button-style:black;border:none;cursor:pointer}
 #sq-card-container{background:transparent;border:none;border-radius:12px;padding:0;min-height:88px}
-.zip-note{font-size:11px;color:var(--mu);line-height:1.5;margin:8px 0 0}
 #sq-pay-btn{width:100%;background:linear-gradient(135deg,var(--mango),var(--terra));color:#000;font-family:'Montserrat',sans-serif;font-weight:900;font-size:15px;padding:15px;border:none;border-radius:14px;cursor:pointer;margin-top:16px;transition:filter .15s}
 #sq-pay-btn:hover:not(:disabled){filter:brightness(1.08)}
 #sq-pay-btn:disabled{opacity:.45;cursor:not-allowed}
@@ -1531,7 +1530,6 @@ body{background:transparent}
         <label class="form-lbl">Datos de Tarjeta</label>
         <div id="sq-loading" style="text-align:center;padding:18px;color:var(--mu);font-size:13px">⏳ Cargando sistema de pago...</div>
         <div id="sq-card-container" style="display:none"></div>
-        <p class="zip-note">Square puede solicitar ZIP de facturación para verificar la tarjeta.</p>
       </div>
       <button id="sq-pay-btn" onclick="sendOrder()" disabled>💳 Pagar</button>
       <p class="pay-note">🔒 Pago seguro con Square · Visa, Mastercard, Amex, Discover</p>
