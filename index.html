@@ -855,14 +855,16 @@ body{background:transparent}
 .brand-chip.mc{position:relative;color:transparent;width:30px}
 .brand-chip.mc::before,.brand-chip.mc::after{content:'';position:absolute;top:3px;width:12px;height:12px;border-radius:50%}
 .brand-chip.mc::before{left:6px;background:#eb001b}.brand-chip.mc::after{right:6px;background:#f79e1b;mix-blend-mode:multiply}
-.brand-chip.apple{background:#fff;color:#000;font-size:9px}
+.brand-chip.apple{padding:0;width:32px;overflow:hidden}
+.brand-chip.apple img{width:100%;height:100%;object-fit:contain;display:block}
 .pay-methods{border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px}
 .pay-method{display:grid;grid-template-columns:22px 34px 1fr;align-items:center;gap:10px;padding:14px 0;cursor:pointer;color:var(--txt)}
 .pay-method+.pay-method{border-top:1px solid var(--b)}
 .pay-method input{width:17px;height:17px;accent-color:var(--mango);margin:0}
 .pay-method.disabled{opacity:.45;cursor:not-allowed}
 .method-icon{width:30px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-size:9px;font-weight:900}
-.method-icon.apple{background:#000;color:#fff}
+.method-icon.apple{background:#fff;border:1px solid #d8d8d8;overflow:hidden}
+.method-icon.apple img{width:100%;height:100%;object-fit:contain;display:block}
 .method-icon.card{background:#cfd3d7;color:#fff;position:relative}
 .method-icon.card::before{content:'';position:absolute;left:5px;right:5px;top:6px;height:2px;background:rgba(255,255,255,.9)}
 .method-icon.card::after{content:'';position:absolute;left:6px;bottom:5px;width:8px;height:2px;background:rgba(255,255,255,.85)}
@@ -1495,13 +1497,13 @@ body{background:transparent}
           <span class="brand-chip discover">DISC</span>
           <span class="brand-chip diners">D</span>
           <span class="brand-chip mc">MC</span>
-          <span class="brand-chip apple">Pay</span>
+          <span class="brand-chip apple"><img src="fotos/apple-pay-logo.png" alt="Apple Pay"></span>
         </div>
       </div>
       <div class="pay-methods" id="paymentMethods">
         <label class="pay-method disabled" id="applePayMethod">
           <input type="radio" name="paymentMethod" id="payApple" value="apple" onchange="selectPaymentMethod('apple')" disabled>
-          <span class="method-icon apple">Pay</span>
+          <span class="method-icon apple"><img src="fotos/apple-pay-logo.png" alt=""></span>
           <span class="method-copy">Apple Pay<span class="method-hint" id="applePayHint">Disponible en Safari con Apple Pay</span></span>
         </label>
         <label class="pay-method" id="cardPayMethod">
