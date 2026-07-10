@@ -1444,7 +1444,6 @@ body{background:transparent}
         <div class="drinks-grid" id="drinksGrid"></div>
       </div>
       <div class="custom-section-title" style="margin-top:20px">🥫 Salsas de Acompañamiento</div>
-      <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Elige entre <strong style="color:var(--mango)">1 y 2 salsas</strong> (mínimo 1 obligatoria):</p>
       <div class="custom-checks" id="customChecks"></div>
       <div class="salsa-error" id="salsaError">⚠️ Debes elegir al menos una salsa</div>
       <div class="custom-section-title" style="margin-top:20px">Nota adicional</div>
@@ -1788,6 +1787,7 @@ let cart = [];
 const TOPPINGS = ['Repollo','Cebolla','Papitas','Maíz','Ketchup','Mayonesa','Mostaza','Queso amarillo'];
 const EXTRAS   = [{name:'Queso de Mano',price:2.00},{name:'Tocineta',price:2.00}];
 const SALSAS   = ['Ajo','Chica Sexi','Maíz','Queso','Tocineta','Piña','Picante','BBQ','Queso de Año'];
+const SALSA_EXTRA_PRICE = 0.50;
 const DRINKS   = [
   {name:'Coca Cola',price:0},{name:'Coca Cola Zero',price:0},{name:'Diet Coke',price:0},
   {name:'Sprite',price:0},{name:'Nestea Limón',price:0},{name:'Nestea Durazno',price:0},
@@ -1859,12 +1859,9 @@ function toggleSalsa(lbl,ev){
   ev.preventDefault();
   const isSel = lbl.classList.contains('selected');
   if(!isSel){
-    const count=document.querySelectorAll('#customChecks .custom-check.selected').length;
-    if(count>=2)return;
     lbl.classList.add('selected'); lbl.querySelector('input').checked=true;
   } else { lbl.classList.remove('selected'); lbl.querySelector('input').checked=false; }
   const count=document.querySelectorAll('#customChecks .custom-check.selected').length;
-  document.querySelectorAll('#customChecks .custom-check:not(.selected)').forEach(el=>el.classList.toggle('salsa-disabled',count>=2));
   document.getElementById('customConfirmBtn').disabled=count===0;
   if(count>0)document.getElementById('salsaError').style.display='none';
 }
@@ -1890,7 +1887,12 @@ function confirmCustom(){
   }
   const drinkEl=document.querySelector('input[name="customDrink"]:checked');
   if(drinkEl){ const dp=parseFloat(drinkEl.dataset.price)||0; extraCost+=dp; details.push(`Bebida: ${drinkEl.value}${dp>0?` (+$${dp.toFixed(2)})`:''}`);}
+  const includedSauces = _custom.numHD >= 2 ? 2 : 1;
+  const extraSauceCount = Math.max(0, salsas.length - includedSauces);
+  const extraSauceCost = extraSauceCount * SALSA_EXTRA_PRICE;
+  extraCost += extraSauceCost;
   details.push(`Salsas: ${salsas.join(', ')}`);
+  if(extraSauceCost)details.push(`Salsas extra: ${extraSauceCount} (+$${extraSauceCost.toFixed(2)})`);
   const note=document.getElementById('customNote').value.trim();
   if(note)details.push(note);
   const uid=_custom.id+'_'+Date.now();
