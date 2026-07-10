@@ -1489,7 +1489,7 @@ body{background:transparent}
       <div class="form-grp"><label class="form-lbl">Teléfono / WhatsApp</label><input class="form-inp" id="cPhone" placeholder="+1 (305) 000-0000" type="tel" maxlength="20" autocomplete="tel"></div>
       <div class="form-grp"><label class="form-lbl">Correo Electrónico</label><input class="form-inp" id="cEmail" placeholder="tu@email.com" type="email" maxlength="120" autocomplete="email"></div>
       <div class="form-grp"><label class="form-lbl">Tipo de Orden</label>
-        <select class="form-sel" id="cType">
+        <select class="form-sel" id="cType" disabled>
           <option value="pickup">📍 Pickup — Recoger en el local</option>
         </select>
       </div>
@@ -1501,7 +1501,7 @@ body{background:transparent}
           <option value="nmb">North Miami Beach — 18315 W Dixie Hwy</option>
         </select>
       </div>
-      <div class="form-grp"><label class="form-lbl">Notas (opcional)</label><input class="form-inp" id="cNotes" placeholder="Ej: sin cebolla, extra salsa..." maxlength="300"></div>
+      <div class="form-grp"><label class="form-lbl">Notas (opcional)</label><input class="form-inp" id="cNotes" maxlength="300"></div>
       <div class="payment-head">
         <span class="payment-title">Payment</span>
         <div class="card-brands" aria-label="Tarjetas aceptadas">
@@ -2181,13 +2181,13 @@ function validateCheckoutForm(){
   const phone=cleanPhone(document.getElementById('cPhone').value);
   const emailVal=cleanText(document.getElementById('cEmail').value,CHECKOUT_LIMITS.email).toLowerCase();
   const notes=cleanText(document.getElementById('cNotes').value,CHECKOUT_LIMITS.notes);
-  const orderType=document.getElementById('cType').value;
+  const orderType='pickup';
   const location=document.getElementById('cLoc').value;
   if(!name||!phone){ showToast('⚠️ Ingresa tu nombre y teléfono','info'); return null; }
   if(phone.length<7||phone.length>CHECKOUT_LIMITS.phone){ showToast('⚠️ El teléfono no es válido','info'); return null; }
   if(emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){ showToast('⚠️ El correo electrónico no es válido','info'); return null; }
   if(!location){ showToast('⚠️ Debes seleccionar una sede antes de continuar','info'); return null; }
-  if(!['pickup','delivery'].includes(orderType)||!['nmb','doral','downtown'].includes(location)){ showToast('⚠️ Revisa el tipo de orden y la ubicación','info'); return null; }
+  if(orderType!=='pickup'||!['nmb','doral','downtown'].includes(location)){ showToast('⚠️ Revisa el tipo de orden y la ubicación','info'); return null; }
   if(cart.length>CHECKOUT_LIMITS.maxItems||cart.some(i=>i.qty<1||i.qty>CHECKOUT_LIMITS.maxQty)){ showToast('⚠️ Tu pedido es demasiado grande. Llámanos para ayudarte.','info'); return null; }
   return {name,phone,emailVal,notes,orderType,location};
 }
