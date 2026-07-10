@@ -1,6 +1,13 @@
 'use strict';
 
+const nodemailer = require('nodemailer');
+
 const RESEND_ENDPOINT = 'https://api.resend.com/emails';
+const FROM_BY_LOCATION = {
+  nmb: 'ORDER_FROM_NMB',
+  doral: 'ORDER_FROM_DORAL',
+  downtown: 'ORDER_FROM_DOWNTOWN'
+};
 
 function money(value) {
   return `$${Number(value || 0).toFixed(2)}`;
@@ -132,24 +139,58 @@ async function sendResendEmail({ apiKey, from, to, subject, text, html }) {
   return { sent: true, id: data.id };
 }
 
+function createSmtpTransport() {
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!host || !user || !pass) return null;
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+    requireTLS: port === 587
+  });
+}
+
+function fromForAttempt(attempt) {
+  const locationKey = FROM_BY_LOCATION[attempt.location];
+  return (locationKey && process.env[locationKey])
+    || process.env.ORDER_CONFIRMATION_FROM
+    || process.env.SMTP_USER
+    || '';
+}
+
+async function sendSmtpEmail({ transport, from, to, subject, text, html }) {
+  if (!to) return { skipped: true, reason: 'missing_recipient' };
+  const result = await transport.sendMail({ from, to, subject, text, html });
+  return { sent: true, id: result.messageId };
+}
+
 async function sendOrderEmails(attempt) {
+  const smtpTransport = createSmtpTransport();
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.ORDER_CONFIRMATION_FROM;
-  if (!apiKey || !from) {
+  const from = fromForAttempt(attempt);
+  if (!smtpTransport && (!apiKey || !from)) {
     return { skipped: true, reason: 'email_not_configured' };
   }
 
   const results = [];
+  const sendEmail = smtpTransport
+    ? payload => sendSmtpEmail({ transport: smtpTransport, ...payload })
+    : payload => sendResendEmail({ apiKey, ...payload });
+
   const customerEmail = attempt.customer?.email || '';
   if (customerEmail) {
     const email = buildCustomerEmail(attempt);
-    results.push(await sendResendEmail({ apiKey, from, to: customerEmail, ...email }));
+    results.push(await sendEmail({ from, to: customerEmail, ...email }));
   }
 
   const restaurantEmail = process.env.ORDER_NOTIFICATION_EMAIL || '';
   if (restaurantEmail) {
     const email = buildRestaurantEmail(attempt);
-    results.push(await sendResendEmail({ apiKey, from, to: restaurantEmail, ...email }));
+    results.push(await sendEmail({ from, to: restaurantEmail, ...email }));
   }
 
   return { sent: results.length, results };

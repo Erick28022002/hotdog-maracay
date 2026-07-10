@@ -14,14 +14,31 @@ para Production, Preview y Development:
 - `RESEND_API_KEY`
 - `ORDER_CONFIRMATION_FROM`
 - `ORDER_NOTIFICATION_EMAIL`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `ORDER_FROM_NMB`
+- `ORDER_FROM_DORAL`
+- `ORDER_FROM_DOWNTOWN`
 
 La clave `SUPABASE_SERVICE_ROLE_KEY` se obtiene en Supabase > Project Settings >
 API Keys. Nunca debe copiarse al frontend, subirse a GitHub ni enviarse por chat.
 
-`RESEND_API_KEY` activa los correos de confirmacion. `ORDER_CONFIRMATION_FROM`
-debe ser un remitente verificado en Resend, por ejemplo
-`Hot Dog Maracay <orders@hotdogmaracay.com>`. `ORDER_NOTIFICATION_EMAIL` es el
-correo interno del restaurante que recibira copia de cada orden pagada.
+Para Microsoft 365 / Outlook, configurar:
+
+- `SMTP_HOST=smtp.office365.com`
+- `SMTP_PORT=587`
+- `SMTP_USER=Miami@hotdogmaracay.com`
+- `SMTP_PASS` con la contrasena segura/app password del buzon
+- `ORDER_CONFIRMATION_FROM=Hot Dog Maracay Miami <Miami@hotdogmaracay.com>`
+
+Si cada sede tiene su propio buzon, usar `ORDER_FROM_NMB`, `ORDER_FROM_DORAL`
+y `ORDER_FROM_DOWNTOWN`. `ORDER_NOTIFICATION_EMAIL` es el correo interno del
+restaurante que recibira copia de cada orden pagada.
+
+`RESEND_API_KEY` queda como alternativa opcional. Si hay SMTP configurado, el
+backend usa SMTP primero.
 
 ## 2. Despliegue coordinado
 
