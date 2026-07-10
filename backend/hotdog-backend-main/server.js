@@ -110,6 +110,7 @@ const supabase = process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_K
     })
   : null;
 const checkoutRepository = supabase ? createSupabaseCheckoutRepository(supabase) : null;
+const ORDER_TYPES = new Set(['pickup']);
 
 app.get('/health', (req, res) => res.json({
   ok: true,
@@ -154,11 +155,6 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
   let approvedPaymentContext = null;
   let claimedAttemptId = null;
   try {
-    if (!supabase || !checkoutRepository) {
-      console.error('Configuracion privada incompleta para pagos');
-      return res.status(503).json({ success: false, error: 'Pago temporalmente no disponible' });
-    }
-
     const { sourceId, checkoutAttemptId, items, customer, orderType, location, notes } = req.body || {};
     if (typeof sourceId !== 'string' || sourceId.length < 10 || sourceId.length > 500) {
       return res.status(400).json({ success: false, error: 'Token de pago invalido' });
@@ -190,7 +186,7 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Correo invalido' });
     }
     const branch = BRANCH_CONFIG[location];
-    if (!['pickup', 'delivery'].includes(orderType) || !branch) {
+    if (!ORDER_TYPES.has(orderType) || !branch) {
       return res.status(400).json({ success: false, error: 'Tipo de orden o ubicacion invalida' });
     }
     if (!branch.enabled) {
@@ -198,6 +194,10 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
         success: false,
         error: 'Los pedidos online para esta sede todavia no estan disponibles. Selecciona otra ubicacion.'
       });
+    }
+    if (!supabase || !checkoutRepository) {
+      console.error('Configuracion privada incompleta para pagos');
+      return res.status(503).json({ success: false, error: 'Pago temporalmente no disponible' });
     }
 
     const trustedItemsForStorage = trustedOrder.items.map(item => ({

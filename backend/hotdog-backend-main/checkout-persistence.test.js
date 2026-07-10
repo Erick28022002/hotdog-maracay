@@ -154,3 +154,28 @@ test('respuestas de pago no exponen ids internos de Square', async () => {
     await new Promise(resolve => server.close(resolve));
   }
 });
+
+test('rechaza delivery en checkout web mientras solo existe pickup', async () => {
+  const server = app.listen(0);
+  try {
+    const baseUrl = `http://127.0.0.1:${server.address().port}`;
+    const response = await fetch(`${baseUrl}/api/pay`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sourceId: 'cnon:card-nonce-ok',
+        checkoutAttemptId: '44444444-4444-4444-8444-444444444444',
+        items: [{ productId: 'beb-agua', qty: 1 }],
+        customer: { name: 'Cliente Prueba', phone: '3055550100', email: '' },
+        orderType: 'delivery',
+        location: 'nmb',
+        notes: ''
+      })
+    });
+    const body = await response.json();
+    assert.equal(response.status, 400);
+    assert.match(body.error, /Tipo de orden/);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
+});
