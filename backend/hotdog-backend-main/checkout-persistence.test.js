@@ -147,6 +147,13 @@ test('guarda location con el nombre exacto que filtra el KDS real', () => {
   assert.equal(locationDisplayName('downtown'), 'Downtown Miami');
 });
 
+test('las ordenes web quedan marcadas como pickup web para empacado en meseras', () => {
+  const order = webOrderFromAttempt(approvedAttempt('66666666-6666-4666-8666-666666666666'));
+  assert.equal(order.channel, 'web');
+  assert.equal(order.order_type, 'pickup');
+  assert.equal(order.status, 'paid');
+});
+
 test('respuestas de pago no exponen ids internos de Square', async () => {
   const server = app.listen(0);
   try {
