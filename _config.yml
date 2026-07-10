@@ -1,0 +1,10 @@
+include:
+  - .well-known
+
+exclude:
+  - backend
+  - AUDITORIA_*.md
+  - .deploy-hotdog-maracay
+  - node_modules
+  - package.json
+  - package-lock.json
