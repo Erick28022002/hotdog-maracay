@@ -43,7 +43,14 @@ on public.web_orders
 for update
 to authenticated
 using (public.auth_is_admin() or location = public.get_my_sede())
-with check (public.auth_is_admin() or location = public.get_my_sede());
+with check (
+  (public.auth_is_admin() or location = public.get_my_sede())
+  and status in (
+    'new', 'paid', 'pending', 'packing', 'preparing', 'ready',
+    'completed', 'complete', 'done',
+    'cancelled', 'canceled'
+  )
+);
 
 -- Future KDS versions can use this RPC for safer status transitions with an
 -- optimistic expected-status check.
@@ -61,6 +68,7 @@ declare
   v_order public.web_orders;
   v_allowed_statuses constant text[] := array[
     'new', 'paid', 'pending', 'preparing', 'ready',
+    'packing',
     'completed', 'complete', 'done',
     'cancelled', 'canceled'
   ];
