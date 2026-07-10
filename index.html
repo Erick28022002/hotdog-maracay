@@ -1872,7 +1872,6 @@ function confirmCustom(){
     selections:{removedToppings,extras:selectedExtras,drink:drinkEl?.value||'',sauces:salsas,note}
   });
   renderCart(); bump();
-  showToast(`${_custom.emoji} Agregado al carrito`,'ok');
   closeCustom();
 }
 
@@ -1880,7 +1879,6 @@ function addToCart(id,name,price,emoji,img){
   const ex=cart.find(i=>i.id===id);
   if(ex){ex.qty++;}else{cart.push({id,productId:id,name,price,emoji,img:img||'',qty:1,details:'',selections:null});}
   renderCart(); bump();
-  showToast(`${emoji} Agregado al carrito`,'ok');
 }
 
 function bump(){ const b=document.getElementById('cartBadge'); b.style.transform='scale(1.5)'; setTimeout(()=>b.style.transform='',250); }
