@@ -3,6 +3,16 @@
 const nodemailer = require('nodemailer');
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails';
+const BRAND = {
+  name: 'Hot Dog Maracay',
+  logoUrl: 'https://hotdogmaracay.com/fotos/email-receipt-logo.jpeg',
+  siteUrl: 'https://hotdogmaracay.com',
+  accent: '#FAA83C',
+  red: '#E8272A',
+  ink: '#14100d',
+  muted: '#6b625b',
+  paper: '#fff8ef'
+};
 const FROM_BY_LOCATION = {
   nmb: 'ORDER_FROM_NMB',
   doral: 'ORDER_FROM_DORAL',
@@ -37,16 +47,54 @@ function renderItemsText(items) {
 function renderItemsHtml(items) {
   return (items || []).map(item => {
     const qty = item.qty || item.quantity || 1;
-    const details = item.details ? `<div style="color:#666;font-size:13px;margin-top:4px">${escapeHtml(item.details)}</div>` : '';
+    const details = item.details ? `<div style="color:${BRAND.muted};font-size:13px;margin-top:4px">${escapeHtml(item.details)}</div>` : '';
     return `
       <tr>
-        <td style="padding:10px 0;border-bottom:1px solid #eee">
-          <strong>${escapeHtml(qty)} x ${escapeHtml(item.name)}</strong>
+        <td style="padding:13px 0;border-bottom:1px solid #eadfce">
+          <strong style="color:${BRAND.ink}">${escapeHtml(qty)} x ${escapeHtml(item.name)}</strong>
           ${details}
         </td>
-        <td style="padding:10px 0;border-bottom:1px solid #eee;text-align:right">${money(itemTotal(item))}</td>
+        <td style="padding:13px 0;border-bottom:1px solid #eadfce;text-align:right;color:${BRAND.ink};font-weight:700">${money(itemTotal(item))}</td>
       </tr>`;
   }).join('');
+}
+
+function receiptShell({ title, eyebrow, body, footerNote }) {
+  return `
+    <div style="margin:0;padding:24px;background:#f2eee8;font-family:Arial,sans-serif;color:${BRAND.ink};line-height:1.5">
+      <div style="max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #eadfce;border-radius:18px;overflow:hidden">
+        <div style="background:${BRAND.ink};padding:22px 24px;color:#fff">
+          <table role="presentation" width="100%" style="border-collapse:collapse">
+            <tr>
+              <td style="vertical-align:middle">
+                <img src="${BRAND.logoUrl}" alt="${BRAND.name}" width="64" height="64" style="display:block;border-radius:14px;background:#fff;object-fit:cover">
+              </td>
+              <td style="vertical-align:middle;text-align:right">
+                <div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:${BRAND.accent};font-weight:800">${escapeHtml(eyebrow)}</div>
+                <div style="font-size:26px;font-weight:900;margin-top:2px">${escapeHtml(title)}</div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div style="padding:26px 24px;background:${BRAND.paper}">
+          ${body}
+        </div>
+        <div style="padding:18px 24px;background:#fff;color:${BRAND.muted};font-size:12px;text-align:center">
+          ${footerNote || `Hot Dog Maracay · <a href="${BRAND.siteUrl}" style="color:${BRAND.red};text-decoration:none;font-weight:700">hotdogmaracay.com</a>`}
+        </div>
+      </div>
+    </div>`;
+}
+
+function metaGrid(rows) {
+  return `
+    <table role="presentation" width="100%" style="border-collapse:collapse;margin:18px 0;background:#fff;border:1px solid #eadfce;border-radius:12px;overflow:hidden">
+      ${rows.map(row => `
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid #f1e7d7;color:${BRAND.muted};font-size:12px;text-transform:uppercase;letter-spacing:.8px;font-weight:800">${escapeHtml(row.label)}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #f1e7d7;text-align:right;font-weight:700;color:${BRAND.ink}">${escapeHtml(row.value || '-')}</td>
+        </tr>`).join('')}
+    </table>`;
 }
 
 function buildCustomerEmail(attempt) {
@@ -67,25 +115,31 @@ Total: ${money(attempt.total)}${receiptLine}
 Estamos preparando tu orden.`;
 
   const receiptButton = attempt.receipt_url
-    ? `<p><a href="${escapeHtml(attempt.receipt_url)}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;padding:12px 18px;border-radius:8px">Ver recibo de Square</a></p>`
+    ? `<p style="margin:22px 0 0"><a href="${escapeHtml(attempt.receipt_url)}" style="display:inline-block;background:${BRAND.red};color:#fff;text-decoration:none;padding:12px 18px;border-radius:999px;font-weight:800">Ver recibo de Square</a></p>`
     : '';
 
-  const html = `
-    <div style="font-family:Arial,sans-serif;color:#111;line-height:1.5;max-width:560px;margin:auto">
-      <h1 style="font-size:24px;margin-bottom:8px">Pedido confirmado</h1>
-      <p>Gracias por tu pedido en <strong>Hot Dog Maracay</strong>. Tu pago fue procesado correctamente.</p>
-      <table style="width:100%;border-collapse:collapse;margin:18px 0">
+  const html = receiptShell({
+    eyebrow: 'Recibo de pedido',
+    title: 'Pedido confirmado',
+    body: `
+      <p style="margin:0 0 12px;font-size:16px">Gracias por tu pedido en <strong>${BRAND.name}</strong>. Tu pago fue procesado correctamente.</p>
+      ${metaGrid([
+        { label: 'Cliente', value: attempt.customer?.name || '' },
+        { label: 'Telefono', value: attempt.customer?.phone || '' },
+        { label: 'Sede', value: attempt.location || '' },
+        { label: 'Tipo', value: attempt.order_type || 'pickup' },
+        { label: 'Pago', value: attempt.payment_id || 'Aprobado' }
+      ])}
+      <table style="width:100%;border-collapse:collapse;margin:18px 0;background:#fff;border-radius:12px;overflow:hidden">
         ${renderItemsHtml(attempt.items)}
         <tr>
-          <td style="padding:14px 0;font-size:18px"><strong>Total</strong></td>
-          <td style="padding:14px 0;text-align:right;font-size:18px"><strong>${money(attempt.total)}</strong></td>
+          <td style="padding:16px 0;font-size:20px;color:${BRAND.ink}"><strong>Total pagado</strong></td>
+          <td style="padding:16px 0;text-align:right;font-size:22px;color:${BRAND.red}"><strong>${money(attempt.total)}</strong></td>
         </tr>
       </table>
-      <p><strong>Sede:</strong> ${escapeHtml(attempt.location || '')}</p>
-      <p><strong>Tipo de orden:</strong> ${escapeHtml(attempt.order_type || 'pickup')}</p>
       ${receiptButton}
-      <p style="color:#666;font-size:13px">Estamos preparando tu orden.</p>
-    </div>`;
+      <p style="color:${BRAND.muted};font-size:13px;margin:18px 0 0">Estamos preparando tu orden.</p>`
+  });
 
   return { subject: 'Tu pedido en Hot Dog Maracay esta confirmado', text, html };
 }
@@ -106,18 +160,22 @@ Total: ${money(attempt.total)}
 Pago Square: ${attempt.payment_id || ''}
 Recibo: ${attempt.receipt_url || ''}`;
 
-  const html = `
-    <div style="font-family:Arial,sans-serif;color:#111;line-height:1.5">
-      <h1>Nueva orden pagada</h1>
-      <p><strong>Cliente:</strong> ${escapeHtml(attempt.customer?.name || '')}</p>
-      <p><strong>Telefono:</strong> ${escapeHtml(attempt.customer?.phone || '')}</p>
-      <p><strong>Email:</strong> ${escapeHtml(attempt.customer?.email || '')}</p>
-      <p><strong>Sede:</strong> ${escapeHtml(attempt.location || '')}</p>
-      <table style="width:100%;border-collapse:collapse;margin:18px 0">${renderItemsHtml(attempt.items)}</table>
-      <p><strong>Notas:</strong> ${escapeHtml(attempt.notes || '')}</p>
-      <p><strong>Total:</strong> ${money(attempt.total)}</p>
-      <p><strong>Pago Square:</strong> ${escapeHtml(attempt.payment_id || '')}</p>
-    </div>`;
+  const html = receiptShell({
+    eyebrow: 'Orden web pagada',
+    title: 'Nueva orden pagada',
+    body: `
+      ${metaGrid([
+        { label: 'Cliente', value: attempt.customer?.name || '' },
+        { label: 'Telefono', value: attempt.customer?.phone || '' },
+        { label: 'Email', value: attempt.customer?.email || '' },
+        { label: 'Sede', value: attempt.location || '' },
+        { label: 'Tipo', value: attempt.order_type || 'pickup' },
+        { label: 'Pago Square', value: attempt.payment_id || '' }
+      ])}
+      <table style="width:100%;border-collapse:collapse;margin:18px 0;background:#fff;border-radius:12px;overflow:hidden">${renderItemsHtml(attempt.items)}</table>
+      <p style="margin:12px 0"><strong>Notas:</strong> ${escapeHtml(attempt.notes || '')}</p>
+      <p style="font-size:22px;margin:16px 0;color:${BRAND.red}"><strong>Total: ${money(attempt.total)}</strong></p>`
+  });
 
   return { subject: 'Nueva orden pagada - Hot Dog Maracay', text, html };
 }
