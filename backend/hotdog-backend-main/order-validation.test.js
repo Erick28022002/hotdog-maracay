@@ -65,6 +65,10 @@ test('rechaza productos inexistentes', () => {
   assert.throws(() => buildTrustedOrder([{ productId: 'producto-falso', qty: 1 }]), /no disponible/);
 });
 
+test('rechaza la promocion de prueba retirada de produccion', () => {
+  assert.throws(() => buildTrustedOrder([{ productId: 'promo-especial', qty: 1 }]), /no disponible/);
+});
+
 test('rechaza personalizaciones incompletas', () => {
   const selections = promoSelections();
   selections.sauces = [];

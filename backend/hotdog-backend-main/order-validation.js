@@ -16,7 +16,6 @@ const DRINKS = new Map([
 ]);
 
 const CATALOG = new Map([
-  ['promo-especial', { name: 'Promocion Especial', cents: 100, custom: true, hotDogs: 2, drink: true }],
   ['promo-clasica', { name: 'Promo Clasica', cents: 1250, custom: true, hotDogs: 2, drink: true }],
   ['hd-clasico', { name: 'Hot Dog Clasico', cents: 685, custom: true, hotDogs: 1, drink: false }],
   ['promo-mechada', { name: 'Promo de Carne Mechada', cents: 1999, custom: true, hotDogs: 2, drink: true }],
