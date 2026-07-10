@@ -40,15 +40,15 @@ create policy web_orders_staff_read
 on public.web_orders
 for select
 to authenticated
-using (public.auth_is_admin() or location = public.get_my_sede());
+using (public.auth_is_admin() or sede = public.get_my_sede());
 
 create policy web_orders_staff_update_limited
 on public.web_orders
 for update
 to authenticated
-using (public.auth_is_admin() or location = public.get_my_sede())
+using (public.auth_is_admin() or sede = public.get_my_sede())
 with check (
-  (public.auth_is_admin() or location = public.get_my_sede())
+  (public.auth_is_admin() or sede = public.get_my_sede())
   and status in (
     'new', 'paid', 'pending', 'packing', 'preparing', 'ready',
     'completed', 'complete', 'done',
@@ -91,7 +91,7 @@ begin
          updated_at = now()
    where id::text = p_order_id
      and status = p_expected
-     and (public.auth_is_admin() or location = public.get_my_sede())
+     and (public.auth_is_admin() or sede = public.get_my_sede())
    returning * into v_order;
 
   if not found then
