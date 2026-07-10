@@ -30,9 +30,14 @@ function locReady(l) {
   return l.provider === 'clover' ? !!(l.token && l.merchantId) : !!(l.token && l.locId);
 }
 
-/* ══ SUPABASE ═══════════════════════════════════════════════*/
+/* ══ SUPABASE ═══════════════════════════════════════════════
+   SUPABASE_SERVICE_KEY se carga desde .env (fuera de git) para que este
+   backend ignore RLS por completo, en vez de depender de la clave anon
+   (que ahora esta restringida a lo que necesita el navegador del KDS).
+   Si el .env no esta presente cae a la clave publica como respaldo seguro
+   (esa clave ya es publica de por si, no es un secreto). */
 const SUPABASE_URL = 'ckzvjudhpbhzisrrhozk.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_5cEosCpGfTIM-culYQ1ofA_xggsaIBc';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || 'sb_publishable_5cEosCpGfTIM-culYQ1ofA_xggsaIBc';
 
 function supabaseInsert(row) {
   const data = JSON.stringify(row);
@@ -575,6 +580,11 @@ async function pollSquare(loc) {
     }, loc.token);
 
     for (const ord of (result.orders || [])) {
+      // Orden creada por el checkout de la pagina web — ya la inserta el backend de
+      // pagos (hotdog-backend, con el nombre real del cliente y sus modificadores).
+      // Si el poller tambien la procesara, quedaria un ticket duplicado en el KDS.
+      if (ord.reference_id === 'web-order') continue;
+
       const lineItems = (ord.line_items || []).filter(li => li.name && li.item_type !== 'CUSTOM_AMOUNT');
       // ¿Tiene pago aplicado? Una orden PAGADA es una venta real y NO debe desaparecer sola,
       // aunque llegue vacía. Una orden BORRADA/anulada queda vacía y SIN pago → sí se quita.
