@@ -81,7 +81,9 @@ backend usa SMTP primero.
    permisos anonimos directos sobre tablas y vistas internas.
 13. Aplicar `supabase-admin-rpc-hardening.sql` desde Supabase SQL Editor para
    limitar RPC administrativas a `service_role`.
-14. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+14. Aplicar `supabase-owner-financial-hardening.sql` desde Supabase SQL Editor
+   para limitar datos financieros/contactos de duenos solo a administradores.
+15. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
