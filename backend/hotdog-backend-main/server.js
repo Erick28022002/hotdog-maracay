@@ -70,10 +70,12 @@ const paymentLimiter = rateLimit({
 // sede real. Solo queda disponible para pruebas manuales, no es alcanzable
 // desde /api/pay (el checkout real solo acepta 'nmb' | 'doral' | 'downtown').
 const LOCATION_ID = process.env.SQUARE_LOCATION_ID;
-const squareClient = new SquareClient({
-  token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: process.env.SQUARE_ENV === 'production' ? SquareEnvironment.Production : SquareEnvironment.Sandbox
-});
+const squareClient = process.env.SQUARE_ACCESS_TOKEN
+  ? new SquareClient({
+      token: process.env.SQUARE_ACCESS_TOKEN,
+      environment: process.env.SQUARE_ENV === 'production' ? SquareEnvironment.Production : SquareEnvironment.Sandbox
+    })
+  : null;
 
 // Multi-sede: cada sede procesa el pago con SU PROPIA cuenta Square
 // (token + location_id independientes). Ninguna sede cae en otra si a la
@@ -102,6 +104,13 @@ for (const branch of Object.values(BRANCH_CONFIG)) {
     : null;
 }
 console.log('Checkout web inicializado');
+
+function squareClientForLocation(locationId) {
+  const branch = Object.values(BRANCH_CONFIG).find(candidate =>
+    candidate.enabled && candidate.locationId === locationId
+  );
+  return branch?.client || squareClient;
+}
 
 const supabase = process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
   ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
@@ -448,7 +457,7 @@ async function resolverSede(supabaseClient, locationId) {
 // Webhook de Square — recibe eventos del POS y los manda al KDS via Supabase
 app.post('/webhook/square', async (req, res) => {
   try {
-    if (!supabase || !process.env.SQUARE_ACCESS_TOKEN || !LOCATION_ID) {
+    if (!supabase) {
       console.error('Configuracion privada incompleta para webhook');
       return res.status(503).json({ error: 'Service unavailable' });
     }
@@ -472,15 +481,22 @@ app.post('/webhook/square', async (req, res) => {
       const orderId = event.data?.object?.order_created?.order_id;
       if (!orderId) return res.json({ ok: true });
 
+      const eventLocationId = event.data?.object?.order_created?.location_id || LOCATION_ID || '';
+      const eventSquareClient = squareClientForLocation(eventLocationId);
+      if (!eventSquareClient) {
+        console.error('SQUARE_CLIENT_NO_RESUELTO', JSON.stringify({ event: 'order.created', locationId: eventLocationId, orderId }));
+        return res.json({ ok: true, skipped: 'square_client_no_resuelto' });
+      }
+
       let lineItems = [], locationName = '';
       try {
-        const orderResp = await getSquareOrder(squareClient, orderId);
+        const orderResp = await getSquareOrder(eventSquareClient, orderId);
         const sqOrder   = orderResp?.order || orderResp?.result?.order;
 
         // Ignorar pedidos creados desde la web (para no duplicar)
         if (sqOrder?.referenceId === 'web-order') return res.json({ ok: true });
 
-        locationName = sqOrder?.locationId || '';
+        locationName = sqOrder?.locationId || eventLocationId;
         lineItems = (sqOrder?.lineItems || []).map(li => ({
           name:  li.name,
           qty:   parseInt(li.quantity) || 1,
