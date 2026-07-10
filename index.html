@@ -886,6 +886,13 @@ body{background:transparent}
 .custom-item-preview span{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--mango)}
 .custom-section-title{font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:12px;margin-top:20px;display:flex;align-items:center;gap:8px}
 .custom-section-title::after{content:'';flex:1;height:1px;background:var(--b)}
+.topping-accordion{border-bottom:1px solid var(--b);padding-bottom:12px;margin-bottom:14px}
+.topping-toggle{width:100%;background:transparent;border:none;color:var(--mu);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 12px;padding:0;display:flex;align-items:center;gap:8px;cursor:pointer;text-align:left}
+.topping-line{flex:1;height:1px;background:var(--b)}
+.topping-chevron{color:var(--mango);font-size:16px;line-height:1;transition:transform .18s}
+.topping-accordion.open .topping-chevron{transform:rotate(180deg)}
+.topping-content{display:none}
+.topping-accordion.open .topping-content{display:block}
 .custom-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .custom-check{display:flex;align-items:center;gap:10px;background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:10px 14px;cursor:pointer;transition:all .15s;user-select:none}
 .custom-check input{display:none}
@@ -1790,16 +1797,29 @@ const DRINKS   = [
 let _custom = null;
 
 function toppingBlockHTML(n, label) {
+  const isOpen = n === 1 ? ' open' : '';
   return `
-    <div class="custom-section-title" style="margin-top:${n===1?'0':'24px'}">${label}</div>
-    <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Desmarca lo que <strong>NO quieres</strong>:</p>
-    <div class="custom-checks" id="customChecks${n}">
-      ${TOPPINGS.map(t=>`<label class="custom-check" onclick="toggleTopping(this,event)"><input type="checkbox" value="${t}" checked><div class="ck-box">✓</div><span class="ck-lbl">${t}</span></label>`).join('')}
+    <div class="topping-accordion${isOpen}" id="toppingAccordion${n}" style="margin-top:${n===1?'0':'14px'}">
+      <button type="button" class="topping-toggle" onclick="toggleToppingPanel(${n})">
+        <span>${label}</span><span class="topping-line"></span><span class="topping-chevron">⌄</span>
+      </button>
+      <div class="topping-content">
+        <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Desmarca lo que <strong>NO quieres</strong>:</p>
+        <div class="custom-checks" id="customChecks${n}">
+          ${TOPPINGS.map(t=>`<label class="custom-check" onclick="toggleTopping(this,event)"><input type="checkbox" value="${t}" checked><div class="ck-box">✓</div><span class="ck-lbl">${t}</span></label>`).join('')}
+        </div>
+        <p style="font-size:11px;font-weight:700;color:var(--mango);letter-spacing:.5px;margin:10px 0 6px">EXTRAS (+$2.00 c/u):</p>
+        <div class="custom-checks" id="customExtras${n}">
+          ${EXTRAS.map(e=>`<label class="custom-check" onclick="toggleExtra(this,event)"><input type="checkbox" value="${e.name}" data-price="${e.price}"><div class="ck-box">✓</div><span class="ck-lbl">${e.name} <em style="color:var(--mango);font-style:normal;font-size:11px">+$${e.price.toFixed(2)}</em></span></label>`).join('')}
+        </div>
+      </div>
     </div>
-    <p style="font-size:11px;font-weight:700;color:var(--mango);letter-spacing:.5px;margin:10px 0 6px">EXTRAS (+$2.00 c/u):</p>
-    <div class="custom-checks" id="customExtras${n}">
-      ${EXTRAS.map(e=>`<label class="custom-check" onclick="toggleExtra(this,event)"><input type="checkbox" value="${e.name}" data-price="${e.price}"><div class="ck-box">✓</div><span class="ck-lbl">${e.name} <em style="color:var(--mango);font-style:normal;font-size:11px">+$${e.price.toFixed(2)}</em></span></label>`).join('')}
-    </div>`;
+  `;
+}
+
+function toggleToppingPanel(n) {
+  const panel = document.getElementById(`toppingAccordion${n}`);
+  if (panel) panel.classList.toggle('open');
 }
 
 function openCustom(id, name, price, emoji, img, hasDrink, numHD) {
