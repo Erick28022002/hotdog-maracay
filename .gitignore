@@ -21,3 +21,7 @@ Thumbs.db
 !.env.example
 !backend/.env.example
 !backend/hotdog-backend-main/.env.example
+
+# Artefactos locales de despliegue/auditoria
+.deploy-hotdog-maracay/
+AUDITORIA_*.md

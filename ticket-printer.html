@@ -153,7 +153,7 @@
 <!-- Ticket oculto para imprimir -->
 <div id="ticket-print"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.4/dist/umd/supabase.min.js"></script>
 <script>
 const SUPABASE_URL = 'https://ckzvjudhpbhzisrrhozk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_5cEosCpGfTIM-culYQ1ofA_xggsaIBc';
@@ -286,7 +286,7 @@ async function loadTodayOrders() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const { data } = await db.from('web_orders')
-    .select('*')
+    .select('id,customer_name,customer_phone,order_type,notes,items,total,created_at')
     .gte('created_at', today.toISOString())
     .order('created_at', { ascending: false });
   orders = data || [];
