@@ -24,6 +24,14 @@ create table if not exists public.web_checkout_attempts (
 alter table public.web_checkout_attempts enable row level security;
 revoke all on table public.web_checkout_attempts from anon, authenticated;
 
+drop policy if exists web_checkout_attempts_no_browser_access on public.web_checkout_attempts;
+create policy web_checkout_attempts_no_browser_access
+on public.web_checkout_attempts
+for all
+to anon, authenticated
+using (false)
+with check (false);
+
 alter table public.web_orders
   add column if not exists checkout_attempt_id uuid,
   add column if not exists square_order_id text,
