@@ -102,8 +102,7 @@ for (const branch of Object.values(BRANCH_CONFIG)) {
     ? new SquareClient({ token: branch.accessToken, environment: SquareEnvironment.Production })
     : null;
 }
-console.log('Sedes checkout web:', Object.entries(BRANCH_CONFIG)
-  .map(([id, b]) => `${id}:${b.enabled ? 'OK' : 'SIN CONFIGURAR'}`).join(', '));
+console.log('Checkout web inicializado');
 
 const supabase = process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
   ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
@@ -233,7 +232,6 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
           const attempt = reconciliation.attempt;
           return res.json({
             success: true,
-            paymentId: attempt.payment_id,
             receiptUrl: attempt.receipt_url || '',
             total: Number(attempt.total),
             reconciled: true
@@ -309,7 +307,7 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
       locationId: branch.locationId,
       orderId,
       buyerEmailAddress: customerEmail || undefined,
-      note: `${customerName} | ${orderType} | ${location} | ${safeNotes}`
+      note: `Pedido web | ${orderType} | ${location} | ${checkoutAttemptId}`
     });
 
     const payment = payResponse?.payment || payResponse?.result?.payment || payResponse;
@@ -344,8 +342,6 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
         paymentApproved: true,
         paymentStatus: 'verification_pending',
         checkoutAttemptId,
-        squareOrderId: orderId,
-        paymentId,
         message: 'Tu pago fue aprobado y esta siendo verificado. No vuelvas a pagar.'
       });
     }
@@ -360,7 +356,7 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
       console.error('ORDER_EMAIL_ERROR', emailError?.message || emailError);
     }
 
-    res.json({ success: true, paymentId, receiptUrl, total: Number(orderTotal) / 100 });
+    res.json({ success: true, receiptUrl, total: Number(orderTotal) / 100 });
   } catch (err) {
     const errMsg = err?.errors?.[0]?.detail || err?.message || JSON.stringify(err);
     console.error('Error en /api/pay:', errMsg);
@@ -374,8 +370,6 @@ app.post('/api/pay', paymentLimiter, async (req, res) => {
         paymentApproved: true,
         paymentStatus: 'verification_pending',
         checkoutAttemptId: approvedPaymentContext.checkoutAttemptId,
-        squareOrderId: approvedPaymentContext.squareOrderId,
-        paymentId: approvedPaymentContext.paymentId,
         message: 'Tu pago fue aprobado y esta siendo verificado. No vuelvas a pagar.'
       });
     }
@@ -403,7 +397,6 @@ app.post('/api/pay/reconcile', paymentLimiter, async (req, res) => {
       return res.json({
         success: true,
         reconciled: true,
-        paymentId: result.attempt.payment_id,
         receiptUrl: result.attempt.receipt_url || '',
         total: Number(result.attempt.total)
       });

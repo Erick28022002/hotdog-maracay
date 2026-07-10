@@ -10,6 +10,7 @@ const {
   persistApprovedCheckout,
   reconcileApprovedCheckout
 } = require('./checkout-persistence');
+const app = require('./server');
 
 function duplicateError() {
   return Object.assign(new Error('duplicate'), { code: '23505' });
@@ -134,4 +135,22 @@ test('fallo de Supabase despues del pago queda verificable y se reconcilia sin o
   const repeated = await reconcileApprovedCheckout(repository, id);
   assert.equal(repeated.persisted, true);
   assert.equal(repository.orders.size, 1);
+});
+
+test('respuestas de pago no exponen ids internos de Square', async () => {
+  const server = app.listen(0);
+  try {
+    const baseUrl = `http://127.0.0.1:${server.address().port}`;
+    const response = await fetch(`${baseUrl}/api/pay/reconcile`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ checkoutAttemptId: 'bad-id' })
+    });
+    const body = await response.json();
+    assert.equal(response.status, 400);
+    assert.equal(Object.hasOwn(body, 'paymentId'), false);
+    assert.equal(Object.hasOwn(body, 'squareOrderId'), false);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
 });
