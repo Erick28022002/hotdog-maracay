@@ -147,6 +147,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://web.squarecdn.com" crossorigin>
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="preload" as="image" href="fotos/miami-neon.webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
@@ -1050,7 +1053,7 @@ body{background:transparent}
   <div class="hist-grid">
     <div style="position:relative">
       <div class="hist-img-wrap">
-        <img src="fotos/historia-ambiente.webp" alt="Interior del restaurante Hot Dog Maracay" loading="lazy" width="800" height="534">
+        <img src="fotos/historia-ambiente.webp" alt="Interior del restaurante Hot Dog Maracay" loading="lazy" decoding="async" width="800" height="534">
         <div class="hist-neon-border"></div>
       </div>
     </div>
@@ -1100,7 +1103,7 @@ body{background:transparent}
         <button class="btn-primary" style="width:fit-content" onclick="openCustom('promo-clasica','Promo Clásica',12.50,'🌭','fotos/promo-clasica.webp',true,2)">Agregar — $12.50</button>
       </div>
       <div class="promo-right">
-        <img src="fotos/promo-clasica.webp" alt="Promo Clásica Hotdog Maracay">
+        <img src="fotos/promo-clasica.webp" alt="Promo Clásica Hotdog Maracay" loading="lazy" decoding="async">
       </div>
     </div>
 
@@ -1114,47 +1117,47 @@ body{background:transparent}
     <div class="menu-cat active" id="cat-hotdogs">
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/promo-clasica.webp" alt="Promoción Especial"><span class="mcard-badge" style="background:#E8272A">PRUEBA</span></div>
+        <div class="mcard-img"><img src="fotos/promo-clasica.webp" alt="Promoción Especial" loading="lazy" decoding="async"><span class="mcard-badge" style="background:#E8272A">PRUEBA</span></div>
         <div class="mcard-body"><div class="mcard-name">Promoción Especial</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$1.00</span><button class="add-btn" onclick="openCustom('promo-especial','Promoción Especial',1.00,'🌭','fotos/promo-clasica.webp',true,2)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/promo-clasica.webp" alt="Promo Clásica"><span class="mcard-badge gold">MÁS PEDIDO</span></div>
+        <div class="mcard-img"><img src="fotos/promo-clasica.webp" alt="Promo Clásica" loading="lazy" decoding="async"><span class="mcard-badge gold">MÁS PEDIDO</span></div>
         <div class="mcard-body"><div class="mcard-name">Promo Clásica</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$12.50</span><button class="add-btn" onclick="openCustom('promo-clasica','Promo Clásica',12.50,'🌭','fotos/promo-clasica.webp',true,2)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/clasico-pro.webp" alt="Hot Dog Clásico"></div>
+        <div class="mcard-img"><img src="fotos/clasico-pro.webp" alt="Hot Dog Clásico" loading="lazy" decoding="async"></div>
         <div class="mcard-body"><div class="mcard-name">Hot Dog Clásico</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$6.85</span><button class="add-btn" onclick="openCustom('hd-clasico','Hot Dog Clásico',6.85,'🌭','fotos/clasico-pro.webp',false)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/promo-mechada.webp" alt="Promo de Carne Mechada"><span class="mcard-badge">ESTRELLA</span></div>
+        <div class="mcard-img"><img src="fotos/promo-mechada.webp" alt="Promo de Carne Mechada" loading="lazy" decoding="async"><span class="mcard-badge">ESTRELLA</span></div>
         <div class="mcard-body"><div class="mcard-name">Promo de Carne Mechada</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, carne mechada, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$19.99</span><button class="add-btn" onclick="openCustom('promo-mechada','Promo de Carne Mechada',19.99,'🔥','fotos/promo-mechada.webp',true,2)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/hd-mechada-dark.webp" alt="Hot Dog con Carne Mechada"></div>
+        <div class="mcard-img"><img src="fotos/hd-mechada-dark.webp" alt="Hot Dog con Carne Mechada" loading="lazy" decoding="async"></div>
         <div class="mcard-body"><div class="mcard-name">Hot Dog con Carne Mechada</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, carne mechada, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$10.99</span><button class="add-btn" onclick="openCustom('hd-mechada','Hot Dog con Carne Mechada',10.99,'🔥','fotos/hd-mechada-dark.webp',false)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/promo-bacon.webp" alt="Promo de Bacon"><span class="mcard-badge">ESPECIAL</span></div>
+        <div class="mcard-img"><img src="fotos/promo-bacon.webp" alt="Promo de Bacon" loading="lazy" decoding="async"><span class="mcard-badge">ESPECIAL</span></div>
         <div class="mcard-body"><div class="mcard-name">Promo de Bacon</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, bacon crujiente, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$16.50</span><button class="add-btn" onclick="openCustom('promo-bacon','Promo de Bacon',16.50,'🥓','fotos/promo-bacon.webp',true,2)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/hd-bacon.webp" alt="Hot Dog con Bacon"></div>
+        <div class="mcard-img"><img src="fotos/hd-bacon.webp" alt="Hot Dog con Bacon" loading="lazy" decoding="async"></div>
         <div class="mcard-body"><div class="mcard-name">Hot Dog con Bacon</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, bacon crujiente, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$8.85</span><button class="add-btn" onclick="openCustom('hd-bacon','Hot Dog con Bacon',8.85,'🥓','fotos/hd-bacon.webp',false)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/promo-queso.webp" alt="Promo de Queso de Mano"></div>
+        <div class="mcard-img"><img src="fotos/promo-queso.webp" alt="Promo de Queso de Mano" loading="lazy" decoding="async"></div>
         <div class="mcard-body"><div class="mcard-name">Promo de Queso de Mano</div><div class="mcard-desc">Dos hot dogs preparados en pan caliente con salchicha mixta, queso de mano, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. Incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$16.50</span><button class="add-btn" onclick="openCustom('promo-queso','Promo de Queso de Mano',16.50,'🧀','fotos/promo-queso.webp',true,2)">+</button></div></div>
       </div>
 
       <div class="mcard">
-        <div class="mcard-img"><img src="fotos/hd-queso-mano.webp" alt="Hot Dog con Queso de Mano"></div>
+        <div class="mcard-img"><img src="fotos/hd-queso-mano.webp" alt="Hot Dog con Queso de Mano" loading="lazy" decoding="async"></div>
         <div class="mcard-body"><div class="mcard-name">Hot Dog con Queso de Mano</div><div class="mcard-desc">Hot dog preparado en pan caliente con salchicha mixta, queso de mano, repollo, cebolla, papitas, maíz, ketchup, mayonesa, mostaza y queso amarillo. No incluye bebida.</div><div class="mcard-footer"><span class="mcard-price">$8.85</span><button class="add-btn" onclick="openCustom('hd-queso','Hot Dog con Queso de Mano',8.85,'🧀','fotos/hd-queso-mano.webp',false)">+</button></div></div>
       </div>
 
@@ -1162,16 +1165,16 @@ body{background:transparent}
 
     <!-- Bebidas -->
     <div class="menu-cat" id="cat-bebidas">
-      <div class="mcard"><div class="mcard-img"><img src="fotos/coca-cola.webp" alt="Coca Cola"></div><div class="mcard-body"><div class="mcard-name">Coca Cola</div><div class="mcard-desc">La clásica bien fría.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-cola','🥤 Coca Cola',3.50,'🥤','fotos/coca-cola.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/coca-zero.webp" alt="Coca Cola Zero"></div><div class="mcard-body"><div class="mcard-name">Coca Cola Zero</div><div class="mcard-desc">Todo el sabor, sin azúcar.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-zero','🥤 Coca Cola Zero',3.50,'🥤','fotos/coca-zero.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/diet-coke.webp" alt="Diet Coke"></div><div class="mcard-body"><div class="mcard-name">Diet Coke</div><div class="mcard-desc">Ligera y refrescante.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-diet','🥤 Diet Coke',3.50,'🥤','fotos/diet-coke.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/sprite.webp" alt="Sprite"></div><div class="mcard-body"><div class="mcard-name">Sprite</div><div class="mcard-desc">Limonada burbujeante fría.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-sprite','🥤 Sprite',3.50,'🥤','fotos/sprite.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/nestea.webp" alt="Nestea Limón"></div><div class="mcard-body"><div class="mcard-name">Nestea Limón</div><div class="mcard-desc">Té helado sabor limón.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-neslim','🫖 Nestea Limón',3.50,'🫖','fotos/nestea.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/nestea.webp" alt="Nestea Durazno"></div><div class="mcard-body"><div class="mcard-name">Nestea Durazno</div><div class="mcard-desc">Té helado sabor durazno.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-nesdur','🫖 Nestea Durazno',3.50,'🫖','fotos/nestea.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/frescolita.webp" alt="Frescolita"></div><div class="mcard-body"><div class="mcard-name">Frescolita</div><div class="mcard-desc">La bebida venezolana por excelencia.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-fre','🥤 Frescolita',3.50,'🥤','fotos/frescolita.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/malta.webp" alt="Malta"></div><div class="mcard-body"><div class="mcard-name">Malta</div><div class="mcard-desc">El acompañante clásico del hot dog venezolano.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-malta','🍺 Malta',3.50,'🍺','fotos/malta.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/uvita.webp" alt="Uvita"></div><div class="mcard-body"><div class="mcard-name">Uvita</div><div class="mcard-desc">Refrescante bebida de uva venezolana.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-uvita','🍇 Uvita',3.50,'🍇','fotos/uvita.webp')">+</button></div></div></div>
-      <div class="mcard"><div class="mcard-img"><img src="fotos/agua.webp" alt="Agua"></div><div class="mcard-body"><div class="mcard-name">Agua</div><div class="mcard-desc">Bien fría.</div><div class="mcard-footer"><span class="mcard-price">$2.00</span><button class="add-btn" onclick="addToCart('beb-agua','💧 Agua',2.00,'💧','fotos/agua.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/coca-cola.webp" alt="Coca Cola" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Coca Cola</div><div class="mcard-desc">La clásica bien fría.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-cola','🥤 Coca Cola',3.50,'🥤','fotos/coca-cola.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/coca-zero.webp" alt="Coca Cola Zero" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Coca Cola Zero</div><div class="mcard-desc">Todo el sabor, sin azúcar.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-zero','🥤 Coca Cola Zero',3.50,'🥤','fotos/coca-zero.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/diet-coke.webp" alt="Diet Coke" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Diet Coke</div><div class="mcard-desc">Ligera y refrescante.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-diet','🥤 Diet Coke',3.50,'🥤','fotos/diet-coke.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/sprite.webp" alt="Sprite" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Sprite</div><div class="mcard-desc">Limonada burbujeante fría.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-sprite','🥤 Sprite',3.50,'🥤','fotos/sprite.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/nestea.webp" alt="Nestea Limón" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Nestea Limón</div><div class="mcard-desc">Té helado sabor limón.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-neslim','🫖 Nestea Limón',3.50,'🫖','fotos/nestea.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/nestea.webp" alt="Nestea Durazno" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Nestea Durazno</div><div class="mcard-desc">Té helado sabor durazno.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-nesdur','🫖 Nestea Durazno',3.50,'🫖','fotos/nestea.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/frescolita.webp" alt="Frescolita" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Frescolita</div><div class="mcard-desc">La bebida venezolana por excelencia.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-fre','🥤 Frescolita',3.50,'🥤','fotos/frescolita.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/malta.webp" alt="Malta" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Malta</div><div class="mcard-desc">El acompañante clásico del hot dog venezolano.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-malta','🍺 Malta',3.50,'🍺','fotos/malta.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/uvita.webp" alt="Uvita" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Uvita</div><div class="mcard-desc">Refrescante bebida de uva venezolana.</div><div class="mcard-footer"><span class="mcard-price">$3.50</span><button class="add-btn" onclick="addToCart('beb-uvita','🍇 Uvita',3.50,'🍇','fotos/uvita.webp')">+</button></div></div></div>
+      <div class="mcard"><div class="mcard-img"><img src="fotos/agua.webp" alt="Agua" loading="lazy" decoding="async"></div><div class="mcard-body"><div class="mcard-name">Agua</div><div class="mcard-desc">Bien fría.</div><div class="mcard-footer"><span class="mcard-price">$2.00</span><button class="add-btn" onclick="addToCart('beb-agua','💧 Agua',2.00,'💧','fotos/agua.webp')">+</button></div></div></div>
     </div>
   </div>
 </section>
@@ -1228,7 +1231,7 @@ body{background:transparent}
           </div>
         </div>
         <div class="loc-img-wrap">
-          <img src="fotos/sede-downtown.webp" alt="Hot Dog Maracay Downtown Miami" class="loc-par" loading="lazy" width="600" height="400">
+          <img src="fotos/sede-downtown.webp" alt="Hot Dog Maracay Downtown Miami" class="loc-par" loading="lazy" decoding="async" width="600" height="400">
         </div>
       </div>
 
@@ -1245,7 +1248,7 @@ body{background:transparent}
           </div>
         </div>
         <div class="loc-img-wrap">
-          <img src="fotos/sede-doral.webp" alt="Hot Dog Maracay Doral Miami" class="loc-par" loading="lazy" width="600" height="400">
+          <img src="fotos/sede-doral.webp" alt="Hot Dog Maracay Doral Miami" class="loc-par" loading="lazy" decoding="async" width="600" height="400">
         </div>
       </div>
 
@@ -1262,7 +1265,7 @@ body{background:transparent}
           </div>
         </div>
         <div class="loc-img-wrap">
-          <img src="fotos/sede-northmiami.webp" alt="Hot Dog Maracay North Miami Beach" class="loc-par" loading="lazy" width="600" height="400">
+          <img src="fotos/sede-northmiami.webp" alt="Hot Dog Maracay North Miami Beach" class="loc-par" loading="lazy" decoding="async" width="600" height="400">
         </div>
       </div>
 
@@ -1307,12 +1310,12 @@ body{background:transparent}
 <section class="sec gallery-sec" id="gallery">
   <div class="container">
     <div class="gallery-grid">
-      <div class="g-item"><img src="fotos/ig-queso-bowl.webp" alt="Queso Amarillo Hotdog Maracay"><div class="g-overlay"></div></div>
-      <div class="g-item"><img src="fotos/ig-promo-dos.webp" alt="Promo Dos Hot Dogs"><div class="g-overlay"></div></div>
-      <div class="g-item"><img src="fotos/ig-chica-mordiendo.webp" alt="Hotdog Maracay Miami"><div class="g-overlay"></div></div>
-      <div class="g-item"><img src="fotos/ig-rallando-queso.webp" alt="Preparación Hotdog Maracay"><div class="g-overlay"></div></div>
-      <div class="g-item"><img src="fotos/ig-queso-cayendo.webp" alt="Queso Cayendo"><div class="g-overlay"></div></div>
-      <div class="g-item"><img src="fotos/ig-hd-queso-logo.webp" alt="Hot Dog Hotdog Maracay"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-queso-bowl.webp" alt="Queso Amarillo Hotdog Maracay" loading="lazy" decoding="async"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-promo-dos.webp" alt="Promo Dos Hot Dogs" loading="lazy" decoding="async"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-chica-mordiendo.webp" alt="Hotdog Maracay Miami" loading="lazy" decoding="async"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-rallando-queso.webp" alt="Preparación Hotdog Maracay" loading="lazy" decoding="async"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-queso-cayendo.webp" alt="Queso Cayendo" loading="lazy" decoding="async"><div class="g-overlay"></div></div>
+      <div class="g-item"><img src="fotos/ig-hd-queso-logo.webp" alt="Hot Dog Hotdog Maracay" loading="lazy" decoding="async"><div class="g-overlay"></div></div>
     </div>
   </div>
 </section>
