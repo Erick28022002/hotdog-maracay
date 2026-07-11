@@ -62,6 +62,10 @@ backend usa SMTP primero.
 
 ## 2. Despliegue coordinado
 
+Antes de cualquier redeploy del backend, confirmar en Vercel Production que
+`SQUARE_WEBHOOK_KEY` existe. Si falta, no desplegar: los webhooks de Square
+fallarian despues del nuevo deploy aunque el despliegue activo todavia funcione.
+
 1. Configurar todas las variables privadas.
 2. Desplegar este backend.
 3. Confirmar que `/health` responde correctamente.
@@ -118,6 +122,8 @@ un contrato de pedido nuevo y deben publicarse juntos.
 - Configurar un limite de trafico para `/api/pay` en Vercel Firewall. El limite
   incluido en Express es una segunda barrera por instancia, no un limite global.
 - Activar MFA en Vercel, Square, Supabase, GitHub y el proveedor del dominio.
+- Activar Supabase Auth > Password Security > Leaked Password Protection para
+  bloquear contrasenas conocidas como filtradas.
 - Revisar las tablas publicas sin RLS antes de habilitar RLS en bloque, porque el
   proyecto contiene otras aplicaciones que pueden depender de ellas.
 - Antes de desplegar nuevamente el backend, reponer `SQUARE_WEBHOOK_KEY` en
