@@ -1899,7 +1899,7 @@ function openCustom(id, name, price, emoji, img, hasDrink, numHD) {
   document.getElementById('customPrice').textContent = '$' + price.toFixed(2);
   const thumb = document.getElementById('customThumb');
   thumb.innerHTML = img
-    ? `<img src="${img}" alt="${name}" style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0">`
+    ? `<img src="${escHtml(img)}" alt="${escHtml(name)}" style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0">`
     : `<div class="ci-emoji">${emoji}</div>`;
   document.getElementById('toppingsContainer').innerHTML = numHD >= 2
     ? toppingBlockHTML(1,'🌭 Toppings Hot Dog 1') + toppingBlockHTML(2,'🌭 Toppings Hot Dog 2')
