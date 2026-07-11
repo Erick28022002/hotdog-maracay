@@ -1668,10 +1668,11 @@ function startHeroStatsCount(){
   const stats = document.getElementById('heroStats');
   if(!stats || stats.dataset.counted)return;
   stats.dataset.counted='true';
-  countUp(document.getElementById('s1'),4.9,true);
-  countUp(document.getElementById('s2'),564);
-  countUp(document.getElementById('s3'),3);
-  countUp(document.getElementById('s4'),12);
+  const values = [['s1','4.9'], ['s2','564'], ['s3','3'], ['s4','12']];
+  values.forEach(([id,value])=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=value;
+  });
 }
 if('IntersectionObserver' in window){
   const statsObserver = new IntersectionObserver(entries=>{
