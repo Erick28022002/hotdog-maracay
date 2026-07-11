@@ -93,7 +93,9 @@ backend usa SMTP primero.
    dejar logs de auditoria como solo lectura o append-only.
 19. Aplicar `supabase-integration-config-hardening.sql` desde Supabase SQL
    Editor para limitar configuracion financiera/POS a administradores.
-20. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+20. Aplicar `supabase-financial-delete-hardening.sql` desde Supabase SQL Editor
+   para impedir borrado de registros financieros desde usuarios autenticados.
+21. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
