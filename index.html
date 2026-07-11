@@ -2293,9 +2293,14 @@ async function submitPayment(sourceId,form,resetBtn){
     location:form.location,
     notes:form.notes
   };
+  let slowPaymentNotice=null;
   try{
-    setPayStatus('Confirmando tu pago. No cierres ni recargues esta pantalla.');
+    setPayStatus('Confirmando con Square y registrando tu pedido. No cierres ni recargues esta pantalla.');
+    slowPaymentNotice=setTimeout(()=>{
+      setPayStatus('Sigue procesando de forma segura. Puede tardar unos segundos; no recargues ni vuelvas a pagar.');
+    },7000);
     const resp=await fetch(BACKEND_URL+'/api/pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(orderPayload)});
+    clearTimeout(slowPaymentNotice);
     const data=await resp.json().catch(()=>({}));
     if(resp.ok&&data.success){
       showPaymentResult({receiptUrl:data.receiptUrl});
@@ -2307,7 +2312,12 @@ async function submitPayment(sourceId,form,resetBtn){
     }
     setPayStatus('');
     showToast('⚠️ No se pudo procesar el pago. Verifica tus datos o intenta de nuevo.','info'); resetBtn();
-  }catch(e){ setPayStatus(''); showToast('⚠️ Error de conexión con el servidor','info'); resetBtn(); }
+  }catch(e){
+    if(slowPaymentNotice)clearTimeout(slowPaymentNotice);
+    setPayStatus('');
+    showToast('⚠️ Error de conexión con el servidor','info');
+    resetBtn();
+  }
 }
 async function sendOrder(){
   const form=validateCheckoutForm();
