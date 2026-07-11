@@ -87,7 +87,9 @@ backend usa SMTP primero.
    para limitar contactos de proveedores por sede.
 16. Aplicar `supabase-authenticated-privileges-hardening.sql` desde Supabase SQL
    Editor para quitar permisos administrativos de tablas al rol autenticado.
-17. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+17. Aplicar `supabase-global-read-hardening.sql` desde Supabase SQL Editor para
+   exigir cuenta activa/aprobada en lecturas globales de catalogo interno.
+18. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
