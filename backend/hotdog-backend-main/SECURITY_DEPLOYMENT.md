@@ -101,7 +101,9 @@ backend usa SMTP primero.
    limitar escrituras de nomina/propinas a administradores.
 23. Aplicar `supabase-purchase-order-hardening.sql` desde Supabase SQL Editor
    para limitar escritura de ordenes de compra a administradores.
-24. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+24. Aplicar `supabase-schedule-hardening.sql` desde Supabase SQL Editor para
+   limitar escritura de horarios a administradores.
+25. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
