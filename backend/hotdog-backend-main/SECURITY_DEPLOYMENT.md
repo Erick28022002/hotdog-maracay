@@ -105,7 +105,9 @@ backend usa SMTP primero.
    limitar escritura de horarios a administradores.
 25. Aplicar `supabase-product-recipes-admin-hardening.sql` desde Supabase SQL
    Editor para hacer que recetas use el helper admin endurecido.
-26. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+26. Aplicar `supabase-daily-financial-write-hardening.sql` desde Supabase SQL
+   Editor para limitar escritura de ventas/caja/Zelle a administradores.
+27. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
