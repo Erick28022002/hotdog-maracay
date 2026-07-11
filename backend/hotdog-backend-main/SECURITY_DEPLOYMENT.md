@@ -83,7 +83,9 @@ backend usa SMTP primero.
    limitar RPC administrativas a `service_role`.
 14. Aplicar `supabase-owner-financial-hardening.sql` desde Supabase SQL Editor
    para limitar datos financieros/contactos de duenos solo a administradores.
-15. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
+15. Aplicar `supabase-provider-access-hardening.sql` desde Supabase SQL Editor
+   para limitar contactos de proveedores por sede.
+16. Confirmar que el KDS inicia sesion y puede leer, ordenar y actualizar
    pedidos.
 
 No desplegar solamente uno de los dos componentes: el frontend y el backend usan
