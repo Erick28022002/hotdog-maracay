@@ -830,6 +830,12 @@ body{background:transparent}
 #sq-pay-btn{width:100%;background:linear-gradient(135deg,var(--mango),var(--terra));color:#000;font-family:'Montserrat',sans-serif;font-weight:900;font-size:15px;padding:15px;border:none;border-radius:14px;cursor:pointer;margin-top:16px;transition:filter .15s}
 #sq-pay-btn:hover:not(:disabled){filter:brightness(1.08)}
 #sq-pay-btn:disabled{opacity:.45;cursor:not-allowed}
+#apple-pay-wrap{display:none;margin-bottom:4px}
+#apple-pay-container{min-height:48px;border-radius:12px;overflow:hidden}
+.pay-divider{text-align:center;color:var(--mu);font-size:12px;margin:14px 0;position:relative}
+.pay-divider::before,.pay-divider::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--b)}
+.pay-divider::before{left:0}
+.pay-divider::after{right:0}
 
 /* ── CUSTOM MODAL ── */
 .custom-item-preview{display:flex;align-items:center;gap:14px;padding:14px;background:var(--s2);border-radius:14px;margin-bottom:20px}
@@ -1418,13 +1424,17 @@ body{background:transparent}
         </select>
       </div>
       <div class="form-grp"><label class="form-lbl">Notas (opcional)</label><input class="form-inp" id="cNotes" placeholder="Ej: sin cebolla, extra salsa..." maxlength="300"></div>
+      <div id="apple-pay-wrap">
+        <div id="apple-pay-container"></div>
+        <div class="pay-divider">o paga con tarjeta</div>
+      </div>
       <div class="form-grp">
         <label class="form-lbl">Datos de Tarjeta</label>
         <div id="sq-loading" style="text-align:center;padding:18px;color:var(--mu);font-size:13px">⏳ Cargando sistema de pago...</div>
         <div id="sq-card-container" style="display:none"></div>
       </div>
       <button id="sq-pay-btn" onclick="sendOrder()" disabled>💳 Pagar</button>
-      <p class="pay-note">🔒 Pago seguro con Square · Visa, Mastercard, Amex, Discover</p>
+      <p class="pay-note">🔒 Pago seguro con Square · Apple Pay · Visa, Mastercard, Amex</p>
     </div>
   </div>
 </div>
@@ -1655,7 +1665,7 @@ function openCustom(id, name, price, emoji, img, hasDrink, numHD) {
          <span class="dk-lbl">${d.name} ${d.price>0?`<em style="color:var(--red);font-style:normal;font-size:11px">+$${d.price.toFixed(2)}</em>`:`<em style="color:var(--gr);font-style:normal;font-size:11px">gratis</em>`}</span>
        </label>`).join('');
   } else { ds.style.display = 'none'; }
-  document.getElementById('customChecks').innerHTML = SALSAS.map(s=>
+  document.getElementById('customChecks').innerHTML = ['Sin salsas', ...SALSAS].map(s=>
     `<label class="custom-check" onclick="toggleSalsa(this,event)"><input type="checkbox" value="${s}"><div class="ck-box">✓</div><span class="ck-lbl">${s}</span></label>`).join('');
   document.getElementById('salsaError').style.display = 'none';
   document.getElementById('customConfirmBtn').disabled = true;
@@ -1669,9 +1679,18 @@ function toggleExtra(lbl,ev){ ev.preventDefault(); const inp=lbl.querySelector('
 function toggleSalsa(lbl,ev){
   ev.preventDefault();
   const isSel = lbl.classList.contains('selected');
-  if(!isSel){
+  const isNone = lbl.querySelector('input').value==='Sin salsas';
+  if(isNone){
+    // "Sin salsas" es excluyente: al elegirla se descarta cualquier otra salsa
+    document.querySelectorAll('#customChecks .custom-check.selected').forEach(el=>{ el.classList.remove('selected'); el.querySelector('input').checked=false; });
+    if(!isSel){ lbl.classList.add('selected'); lbl.querySelector('input').checked=true; }
+  } else if(!isSel){
     const count=document.querySelectorAll('#customChecks .custom-check.selected').length;
     if(count>=2)return;
+    // Elegir una salsa real descarta "Sin salsas" si estaba activa
+    document.querySelectorAll('#customChecks .custom-check.selected').forEach(el=>{
+      if(el.querySelector('input').value==='Sin salsas'){ el.classList.remove('selected'); el.querySelector('input').checked=false; }
+    });
     lbl.classList.add('selected'); lbl.querySelector('input').checked=true;
   } else { lbl.classList.remove('selected'); lbl.querySelector('input').checked=false; }
   const count=document.querySelectorAll('#customChecks .custom-check.selected').length;
@@ -1691,15 +1710,18 @@ function confirmCustom(){
     const removed=[...document.querySelectorAll(`#customChecks${n} input:not(:checked)`)].map(el=>el.value);
     const extraEls=[...document.querySelectorAll(`#customExtras${n} input:checked`)];
     extraEls.forEach(el=>extraCost+=parseFloat(el.dataset.price));
-    const hdTag=_custom.numHD>1?`HD${n}`:'HD';
-    const parts=[];
-    if(removed.length)parts.push(`Sin: ${removed.join(', ')}`);
-    if(extraEls.length)parts.push(`Extra: ${extraEls.map(el=>el.value).join(', ')}`);
-    if(parts.length)details.push(`[${hdTag}] ${parts.join(' · ')}`);
+    // Formato que reconoce el motor de modificadores del KDS (kds.html):
+    // tag "HD 1"/"HD 2" (con espacio, sin corchetes) + un "Sin X"/"Extra X" por parte,
+    // cada uno como token propio — así se agrupan por hot dog y se detectan como
+    // exclusion/extra individuales en vez de caer como nota neutral sin procesar.
+    if(_custom.numHD>1) details.push(`HD ${n}`);
+    removed.forEach(r=>details.push(`Sin ${r}`));
+    extraEls.forEach(el=>details.push(`Extra ${el.value}`));
   }
   const drinkEl=document.querySelector('input[name="customDrink"]:checked');
   if(drinkEl){ const dp=parseFloat(drinkEl.dataset.price)||0; extraCost+=dp; details.push(`Bebida: ${drinkEl.value}${dp>0?` (+$${dp.toFixed(2)})`:''}`);}
-  details.push(`Salsas: ${salsas.join(', ')}`);
+  if(salsas.length===1 && salsas[0]==='Sin salsas') details.push('Sin salsas');
+  else details.push(`Salsas: ${salsas.join(', ')}`);
   const note=document.getElementById('customNote').value.trim();
   if(note)details.push(note);
   const uid=_custom.id+'_'+Date.now();
@@ -1771,9 +1793,33 @@ function closeSuccess(){ document.getElementById('successModal').classList.remov
 const BACKEND_URL='https://hotdog-backend.vercel.app';
 let _sqPayments=null, _sqCard=null;
 async function initSquare(){
-  if(_sqCard){ document.getElementById('sq-loading').style.display='none'; document.getElementById('sq-card-container').style.display='block'; document.getElementById('sq-pay-btn').disabled=false; return; }
-  try{
+  const{total}=totals();
+  if(!_sqPayments){
     _sqPayments=Square.payments('sq0idp-CAxJsVjUl55Ulb7Nwekcjw','L2WHB70494FZB');
+  }
+  // Apple Pay — recrear cada vez para tener el monto actualizado
+  const apWrap=document.getElementById('apple-pay-wrap');
+  document.getElementById('apple-pay-container').innerHTML='';
+  try{
+    const req=_sqPayments.paymentRequest({
+      countryCode:'US', currencyCode:'USD',
+      total:{amount:total.toFixed(2),label:'Hot Dog Maracay'},
+    });
+    const ap=await _sqPayments.applePay(req);
+    await ap.attach('#apple-pay-container');
+    apWrap.style.display='block';
+    ap.addEventListener('ontokenization',async({detail})=>{
+      if(detail.tokenResult?.status==='OK') await processPayment(detail.tokenResult.token);
+    });
+  }catch(e){ apWrap.style.display='none'; }
+  // Tarjeta — inicializar solo una vez
+  if(_sqCard){
+    document.getElementById('sq-loading').style.display='none';
+    document.getElementById('sq-card-container').style.display='block';
+    document.getElementById('sq-pay-btn').disabled=false;
+    return;
+  }
+  try{
     _sqCard=await _sqPayments.card({style:{
       '.input-container':{borderColor:'#ddd',borderRadius:'10px'},
       '.input-container.is-focus':{borderColor:'#FAA83C'},
@@ -1789,6 +1835,18 @@ async function initSquare(){
     document.getElementById('sq-pay-btn').disabled=false;
   }catch(e){ document.getElementById('sq-loading').textContent='⚠️ Error: '+(e?.message||e?.toString()||'desconocido'); console.error('Square init error:',e); }
 }
+async function processPayment(token){
+  const name=document.getElementById('cName').value.trim();
+  const phone=document.getElementById('cPhone').value.trim();
+  if(!name||!phone){ showToast('⚠️ Ingresa tu nombre y teléfono','info'); return; }
+  const{total}=totals();
+  try{
+    const resp=await fetch(BACKEND_URL+'/api/pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sourceId:token,amount:total,items:cart.map(i=>({id:i.id,name:i.name,price:i.price,qty:i.qty,details:i.details})),customer:{name,phone,email:document.getElementById('cEmail').value.trim()},orderType:document.getElementById('cType').value,location:document.getElementById('cLoc').value,notes:document.getElementById('cNotes').value.trim()})});
+    const data=await resp.json();
+    if(data.success){ const rl=document.getElementById('sq-receipt-link'); if(data.receiptUrl){rl.href=data.receiptUrl;rl.style.display='inline';}else{rl.style.display='none';} closeCheckout(); document.getElementById('successModal').classList.add('open'); }
+    else{ showToast('⚠️ '+(data.message||data.error||'No se pudo procesar el pago'),'info'); }
+  }catch(e){ showToast('⚠️ Error de conexión con el servidor','info'); }
+}
 async function sendOrder(){
   const name=document.getElementById('cName').value.trim();
   const phone=document.getElementById('cPhone').value.trim();
@@ -1802,11 +1860,9 @@ async function sendOrder(){
   try{
     const result=await _sqCard.tokenize();
     if(result.status!=='OK'){ showToast('⚠️ '+(result.errors?.[0]?.message||'Verifica los datos de tu tarjeta'),'info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; return; }
-    const resp=await fetch(BACKEND_URL+'/api/pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sourceId:result.token,amount:total,items:cart.map(i=>({id:i.id,name:i.name,price:i.price,qty:i.qty,details:i.details})),customer:{name,phone,email:document.getElementById('cEmail').value.trim()},orderType:document.getElementById('cType').value,location:document.getElementById('cLoc').value,notes:document.getElementById('cNotes').value.trim()})});
-    const data=await resp.json();
-    if(data.success){ const rl=document.getElementById('sq-receipt-link'); if(data.receiptUrl){rl.href=data.receiptUrl;rl.style.display='inline';}else{rl.style.display='none';} closeCheckout(); document.getElementById('successModal').classList.add('open'); }
-    else{ showToast('⚠️ '+(data.message||data.error||'No se pudo procesar el pago'),'info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
-  }catch(e){ showToast('⚠️ Error de conexión con el servidor','info'); payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`; }
+    await processPayment(result.token);
+  }catch(e){ showToast('⚠️ Error de conexión con el servidor','info'); }
+  payBtn.disabled=false; payBtn.textContent=`💳 Pagar $${total.toFixed(2)}`;
 }
 
 /* ── TOAST ── */

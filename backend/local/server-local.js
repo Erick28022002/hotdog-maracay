@@ -182,6 +182,9 @@ function supabaseDeleteExact(paymentId) {
 let orders   = [];
 let counters = {};
 const knownSquareIds = new Set();
+// Última cuenta dividida vista por sede: { base, ts } — para detectar el primer
+// fragmento del split, que a veces conserva el nombre original sin sufijo "- N".
+const lastSplitByLoc = {};
 
 // Hash corto y estable de un texto (para IDs deterministas)
 function hashStr(s) {
@@ -217,6 +220,53 @@ function aggItems(items) {
 // Firma estable de una orden: independiente del orden de líneas y modificadores
 function itemsSig(items) {
   return [...aggItems(items).entries()].map(([k, v]) => k + 'x' + v.qty).sort().join('||');
+}
+
+// Detecta si un ticket_name de Square es un fragmento de "Split ticket" (cuenta
+// dividida para cobrar por separado), NO un pedido nuevo. Square nombra los
+// fragmentos "Nombre - 2", "Nombre - 3", etc. — un patrón que el personal nunca
+// usa a mano (siempre ponen "Mesa 1", solo un número, etc.). El primer fragmento
+// a veces conserva el nombre SIN sufijo, por eso se recuerda por unos segundos
+// para atraparlo también. Ya venían PREPARADOS bajo el ticket original — si los
+// tratáramos como pedido nuevo, el cocinero los prepararía de más.
+const SPLIT_FRAGMENT_WINDOW_MS = 3000;
+function isSplitFragment(ticketName, sede) {
+  const name = (ticketName || '').trim();
+  if (!name) return false;
+  const m = name.match(/^(.+?)\s*-\s*\d+$/); // "Hola - 2" → base "Hola"
+  const now = Date.now();
+  if (m) {
+    lastSplitByLoc[sede] = { base: m[1].trim().toLowerCase(), ts: now };
+    return true;
+  }
+  const last = lastSplitByLoc[sede];
+  if (last && (now - last.ts) < SPLIT_FRAGMENT_WINDOW_MS && name.toLowerCase() === last.base) {
+    return true; // primer fragmento del split, sin sufijo
+  }
+  return false;
+}
+
+// Justo ANTES de que Square reparta los ítems de un ticket dividido en sus
+// fragmentos, a veces reporta brevemente esos mismos ítems como "agregados" al
+// ticket original YA preparado (efecto secundario del propio proceso de split).
+// Nuestra lógica de "Mesa servida" interpreta eso como una ronda adicional real
+// y crea una tarjeta nueva. La ronda se crea de inmediato (igual que antes, para
+// no estorbar si el usuario cancela algo de verdad mientras tanto — esa lógica
+// de cancelación ya funciona sobre la fila una vez que existe). Unos segundos
+// después se revisa si en realidad era el eco de un split del MISMO ticket; si
+// sí, se retira (borra) — si el usuario ya la canceló él mismo, el borrado no
+// tiene efecto (la fila ya no existe).
+const SPLIT_RETRACT_DELAY_MS = 5000;
+function scheduleRetractIfSplit(sede, ticketName, paymentId) {
+  const baseName = (ticketName || '').trim().toLowerCase();
+  const queuedAt = Date.now();
+  setTimeout(() => {
+    const split = lastSplitByLoc[sede];
+    if (split && split.ts >= queuedAt && split.base === baseName) {
+      console.log(`[SQUARE][${sede}] ronda adicional retirada (coincidía con cuenta dividida): ${paymentId}`);
+      supabaseDeleteExact(paymentId);
+    }
+  }, SPLIT_RETRACT_DELAY_MS);
 }
 
 // Aplica adiciones y cancelaciones sobre los ítems de una ronda abierta.
@@ -684,12 +734,16 @@ async function pollSquare(loc) {
               } else if (addedItems.length) {
                 // No hay ronda abierta → crear nueva con lo añadido (las cancelaciones ya preparadas no se tocan)
                 console.log(`[SQUARE][${loc.sede}] ${customerName} — ${addedItems.length} ítem(s) adicionales (ronda nueva)`);
+                const addPaymentId = ord.id + '_add_' + hashStr(itemsSig(items));
                 supabaseInsert({
                   customer_name: customerName, customer_phone: '',
                   items: addedItems, total: 0, order_type: orderType, channel,
                   location: loc.sede, notes: 'Mesa servida', status: 'new',
-                  payment_id: ord.id + '_add_' + hashStr(itemsSig(items)),
+                  payment_id: addPaymentId,
                 });
+                // Si resulta ser el eco de un split en curso para este mismo ticket,
+                // se retira sola unos segundos después (ver scheduleRetractIfSplit).
+                scheduleRetractIfSplit(loc.sede, ord.ticket_name, addPaymentId);
               }
             }
           } else {
@@ -708,8 +762,30 @@ async function pollSquare(loc) {
       const customerName = ord.ticket_name || 'Cliente POS';
       const orderNote    = ord.metadata?.note || '';
       const total        = (ord.total_money?.amount || 0) / 100;
-      const orderNum     = nextOrderNum(loc.sede);
       const now          = new Date().toISOString();
+
+      // Fragmento de cuenta dividida (Split ticket): ya se preparó bajo el ticket
+      // original — se registra directamente como completado para que NO aparezca
+      // como pedido nuevo en el KDS (evita que el cocinero la prepare de más).
+      if (isSplitFragment(ord.ticket_name, loc.sede)) {
+        orders.push({
+          id: 'sq-' + ord.id, source: 'pos', square_id: ord.id,
+          location: loc.sede, status: 'completed', order_type: orderType,
+          customer: { name: customerName, phone: '' },
+          items, notes: orderNote, amount: total,
+          order_num: null, createdAt: ord.created_at || now, created_at: ord.created_at || now,
+        });
+        supabaseInsert({
+          customer_name: customerName, customer_phone: '',
+          items, total, order_type: orderType, channel,
+          location: loc.sede, notes: orderNote, status: 'completed',
+          payment_id: ord.id,
+        });
+        console.log(`[SQUARE][${loc.sede}] "${customerName}" — fragmento de cuenta dividida, registrado como ya preparado (no aparece en el KDS)`);
+        continue;
+      }
+
+      const orderNum = nextOrderNum(loc.sede);
 
       orders.push({
         id: 'sq-' + ord.id, source: 'pos', square_id: ord.id,

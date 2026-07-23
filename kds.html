@@ -210,6 +210,8 @@
     .perro-block { padding:1px 0 }
     .perro-hd  { font-size:13px; font-weight:900; text-transform:uppercase; letter-spacing:.5px; color:var(--accent); margin:2px 0 3px }
     .perro-hd-2 { margin-top:6px; padding-top:6px; border-top:1px dashed #CCC }
+    /* Solo el HOTDOG marcado "para llevar" dentro de una promo dividida se pinta gris */
+    .perro-block.perro-takeout { background:#AEAEAE; border-radius:7px; padding:5px 8px; margin:2px -8px }
 
     /* #3 Insignia de canal de venta */
     .tk-badges-row { margin-top:7px; display:flex; gap:6px; flex-wrap:wrap }
@@ -959,10 +961,17 @@ function autoSplitCombo(parts) {
 function isPremiumMod(s) {
   return /\bbacon\b|tocin(o|eta)|q(?:ueso|s)\.?\s*de\s*mano/i.test(s || '');
 }
+// "para llevar" / "llevar" como parte suelta → no es un modificador, es marca de empaque
+function isTakeoutMod(s) {
+  return /^(para\s+)?llevar$/i.test((s || '').trim());
+}
 function buildModsHtml(parts) {
   const sins = [], extras = [], neutrals = [], premium = [];
+  let takeout = false;
   parts.forEach(part => {
-    if (/^(sin|no)\s+/i.test(part))
+    if (isTakeoutMod(part))
+      takeout = true;
+    else if (/^(sin|no)\s+/i.test(part))
       sins.push(part.replace(/^(sin|no)\s+/i, '').trim());
     else if (isPremiumMod(part))            // bacon / queso de mano (positivo) → cuadro destacado
       premium.push(part);
@@ -998,7 +1007,7 @@ function buildModsHtml(parts) {
     html += '<div class="tk-mod extra">➕ ' + colorizeRaw(ex) + suffix + '</div>';
   });
 
-  // Variantes neutras siempre al final, antes de "PARA LLEVAR"
+  // Variantes neutras siempre al final
   neutrals.forEach(p => { html += '<div class="tk-mod extra">➕ ' + colorizeRaw(p) + '</div>'; });
 
   // Cuadro destacado para adicionales premium (Bacon / Queso de mano) — color provisional
@@ -1011,12 +1020,15 @@ function buildModsHtml(parts) {
     '</div>';
   }
 
-  return html;
+  return { html, takeout };
 }
 
-/* ── MODIFICADORES (punto de entrada) ── */
+/* ── MODIFICADORES (punto de entrada) ──
+   Devuelve { html, takeout, split }. "takeout" solo viene en true cuando el
+   ítem NO se dividió — si se dividió, cada HOTDOG marca su propia caja gris
+   y el ítem completo ya no debe pintarse gris. */
 function parseMods(details, productName) {
-  if (!details) return '';
+  if (!details) return { html: '', takeout: false, split: false };
   const parts = details.split('·').map(p => p.trim()).filter(p => p && !/^(normal|regular)$/i.test(p));
 
   // #6 Dividir SOLO cuando existe marcador explícito en Square ("Hot Dog 2", "Perro 2", "#2")
@@ -1024,19 +1036,21 @@ function parseMods(details, productName) {
   if (groups.size > 1) {
     let html = '', n = 1;
     groups.forEach((subParts) => {
-      html += '<div class="perro-block" data-perro="' + n + '">';
+      const { html: modsHtml, takeout } = buildModsHtml(subParts);
+      html += '<div class="perro-block' + (takeout ? ' perro-takeout' : '') + '" data-perro="' + n + '">';
       if (n === 1) html += '<div class="perro-hd">🌭 HOTDOG 1</div>';
       else         html += '<div class="perro-hd perro-hd-2">🌭 HOTDOG ' + n + '</div>';
-      const mods = buildModsHtml(subParts);
-      html += mods || '<div class="tk-mod keep">✔ CON TODO</div>';
+      html += modsHtml || '<div class="tk-mod keep">✔ CON TODO</div>';
+      if (takeout) html += '<div class="tk-mod" style="color:#555;font-weight:700;font-size:13px;margin-top:1px">PARA LLEVAR</div>';
       html += '</div>';
       n++;
     });
-    return html;
+    return { html, takeout: false, split: true };
   }
 
   // Ítem simple (no se divide sin marcador HOTDOG 2 — spec #6)
-  return buildModsHtml(parts);
+  const r = buildModsHtml(parts);
+  return { html: r.html, takeout: r.takeout, split: false };
 }
 
 /* ── PANEL DE PRODUCCIÓN ── */
@@ -1177,44 +1191,55 @@ function render() {
     const groupedItems = groupAndSortItems(items);
     const itemsHtml = groupedItems.map((it, idx) => {
       const rawDetails    = it.details || it.note || '';
-      // ítem "para llevar" si lo dice en detalles O en su nota (📝)
+      // ítem "para llevar" si lo dice en detalles O en su nota (📝) — señal a nivel de ítem completo,
+      // solo se usa para pintar el ítem entero cuando NO se divide en HOTDOG 1/2 (ver isSplit abajo).
       const isItemTakeout = hasLlevar(rawDetails) || hasLlevar(it.note_text || '');
-      // Quitar "llevar"/"para llevar" antes de parsear mods — así si queda vacío aparece CON TODO
-      const cleanDetails  = stripDrinkMods(rawDetails.replace(/\s*·?\s*(para\s+)?llevar\s*·?\s*/gi, ' ').trim().replace(/^\s*·|·\s*$/g, '').trim());
+      const cleanDetails  = stripDrinkMods(rawDetails.trim().replace(/^\s*·|·\s*$/g, '').trim());
       const pm            = productMatch(it.name || '');
       const noteText      = (it.note_text || '').trim();
       // nota real (no solo "llevar"): es una instrucción específica de cómo quieren el producto
       const hasNote       = noteText && !/^(para\s+)?llevar$/i.test(noteText);
       let contentHtml;
+      let isSplit = false;
       if (it.components && it.components.length) {
         // ── Clover compuesto: Hot Dog 1 / Hot Dog 2 (+ general) ──
         // mods → verde/rojo (buildModsHtml). notes (#N) → franja AMARILLA (clase solo).
+        // "para llevar" se detecta POR COMPONENTE, así solo se pinta gris el HOTDOG marcado.
+        isSplit = true;
         let html = '';
         it.components.forEach((c, i) => {
-          html += '<div class="perro-block" data-perro="' + (i + 1) + '">';
+          const compNotes    = (c.notes || []).filter(Boolean);
+          const noteTakeout  = compNotes.some(isTakeoutMod);
+          const cleanNotes   = compNotes.filter(n => !isTakeoutMod(n));
+          const { html: modsHtml, takeout: modsTakeout } = buildModsHtml((c.mods || []).filter(Boolean));
+          const compTakeout  = modsTakeout || noteTakeout;
+          const notesHtml    = cleanNotes.map(n => '<div class="tk-mod solo">' + esc(n.toUpperCase()) + '</div>').join('');
+          html += '<div class="perro-block' + (compTakeout ? ' perro-takeout' : '') + '" data-perro="' + (i + 1) + '">';
           html += '<div class="perro-hd' + (i > 0 ? ' perro-hd-2' : '') + '">🌭 HOTDOG ' + (i + 1) + '</div>';
-          const modsHtml  = buildModsHtml((c.mods || []).filter(Boolean));
-          const notesHtml = (c.notes || []).filter(Boolean)
-            .map(n => '<div class="tk-mod solo">' + esc(n.toUpperCase()) + '</div>').join('');
           html += (modsHtml + notesHtml) || '<div class="tk-mod keep">✔ CON TODO</div>';
+          if (compTakeout) html += '<div class="tk-mod" style="color:#555;font-weight:700;font-size:13px;margin-top:1px">PARA LLEVAR</div>';
           html += '</div>';
         });
         const gen = (it.general || []).filter(Boolean);
         if (gen.length) {
           html += '<div class="perro-block"><div class="perro-hd perro-hd-2">⚙️ GENERAL</div>' +
-                  buildModsHtml(gen) + '</div>';
+                  buildModsHtml(gen).html + '</div>';
         }
         contentHtml = html;
       } else {
-        const modsHtml    = parseMods(cleanDetails, it.name || '');
+        const parsed      = parseMods(cleanDetails, it.name || '');
+        isSplit           = parsed.split;
         // Si hay una NOTA y NINGÚN modificador, la nota ES la instrucción → NO mostrar "CON TODO".
-        contentHtml       = modsHtml || ((pm && !hasNote) ? '<div class="tk-mod keep">✔ CON TODO</div>' : '');
+        contentHtml       = parsed.html || ((pm && !hasNote) ? '<div class="tk-mod keep">✔ CON TODO</div>' : '');
       }
       const noteHtml      = hasNote ? '<div class="tk-mod item-note">📝 ' + esc(noteText.toUpperCase()) + '</div>' : '';
-      const llevarHtml    = isItemTakeout ? '<div class="tk-mod" style="color:#555;font-weight:700;font-size:13px;margin-top:1px">PARA LLEVAR</div>' : '';
+      // El ítem completo solo se pinta gris si NO se dividió — si se dividió, cada HOTDOG ya
+      // marcó su propia caja gris arriba y no hay que duplicarla envolviendo todo el ítem.
+      const showItemTakeout = isItemTakeout && !isSplit;
+      const llevarHtml    = showItemTakeout ? '<div class="tk-mod" style="color:#555;font-weight:700;font-size:13px;margin-top:1px">PARA LLEVAR</div>' : '';
       const displayMods   = contentHtml + noteHtml + llevarHtml;
       const sep = idx < groupedItems.length - 1 ? '<div class="tk-item-sep"></div>' : '';
-      return '<div class="tk-item' + (isItemTakeout ? ' item-takeout' : '') + '" data-idx="' + idx + '">' +
+      return '<div class="tk-item' + (showItemTakeout ? ' item-takeout' : '') + '" data-idx="' + idx + '">' +
         '<div class="tk-item-row">' +
           '<div class="tk-qty">' + (it.qty || it.quantity || 1) + '</div>' +
           '<div class="tk-item-info">' +
@@ -1543,7 +1568,19 @@ function subscribeRealtime() {
       const o = payload.new;
       if (o.location !== activeSede) return; // aislamiento por sede
       if (knownIds.has(o.id)) return;
-      knownIds.add(o.id); orders.push(o);
+      knownIds.add(o.id);
+      if (o.status === 'completed') {
+        // Ya llega completada (ej. fragmento de cuenta dividida en Square) — no es
+        // un pedido nuevo: va directo al historial, sin sonar ni mostrar tarjeta.
+        if (!history.find(h => h.id === o.id)) {
+          history.unshift({ ...o, completedAt: o.updated_at || o.created_at });
+          history.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+          pruneHistory();
+          saveHistory();
+        }
+        return;
+      }
+      orders.push(o);
       pendingActive.set(o.id, Date.now()); // proteger del polling hasta que la BD la confirme
       render(); beep();
       toast('🌭 Nuevo pedido — ' + (o.customer_name || ''));

@@ -134,23 +134,28 @@
       <div class="add-item-row">
         <select id="itemSelect">
           <option value="">— Selecciona un producto —</option>
-          <optgroup label="Hot Dogs">
-            <option value="Clásico Pro">Clásico Pro</option>
-            <option value="Miami Style">Miami Style</option>
-            <option value="HD con Carne Mechada">HD con Carne Mechada</option>
-            <option value="Hot Dog Venezolano">Hot Dog Venezolano</option>
-            <option value="Reina Pepiada">Reina Pepiada</option>
-            <option value="HD con Pernil">HD con Pernil</option>
+          <optgroup label="🌭 Promos (2 HDs + bebida)">
+            <option value="Promo Clásica">Promo Clásica — $12.50</option>
+            <option value="Promo de Carne Mechada">Promo de Carne Mechada — $19.99</option>
+            <option value="Promo de Bacon">Promo de Bacon — $16.50</option>
+            <option value="Promo de Queso de Mano">Promo de Queso de Mano — $16.50</option>
           </optgroup>
-          <optgroup label="Extras / Combos">
-            <option value="Combo Clásico">Combo Clásico</option>
-            <option value="Papas Fritas">Papas Fritas</option>
+          <optgroup label="🌭 Hot Dogs individuales">
+            <option value="Hot Dog Clásico">Hot Dog Clásico — $6.85</option>
+            <option value="Hot Dog con Carne Mechada">Hot Dog con Carne Mechada — $10.99</option>
+            <option value="Hot Dog con Bacon">Hot Dog con Bacon — $8.85</option>
+            <option value="Hot Dog con Queso de Mano">Hot Dog con Queso de Mano — $8.85</option>
           </optgroup>
-          <optgroup label="Bebidas">
-            <option value="Coca-Cola">Coca-Cola</option>
-            <option value="Coca-Cola Zero">Coca-Cola Zero</option>
+          <optgroup label="🥤 Bebidas">
+            <option value="Coca Cola">Coca Cola</option>
+            <option value="Coca Cola Zero">Coca Cola Zero</option>
+            <option value="Diet Coke">Diet Coke</option>
             <option value="Sprite">Sprite</option>
+            <option value="Nestea Limón">Nestea Limón</option>
+            <option value="Nestea Durazno">Nestea Durazno</option>
+            <option value="Frescolita">Frescolita</option>
             <option value="Malta">Malta</option>
+            <option value="Uvita">Uvita</option>
             <option value="Agua">Agua</option>
           </optgroup>
         </select>
@@ -158,7 +163,7 @@
       </div>
 
       <label>Personalizaciones (opcional)</label>
-      <input type="text" id="itemDetails" placeholder="Sin: Mostaza · Extra: Queso · Salsas: Ajo, Rosada">
+      <input type="text" id="itemDetails" placeholder="Sin: Cebolla, Mostaza · Extra: Queso de Mano · Salsas: Ajo, BBQ">
 
       <label>Notas del pedido</label>
       <textarea id="notes" placeholder="Ej: Sin cebolla en todo, segunda planta…"></textarea>
@@ -180,7 +185,7 @@
 </div>
 
 <script>
-const BACKEND = 'https://hotdog-backend-production-0c45.up.railway.app';
+const BACKEND = 'http://localhost:3000';
 
 /* Ítems acumulados en el pedido */
 let items = [];
