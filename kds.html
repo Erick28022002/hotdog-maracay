@@ -965,6 +965,29 @@ function isPremiumMod(s) {
 function isTakeoutMod(s) {
   return /^(para\s+)?llevar$/i.test((s || '').trim());
 }
+// ¿El ÍTEM COMPLETO es para llevar? En una promo dividida (HOTDOG 1/2) solo cuenta
+// si TODOS los sub-items lo piden — uno solo no hace "para llevar" a la orden entera
+// (eso lo pinta el HOTDOG específico, ver perro-takeout). Se usa para decidir si la
+// ORDEN COMPLETA se marca como para llevar (franja negra + ticket gris).
+function isItemFullyTakeout(it) {
+  const noteTakeout = /llevar/i.test(it.note_text || '');
+  if (it.components && it.components.length) {
+    return it.components.every(c => {
+      const mods  = (c.mods  || []).filter(Boolean);
+      const notes = (c.notes || []).filter(Boolean);
+      return mods.some(isTakeoutMod) || notes.some(isTakeoutMod);
+    });
+  }
+  const rawDetails = it.details || it.note || '';
+  const parts  = rawDetails.split('·').map(p => p.trim()).filter(Boolean);
+  const groups = splitBySubItem(parts);
+  if (groups.size > 1) {
+    let allTakeout = true;
+    groups.forEach(subParts => { if (!subParts.some(isTakeoutMod)) allTakeout = false; });
+    return allTakeout || noteTakeout;
+  }
+  return /llevar/i.test(rawDetails) || noteTakeout;
+}
 function buildModsHtml(parts) {
   const sins = [], extras = [], neutrals = [], premium = [];
   let takeout = false;
@@ -1182,9 +1205,11 @@ function render() {
     const tl           = timeLevel(mins);
     const isDeliveryApp  = ['uber', 'doordash'].includes((o.channel || '').toLowerCase());
     const notesLower     = (o.notes || '').toLowerCase();
-    // "llevar" en CUALQUIER lugar (nombre/título, notas, ítems) ⇒ orden para llevar
+    // "llevar" en CUALQUIER lugar (nombre/título, notas) ⇒ orden para llevar.
+    // Los ÍTEMS se evalúan con isItemFullyTakeout: en una promo dividida, un solo
+    // HOTDOG marcado no basta para que la orden ENTERA se considere para llevar.
     const hasLlevar      = s => /llevar/i.test(s || '');
-    const allItemsLlevar = items.length > 0 && items.every(it => hasLlevar(it.details || it.note || '') || hasLlevar(it.note_text || ''));
+    const allItemsLlevar = items.length > 0 && items.every(isItemFullyTakeout);
     const isTakeout      = (o.order_type === 'pickup' || hasLlevar(o.notes) || hasLlevar(o.customer_name) || allItemsLlevar) && !isDeliveryApp;
     const custName     = o.customer_name || 'Cliente';
 
